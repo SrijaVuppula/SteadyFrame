@@ -15,6 +15,8 @@ class Trace:
         path: str | Path | None = None,
         job_id: str = "local",
         sink: Callable[[dict], None] | None = None,
+        *,
+        append: bool = True,
     ):
         self.path = Path(path) if path else None
         self.job_id = job_id
@@ -24,7 +26,16 @@ class Trace:
         self._seq = 0
         if self.path:
             self.path.parent.mkdir(parents=True, exist_ok=True)
-            self.path.write_text("")
+            if append and self.path.exists():
+                # a resumed job keeps its first-run trace and continues the sequence numbers
+                try:
+                    last = [line for line in self.path.read_text().splitlines() if line.strip()]
+                    if last:
+                        self._seq = int(json.loads(last[-1]).get("seq", 0))
+                except Exception:
+                    pass
+            else:
+                self.path.write_text("")
 
     def log(self, kind: str, name: str, **fields) -> dict:
         self._seq += 1
