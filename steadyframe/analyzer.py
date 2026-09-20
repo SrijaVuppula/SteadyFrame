@@ -23,7 +23,7 @@ from . import __version__, opencv_build_summary
 from .area import AreaChecker
 from .flash import TransitionTracker, WindowCounter
 from .io.video import VideoMeta, open_video
-from .luminance import downsample, relative_luminance
+from .luminance import grid_maps, relative_luminance
 from .pattern import PatternDetector
 from .profiles import Profile, get_profile
 from .redflash import RedTracker
@@ -102,12 +102,11 @@ class FlashAnalyzer:
     # ------------------------------------------------------------------ per frame
     def push(self, frame_bgr: np.ndarray, t: float) -> _Frame:
         p = self.p
-        lum = relative_luminance(frame_bgr)
-        lum_g = downsample(lum, self.gw, self.gh)
+        lum_g, ratio_g, value_g = grid_maps(frame_bgr, self.gw, self.gh)
         if self.keep_history and len(self.lum_history) < self.max_history:
             self.lum_history.append(lum_g.astype(np.float16))
         ev_l = self.lum_tracker.push(lum_g, lum_g < p.dark_state_max, t)
-        ev_r, _ = self.red.push(frame_bgr, t)
+        ev_r, _ = self.red.push_grids(ratio_g, value_g, t)
         rec = _Frame(self.n_frames, t, float(lum_g.mean()))
         limit = p.max_transitions_per_window
         for typ, ev in (("general", ev_l), ("red", ev_r)):
@@ -128,7 +127,7 @@ class FlashAnalyzer:
             rec.verdict[typ] = verdict
             self._update_segment(typ, rec, verdict, hit_mask, ev.magnitude)
         if self.pattern is not None:
-            self.pattern.analyze(lum, t)
+            self.pattern.analyze(relative_luminance(frame_bgr), t)
         self.frames.append(rec)
         self.n_frames += 1
         self.last_t = t
