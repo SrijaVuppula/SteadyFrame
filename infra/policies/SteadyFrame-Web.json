@@ -1,0 +1,153 @@
+{
+  "policies": {
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C256MiBServiceRoleDefaultPolicyE5468F0E": {
+      "policy_document": {
+        "Statement": [
+          {
+            "Action": [
+              "s3:GetObject*",
+              "s3:GetBucket*",
+              "s3:List*"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":s3:::",
+                    {
+                      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                    }
+                  ]
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":s3:::",
+                    {
+                      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "Action": [
+              "s3:GetObject*",
+              "s3:GetBucket*",
+              "s3:List*",
+              "s3:DeleteObject*",
+              "s3:PutObject",
+              "s3:PutObjectLegalHold",
+              "s3:PutObjectRetention",
+              "s3:PutObjectTagging",
+              "s3:PutObjectVersionTagging",
+              "s3:Abort*"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::GetAtt": [
+                  "WebBucket12880F5B",
+                  "Arn"
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::GetAtt": [
+                        "WebBucket12880F5B",
+                        "Arn"
+                      ]
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "Action": [
+              "cloudfront:GetInvalidation",
+              "cloudfront:CreateInvalidation"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "roles": [
+        {
+          "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C256MiBServiceRoleF991ED9F"
+        }
+      ]
+    }
+  },
+  "roles": {
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C256MiBServiceRoleF991ED9F": {
+      "assume_role_policy": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "inline_policies": [],
+      "managed_policies": [
+        {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            ]
+          ]
+        }
+      ]
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+      "assume_role_policy": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "inline_policies": [],
+      "managed_policies": [
+        {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        }
+      ]
+    }
+  }
+}

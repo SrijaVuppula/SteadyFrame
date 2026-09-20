@@ -1,0 +1,13 @@
+{
+  "name": "steadyframe-infra",
+  "private": true,
+  "description": "pins the CDK CLI; the constructs are Python (see requirements-infra.lock)",
+  "devDependencies": {
+    "aws-cdk": "2.1142.0"
+  },
+  "scripts": {
+    "synth": "cdk synth --no-lookups",
+    "deploy": "cdk deploy --all --require-approval never --outputs-file cdk-outputs.json",
+    "destroy": "cdk destroy --all --force"
+  }
+}
