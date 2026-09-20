@@ -104,3 +104,37 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 - "SteadyFrame" is used by a few unrelated video production companies (steadyframeatl.com,
   steadyandframe.com, steadyframe.in) and nothing in software/accessibility. No trademark hit
   found for a software product. Decision: keep the name; the GitHub repo is `steadyframe`.
+
+## 2026-09-20  Analyzer: grid-first per-frame path
+
+- Per-pixel luminance + red metrics (LUT, transform, split, divide on 921k pixels) cost
+  ~19 ms per 720p frame, 11 ms of it in `cv2.split`. Linearising once and INTER_AREA
+  downsampling the 3-channel linear frame to the grid before `cv2.transform` is exact for
+  luminance (linear map of a mean = mean of the map) and moves the red metrics to the
+  cell-average colour. 1.6 ms per frame afterwards; detection results identical on the suite.
+- Consequence recorded in STANDARDS.md: the red rule is evaluated on the cell-average colour.
+
+## 2026-09-20  S1 blends in linear light
+
+- Averaging sRGB code values left a 24% residual luminance swing on a 6 Hz square wave with
+  alpha 0.1 where the EMA maths says 13%; in linear light the measurement matches the
+  prediction, and the parameter hint `alpha` from the measured swing/rate becomes usable.
+
+## 2026-09-20  Mask feathering is outward only
+
+- A Gaussian feather applied to the exact region box gave the region's edge pixels ~84%
+  weight; the analyzer kept failing those edge cells. The box is now padded by 3 sigma
+  before the blur so every original pixel keeps weight >= 0.99.
+
+## 2026-09-20  Human decisions are consumed once
+
+- A decision passed on resume applied to every later `request_human_approval` for the same
+  segment, so one rejection rejected everything. Decisions are popped on first use; a new
+  request pauses the job again.
+
+## 2026-09-20  Heuristic provider
+
+- `eval/agent_vs_fixed.py` needs an offline agent; the `HeuristicProvider` follows the
+  exact tool protocol and uses the parameter hints. It is labelled everywhere as a stand-in
+  and the report keeps a separate row for the live Bedrock run.
+
