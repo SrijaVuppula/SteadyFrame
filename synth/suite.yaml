@@ -1,0 +1,239 @@
+# Synthetic hazard suite. Regions are normalised (x, y, w, h). Boundary cases are rendered
+# losslessly (libx264rgb) and aligned to the 64x48 analysis grid of a 320x240 frame
+# (1 cell = 5 px = 1/64 x 1/48), so quantisation cannot decide the verdict for us.
+# The 10-degree window on that grid is 21 x 16 = 336 cells.
+
+defaults: &defaults
+  width: 320
+  height: 240
+  fps: 30
+  duration_s: 5.0
+  codec: h264
+  crf: 18
+
+clips:
+  # ---------------------------------------------------------------- boundary: rate
+  - name: b_rate_3hz
+    <<: *defaults
+    codec: lossless
+    boundary_case: "exactly three flashes per second -> pass"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 3.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+  - name: b_rate_3p5hz
+    <<: *defaults
+    codec: lossless
+    boundary_case: "3.5 flashes per second -> fail"
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 3.5, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+  - name: b_rate_4hz
+    <<: *defaults
+    codec: lossless
+    boundary_case: "4 flashes per second -> fail"
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 4.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- boundary: delta
+  - name: b_delta_0p09
+    <<: *defaults
+    codec: lossless
+    boundary_case: "luminance swing 0.09 (< 0.10) -> pass"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.30, delta_L: 0.09, delta_side: below, start_s: 0.5, end_s: 4.5}]
+  - name: b_delta_0p11
+    <<: *defaults
+    codec: lossless
+    boundary_case: "luminance swing 0.11 (>= 0.10) -> fail"
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.30, delta_L: 0.11, delta_side: above, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- boundary: dark state
+  - name: b_dark_0p79
+    <<: *defaults
+    codec: lossless
+    boundary_case: "darker state L=0.79 (< 0.80) -> fail"
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.79, delta_L: 0.15, delta_side: above, start_s: 0.5, end_s: 4.5}]
+  - name: b_dark_0p81
+    <<: *defaults
+    codec: lossless
+    boundary_case: "darker state L=0.81 (>= 0.80) -> pass"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.815, delta_L: 0.15, delta_side: above, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- boundary: area
+  - name: b_area_24pct
+    <<: *defaults
+    codec: lossless
+    boundary_case: "9x9 cells = 24.1% of the 21x16 window -> pass"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.3125, y: 0.208333, w: 0.140625, h: 0.1875}}]
+  - name: b_area_26pct
+    <<: *defaults
+    codec: lossless
+    boundary_case: "8x11 cells = 26.2% of the 21x16 window -> fail"
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.3125, y: 0.208333, w: 0.125, h: 0.229167}}]
+
+  # ---------------------------------------------------------------- negatives
+  - name: n_slow_fade
+    <<: *defaults
+    codec: lossless
+    boundary_case: "3 s fade black->white then back -> pass"
+    expected_verdict: pass
+    duration_s: 7.0
+    events:
+      - {kind: fade, from: black, to: white, start_s: 0.5, end_s: 3.5}
+      - {kind: fade, from: white, to: black, start_s: 3.5, end_s: 6.5}
+  - name: n_scene_cuts
+    <<: *defaults
+    codec: lossless
+    boundary_case: "hard cuts every 0.5 s (1 flash/s) -> pass"
+    expected_verdict: pass
+    duration_s: 6.0
+    events: [{kind: flash, freq_hz: 1.0, waveform: square, low: [20, 30, 60], high: [230, 220, 200], start_s: 0.0, end_s: 6.0}]
+  - name: n_single_camera_flash
+    <<: *defaults
+    codec: lossless
+    boundary_case: "one 1-frame white flash -> pass"
+    expected_verdict: pass
+    events: [{kind: fill, color: white, start_s: 2.0, end_s: 2.034}]
+  - name: n_small_strobe_under_area
+    <<: *defaults
+    codec: lossless
+    boundary_case: "10 Hz strobe covering 10% of the window -> pass (area)"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 10.0, waveform: square, low_L: 0.05, delta_L: 0.6, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.40625, y: 0.416667, w: 0.09375, h: 0.125}}]
+  - name: n_two_distant_strobes
+    <<: *defaults
+    codec: lossless
+    boundary_case: "two 15%-of-window strobes in opposite corners -> pass"
+    expected_verdict: pass
+    events:
+      - {kind: flash, freq_hz: 8.0, waveform: square, low_L: 0.05, delta_L: 0.6, start_s: 0.5, end_s: 4.5,
+         region: {x: 0.015625, y: 0.020833, w: 0.109375, h: 0.145833}}
+      - {kind: flash, freq_hz: 8.0, waveform: square, low_L: 0.05, delta_L: 0.6, start_s: 0.5, end_s: 4.5,
+         region: {x: 0.875, y: 0.833333, w: 0.109375, h: 0.145833}}
+  - name: n_near_red_not_saturated
+    <<: *defaults
+    codec: lossless
+    boundary_case: "red with R/(R+G+B)=0.78 and swing 0.084 -> pass (neither rule)"
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low: [180, 72, 72], high: [220, 90, 90], start_s: 0.5, end_s: 4.5}]
+  - name: n_static_texture
+    <<: *defaults
+    background: {kind: texture, lo: 30, hi: 200}
+    boundary_case: "static natural-ish texture -> pass"
+    expected_verdict: pass
+  - name: n_moving_texture
+    <<: *defaults
+    background: {kind: moving, lo: 30, hi: 200, speed_px_s: 60}
+    boundary_case: "panning texture -> pass"
+    expected_verdict: pass
+
+  # ---------------------------------------------------------------- red
+  - name: r_red_strobe_full
+    <<: *defaults
+    codec: lossless
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 5.0, waveform: square, low: darkred, high: red, start_s: 0.5, end_s: 4.5}]
+  - name: r_red_strobe_region
+    <<: *defaults
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 5.0, waveform: square, low: [40, 40, 40], high: [255, 20, 20], start_s: 1.0, end_s: 4.0,
+              region: {x: 0.5, y: 0.25, w: 0.4, h: 0.5}}]
+  - name: r_red_to_white
+    <<: *defaults
+    expected_verdict: fail
+    notes: "saturated red <-> white; both general and red rules fire"
+    events: [{kind: flash, freq_hz: 4.0, waveform: square, low: red, high: white, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- frequency sweep
+  - name: f_sweep
+    <<: *defaults
+    crf_variants: [28, 35]
+    sweep: {param: events.0.freq_hz, values: [1, 2, 3, 4, 6, 10, 15]}
+    events: [{kind: flash, freq_hz: 5.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.25, y: 0.25, w: 0.5, h: 0.5}}]
+
+  # ---------------------------------------------------------------- waveforms
+  - name: w_sine_6hz
+    <<: *defaults
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: sine, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+  - name: w_ramp_6hz
+    <<: *defaults
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: ramp, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+  - name: w_triangle_2hz
+    <<: *defaults
+    expected_verdict: pass
+    events: [{kind: flash, freq_hz: 2.0, waveform: triangle, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- area sweep (fraction of window)
+  - name: a_sweep
+    <<: *defaults
+    sweep: {param: events.0.region, labels: [3x3cells, 6x6cells, 11x11cells, 21x16cells, full],
+            values: [{x: 0.3125, y: 0.208333, w: 0.046875, h: 0.0625},
+                                              {x: 0.3125, y: 0.208333, w: 0.09375, h: 0.125},
+                                              {x: 0.3125, y: 0.208333, w: 0.171875, h: 0.229167},
+                                              {x: 0.3125, y: 0.208333, w: 0.328125, h: 0.333333},
+                                              {x: 0.0, y: 0.0, w: 1.0, h: 1.0}]}
+    events: [{kind: flash, freq_hz: 8.0, waveform: square, low_L: 0.05, delta_L: 0.6, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- fps / resolution / aspect
+  - name: v_fps
+    <<: *defaults
+    sweep: {param: fps, values: [24, 25, 60]}
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.25, y: 0.25, w: 0.5, h: 0.5}}]
+  - name: v_720p_16x9
+    <<: *defaults
+    width: 1280
+    height: 720
+    duration_s: 4.0
+    crf_variants: [28]
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 3.5,
+              region: {x: 0.3, y: 0.3, w: 0.4, h: 0.4}}]
+  - name: v_vertical_9x16
+    <<: *defaults
+    width: 180
+    height: 320
+    expected_verdict: fail
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5}]
+
+  # ---------------------------------------------------------------- multi-segment / backgrounds
+  - name: m_two_segments
+    <<: *defaults
+    duration_s: 10.0
+    expected_verdict: fail
+    crf_variants: [28]
+    background: {kind: texture, lo: 30, hi: 160}
+    events:
+      - {kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 1.0, end_s: 3.0,
+         region: {x: 0.1, y: 0.1, w: 0.4, h: 0.4}}
+      - {kind: flash, freq_hz: 10.0, waveform: sine, low_L: 0.1, delta_L: 0.6, start_s: 6.0, end_s: 8.5,
+         region: {x: 0.5, y: 0.5, w: 0.45, h: 0.45}}
+  - name: m_strobe_on_moving_bg
+    <<: *defaults
+    duration_s: 6.0
+    expected_verdict: fail
+    background: {kind: moving, lo: 30, hi: 180, speed_px_s: 50}
+    events: [{kind: flash, freq_hz: 8.0, waveform: square, low_L: 0.05, delta_L: 0.6, start_s: 1.0, end_s: 4.0,
+              region: {x: 0.3, y: 0.2, w: 0.4, h: 0.5}}]
+  - name: m_gradient_bg_strobe
+    <<: *defaults
+    expected_verdict: fail
+    background: {kind: gradient, lo: 20, hi: 220}
+    events: [{kind: flash, freq_hz: 6.0, waveform: square, low_L: 0.05, delta_L: 0.5, start_s: 0.5, end_s: 4.5,
+              region: {x: 0.2, y: 0.2, w: 0.6, h: 0.6}}]
+
+  # ---------------------------------------------------------------- patterns (experimental)
+  - name: p_stripes_static
+    <<: *defaults
+    notes: "8 light-dark pairs across 80% of the frame, static -> pattern risk (experimental)"
+    events: [{kind: stripes, pairs: 8, low: black, high: white, start_s: 0.5, end_s: 4.5, expect_pattern: true,
+              region: {x: 0.1, y: 0.1, w: 0.8, h: 0.8}}]
