@@ -86,8 +86,8 @@ frame rather than a fixed angle, which is only exact for a full-screen 4:3 viewp
 
 Sources: ITU-R BT.1702-2 "Guidance for the reduction of photosensitive epileptic seizures
 caused by television" and Ofcom Broadcasting Code Annex 1 "Guidance notes on flashing images
-and regular patterns in television". The PDFs could not be fetched from my network
-(see DECISIONS.md); the values below are as summarised by Epilepsy Action, the ASA and the
+and regular patterns in television". The PDFs could not be fetched from my machine
+(see NOTES.md); the values below are as summarised by Epilepsy Action, the ASA and the
 ACM TACCESS 2024 gap analysis (10.1145/3694790). **TODO: paste the exact Annex 1 wording here.**
 
 Reported rules:

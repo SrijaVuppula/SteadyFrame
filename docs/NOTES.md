@@ -41,7 +41,7 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 
 ## 2026-09-20  Ofcom / ITU-R BT.1702
 
-- Primary PDFs (ofcom.org.uk, itu.int) were not reachable from my network. The values
+- Primary PDFs (ofcom.org.uk, itu.int) would not load for me at the time. The values
   below are from the Ofcom "Guidance Note for Licensees on Flashing Images and Regular Patterns
   in Television" (Annex 1) as reproduced by Epilepsy Action / ASA summaries and by the
   ACM TACCESS 2024 gap analysis (dl.acm.org/doi/full/10.1145/3694790):

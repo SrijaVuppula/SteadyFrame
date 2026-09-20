@@ -5,7 +5,7 @@ here is redistributed; `python -m synth.fetch_real` downloads each file to `data
 and the label sits next to it. Every entry needs: URL, licence, author, why it is here,
 and a per-second verdict written by hand with `steadyframe analyze --plot` as an aid.
 
-I could not get to Wikimedia Commons, Internet Archive or Pexels, so this
+My machine could not reach Wikimedia Commons, Internet Archive or Pexels, so this
 list is a template I still have to fill in. Rules: CC0 / CC BY / CC BY-SA / Pexels
 licence only; no well-known copyrighted seizure-inducing clips; concert lighting, emergency
 vehicle lights, game footage with a permissive licence, and calm control clips.

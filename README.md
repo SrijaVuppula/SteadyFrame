@@ -78,7 +78,7 @@ docs/          STANDARDS, DECISIONS, PRIOR_ART, AGENT, API, RESPONSIBLE_USE, rep
 ```
 
 Standards text and every
-implementation decision: `docs/STANDARDS.md`, `docs/DECISIONS.md`.
+implementation decision: `docs/STANDARDS.md`, `docs/NOTES.md`.
 
 ## Licence
 

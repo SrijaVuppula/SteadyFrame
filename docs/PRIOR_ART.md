@@ -1,7 +1,7 @@
 # Prior art
 
 Detection of photosensitive hazards in video is not new. This table is what we found on
-2026-09-20 (details and links in DECISIONS.md). Our contribution is the closed loop:
+2026-09-20 (details and links in NOTES.md). Our contribution is the closed loop:
 localise, choose the least invasive fix, apply, re-verify with the same analyzer, escalate or
 ask a human, explain. Nothing more than that is claimed.
 
