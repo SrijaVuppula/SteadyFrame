@@ -1,0 +1,20 @@
+# keep the build context small: only the package, generator, config and service go in
+.git
+.venv
+.hypothesis
+.pytest_cache
+.ruff_cache
+**/__pycache__
+*.egg-info
+data
+eval
+bench
+docs
+web
+infra
+tests
+*.mp4
+*.avi
+*.mov
+*.gif
+*.mkv
