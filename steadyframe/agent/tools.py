@@ -220,6 +220,7 @@ class Job:
                     "min": round(min(series), 4) if series else None,
                     "max": round(max(series), 4) if series else None,
                 },
+                "approval": st.get("approval"),
                 "applicable_strategies": applicable,
                 "parameter_hints": parameter_hints(
                     s, self.profile, self.state["analysis"]["video"]["fps"]
@@ -620,6 +621,7 @@ class Job:
             "iterations": self.state["iterations"],
             "runtime_s": round(runtime_s, 3),
             "job_id": self.job_id,
+            "llm": self.state.get("llm"),
             "pending_approvals": [
                 o["approval"]
                 for o in self.state["segments"].values()
@@ -661,8 +663,7 @@ def parameter_hints(seg: dict, profile: Profile, fps: float) -> dict:
         },
         "S2": {"max_swing": round(min(0.2, max(0.02, target - 0.04)), 3), "mean_alpha": 0.02},
         "S5": {"target_hz": 2.5},
-        "prefer_regional": seg.get("max_area_fraction", 1.0) < 1.0
-        and sum(r["w"] * r["h"] for r in seg.get("regions", [])) < 0.5,
+        "prefer_regional": sum(r["w"] * r["h"] for r in seg.get("regions", [])) < 0.5,
     }
 
 

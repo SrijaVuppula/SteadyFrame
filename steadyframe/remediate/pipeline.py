@@ -62,9 +62,12 @@ def fix_file(
         if summary["verdict"] != "fail" and not job.open_segments():
             job.finalize(dst, plot_path=plot_path)
         else:
-            if policy == "agent":
+            if policy in ("agent", "heuristic"):
                 from ..agent.loop import run_agent
+                from ..agent.providers import make_provider
 
+                if provider is None and policy == "heuristic":
+                    provider = make_provider("heuristic")
                 used_policy = run_agent(job, provider=provider)
             else:
                 from ..agent.policy_fixed import run_fixed_policy

@@ -1,0 +1,21 @@
+# Agent configuration. Nothing here is a secret. Model IDs are never hardcoded in code:
+# STEADYFRAME_BEDROCK_MODEL_ID overrides bedrock.model_id, AWS_REGION overrides bedrock.region.
+bedrock:
+  # Use the cross-region inference profile ID shown in the Bedrock console for a model with
+  # tool-use support (looks like us.<vendor>.<model>-v1:0). fill in after enabling access.
+  model_id: ""
+  region: "us-east-1"
+  max_tokens: 1500
+  temperature: 0.0
+  timeout_s: 60
+  max_retries: 3          # on ThrottlingException / transient errors, exponential backoff
+  # optional, for the cost column in eval/agent_vs_fixed: USD per 1k tokens. Leave 0 if unknown.
+  price_per_1k_input_usd: 0.0
+  price_per_1k_output_usd: 0.0
+
+loop:
+  max_turns: 40            # model turns per job before falling back to the fixed policy
+  max_consecutive_errors: 3
+  max_iterations_per_segment: 4
+  max_iterations_total: 24
+  approval_min_ssim: 0.75
