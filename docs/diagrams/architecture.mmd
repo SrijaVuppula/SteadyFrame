@@ -1,0 +1,15 @@
+flowchart LR
+    U[Browser<br/>React UI on S3 + CloudFront<br/>flash-safe, WCAG AA] -- presigned PUT --> S3[(S3<br/>uploads/ outputs/<br/>24 h lifecycle, SSE)]
+    U -- REST --> APIGW[API Gateway HTTP API]
+    APIGW --> L[Lambda<br/>create job, presign, status,<br/>segments, trace, approve, download]
+    L --> DDB[(DynamoDB<br/>jobs, traces)]
+    L --> SQS[SQS jobs queue + DLQ]
+    SQS --> W[ECS Fargate worker<br/>ARM64 / Graviton<br/>Python 3.11, OpenCV 5, ffmpeg]
+    W --> S3
+    W --> DDB
+    W -- Converse API, tool use --> BR[Amazon Bedrock<br/>tool-use model]
+    W --> CW[CloudWatch<br/>JSON logs, metrics, dashboard, alarms]
+    subgraph COOL["Benchmark path (Phase 7)"]
+        C8G[c8g Graviton4 EC2<br/>COOL AMI = OpenCV 5 + KleidiCV] --- BENCH[bench/run.py<br/>same analyzer code]
+        C7I[c7i x86 EC2<br/>stock OpenCV 5 wheel] --- BENCH
+    end
