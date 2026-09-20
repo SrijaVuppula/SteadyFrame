@@ -1,0 +1,236 @@
+{
+  "label": "local-x86-stock",
+  "env": {
+    "steadyframe": "0.1.0",
+    "opencv_version": "5.0.0",
+    "opencv_file": "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/cv2/__init__.py",
+    "opencv_threads": 4,
+    "cpu_features": "SSE SSE2 SSE3 *SSE4.1 *SSE4.2 *AVX *FP16 *AVX2 *AVX512-SKX",
+    "python": "3.11.15",
+    "machine": "x86_64",
+    "system": "Linux-6.18.44-fc-v37-x86_64-with-glibc2.39",
+    "cpu_count": 4,
+    "numpy": "2.4.6",
+    "cpu_model_name": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "loaded_libraries": [
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/cv2/cv2.abi3.so",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libaom-a0d22147.so.3.14.1",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libavcodec-c4204469.so.62.28.101",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libavformat-4762a711.so.62.12.101",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libavif-43e630fc.so.16.4.2",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libavutil-befbbc48.so.60.26.101",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libcrypto-5409cd36.so.1.1.1k",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libdrm-b0291a67.so.2.4.0",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libgfortran-83c28eba.so.5.0.0",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libopenblasp-r0-59ffcd50.3.15.so",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libpng16-529cb57a.so.16.58.0",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libquadmath-2284e583.so.0.0.0",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libssl-81259c47.so.1.1.1k",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libswresample-2dfded3b.so.6.3.101",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libswscale-fe215b0b.so.9.5.101",
+      "/home/user/SteadyFrame/.venv/lib/python3.11/site-packages/opencv_python_headless.libs/libvpx-4fb239ff.so.11.0.1"
+    ],
+    "kleidicv_loaded": false,
+    "build_information": "\nGeneral configuration for OpenCV 5.0.0 =====================================\n  Version control:               5.0.0\n\n  Platform:\n    Timestamp:                   2026-07-01T09:06:11Z\n    Host:                        Linux 6.8.0-1059-azure x86_64\n    CMake:                       4.3.2\n    CMake generator:             Unix Makefiles\n    CMake build tool:            /bin/gmake\n    Configuration:               Release\n    Algorithm Hint:              ALGO_HINT_ACCURATE\n\n  CPU/HW features:\n    Baseline:                    SSE SSE2 SSE3\n      requested:                 SSE3\n    Dispatched code generation:  SSE4_1 SSE4_2 AVX FP16 AVX2 AVX512_SKX\n      SSE4_1 (18 files):         + SSSE3 SSE4_1\n      SSE4_2 (1 files):          + SSSE3 SSE4_1 POPCNT SSE4_2\n      AVX (17 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX\n      FP16 (0 files):            + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16\n      AVX2 (49 files):           + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3\n      AVX512_SKX (9 files):      + SSSE3 SSE4_1 POPCNT SSE4_2 AVX FP16 AVX2 FMA3 AVX_512F AVX512_COMMON AVX512_SKX\n\n  C/C++:\n    Built as dynamic libs?:      NO\n    C++ standard:                17\n    C++ Compiler:                /opt/rh/gcc-toolset-14/root/usr/bin/c++  (ver 14.2.1)\n    C++ flags (Release):         -Wl,-strip-all   -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -fvisibility-inlines-hidden -O3 -DNDEBUG  -DNDEBUG\n    C++ flags (Debug):           -Wl,-strip-all   -fsigned-char -W -Wall -Wreturn-type -Wnon-virtual-dtor -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -fvisibility-inlines-hidden -g  -O0 -DDEBUG -D_DEBUG\n    C Compiler:                  /opt/rh/gcc-toolset-14/root/usr/bin/cc\n    C flags (Release):           -Wl,-strip-all   -fsigned-char -W -Wall -Wreturn-type -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -O3 -DNDEBUG  -DNDEBUG\n    C flags (Debug):             -Wl,-strip-all   -fsigned-char -W -Wall -Wreturn-type -Waddress -Wsequence-point -Wformat -Wformat-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -msse3 -fvisibility=hidden -g  -O0 -DDEBUG -D_DEBUG\n    Linker flags (Release):      -Wl,--exclude-libs,libippicv.a -Wl,--exclude-libs,libippiw.a -L/ffmpeg_build/lib  -Wl,--gc-sections -Wl,--as-needed -Wl,--no-undefined  \n    Linker flags (Debug):        -Wl,--exclude-libs,libippicv.a -Wl,--exclude-libs,libippiw.a -L/ffmpeg_build/lib  -Wl,--gc-sections -Wl,--as-needed -Wl,--no-undefined  \n    ccache:                      YES\n    Precompiled headers:         NO\n    Extra dependencies:          avif /usr/local/lib/libpng.so /usr/lib64/libz.so /usr/lib64/libopenblasp.so dl m pthread rt\n    3rdparty dependencies:       ittnotify libprotobuf libjpeg-turbo libwebp libtiff libopenjp2 ipphal ippiw ippicv\n\n  OpenCV modules:\n    To be built:                 calib core dnn features flann geometry highgui imgcodecs imgproc objdetect photo ptcloud python3 stereo stitching video videoio\n    Disabled:                    world\n    Disabled by dependency:      -\n    Unavailable:                 java ts\n    Applications:                -\n    Documentation:               NO\n    Non-free algorithms:         NO\n\n  GUI:                           NONE\n    VTK support:                 NO\n    Built-in Unicode font:       YES\n\n  Media I/O: \n    ZLib:                        /usr/lib64/libz.so (ver 1.2.11)\n    JPEG:                        build-libjpeg-turbo (ver 3.1.2-70)\n      SIMD Support Request:      YES\n      SIMD Support:              YES\n    WEBP:                        build (ver decoder: 0x0210, encoder: 0x0210, demux: 0x0107)\n    AVIF:                        avif (ver 1.4.2)\n    PNG:                         /usr/local/lib/libpng.so (ver 1.6.58)\n      Metadata Support:          EXIF XMP ICC cICP\n    TIFF:                        build (ver 42 - 4.7.1)\n    JPEG 2000:                   build (ver 2.5.3)\n    OpenEXR:                     NO\n    GIF:                         YES\n    HDR:                         YES\n    SUNRASTER:                   YES\n    PXM:                         YES\n    PFM:                         YES\n\n  Video I/O:\n    FFMPEG:                      YES\n      avcodec:                   YES (62.28.101)\n      avformat:                  YES (62.12.101)\n      avutil:                    YES (60.26.101)\n      swscale:                   YES (9.5.101)\n    GStreamer:                   NO\n    v4l/v4l2:                    YES (linux/videodev2.h)\n    Orbbec:                      NO\n\n  Parallel framework:            pthreads\n\n  Trace:                         YES (with Intel ITT(3.25.4))\n\n  Other third-party libraries:\n    Intel IPP:                   2026.0.0 [2026.0.0]\n           at:                   /io/_skbuild/linux-x86_64-3.9/cmake-build/3rdparty/ippicv/ippicv_lnx/icv\n    Intel IPP IW:                sources (2026.0.0)\n              at:                /io/_skbuild/linux-x86_64-3.9/cmake-build/3rdparty/ippicv/ippicv_lnx/iw\n    VA:                          NO\n    Lapack:                      YES (OpenBLAS /usr/lib64/libopenblasp.so)\n    DNN MLAS:                    YES (SGEMM-only, vendored)\n      ASM kernels:               YES (X86_64: SSE2, AVX, FMA3, AVX512F)\n    Eigen:                       NO\n    Custom HAL:                  YES (ipp (ver 0.0.1))\n    Protobuf:                    build (3.19.1)\n    Flatbuffers:                 builtin/3rdparty (25.9.23)\n\n  OpenCL:                        YES (no extra features)\n    Include path:                /io/opencv/3rdparty/include/opencl/1.2\n    Link libraries:              Dynamic load\n\n  ONNX Runtime:                  NO\n\n  Python 3:\n    Interpreter:                 /opt/python/cp39-cp39/bin/python3.9 (ver 3.9.25)\n    Libraries:                   libpython3.9m.a (ver 3.9.25)\n    Limited API:                 YES (ver 0x03060000)\n    numpy:                       /home/ci/.local/lib/python3.9/site-packages/numpy/_core/include (ver 2.0.2)\n    install path:                python/cv2/python-3\n\n  Python (for build):            /opt/python/cp39-cp39/bin/python3.9\n\n  Java:                          \n    ant:                         NO\n    Java:                        NO\n    JNI:                         NO\n    Java wrappers:               NO\n    Java tests:                  NO\n\n  Install to:                    /io/_skbuild/linux-x86_64-3.9/cmake-install\n-----------------------------------------------------------------\n\n",
+    "build_has_kleidicv": false,
+    "ec2_instance_type": null,
+    "ami_id": null
+  },
+  "reps": 5,
+  "clips": {
+    "bench_strobe.mp4": {
+      "frames": 120,
+      "duration_s": 4.0,
+      "resolution": "1280x720",
+      "decode_excluded_s": {
+        "median": 0.18930532100011987,
+        "min": 0.17000315899986163,
+        "max": 0.19954537900002833,
+        "p25": 0.17053756499990413,
+        "p75": 0.1957734600000549,
+        "n": 5
+      },
+      "decode_included_s": {
+        "median": 0.2851105209997513,
+        "min": 0.27543060700008937,
+        "max": 0.30646263599965096,
+        "p25": 0.2837265450002633,
+        "p75": 0.29963869499988505,
+        "n": 5
+      },
+      "decode_only_est_s": {
+        "median": 0.10489304200018523,
+        "min": 0.09442122400014341,
+        "max": 0.11510736199988969,
+        "p25": 0.10009331599985671,
+        "p75": 0.11068917599959605,
+        "n": 5
+      },
+      "fps_excluded": 633.8966034659111,
+      "fps_included": 420.8894136183234,
+      "realtime_factor_excluded": 21.129886782197037,
+      "realtime_factor_included": 14.029647120610779
+    },
+    "bench_red.mp4": {
+      "frames": 120,
+      "duration_s": 4.0,
+      "resolution": "1280x720",
+      "decode_excluded_s": {
+        "median": 0.19928549600035694,
+        "min": 0.195916367999871,
+        "max": 0.2068323150001561,
+        "p25": 0.1982435479999367,
+        "p75": 0.2053109910002604,
+        "n": 5
+      },
+      "decode_included_s": {
+        "median": 0.2893985989999237,
+        "min": 0.2839773460000288,
+        "max": 0.3060440079998443,
+        "p25": 0.2842772529998001,
+        "p75": 0.3020509140001195,
+        "n": 5
+      },
+      "decode_only_est_s": {
+        "median": 0.091155050999987,
+        "min": 0.07744493799964403,
+        "max": 0.10276541799976258,
+        "p25": 0.08806097800015777,
+        "p75": 0.10073301699958392,
+        "n": 5
+      },
+      "fps_excluded": 602.1511971939245,
+      "fps_included": 414.6530094295019,
+      "realtime_factor_excluded": 20.071706573130818,
+      "realtime_factor_included": 13.821766980983396
+    },
+    "bench_clean.mp4": {
+      "frames": 120,
+      "duration_s": 4.0,
+      "resolution": "1280x720",
+      "decode_excluded_s": {
+        "median": 0.20223757999974623,
+        "min": 0.19199032200003785,
+        "max": 0.20743825899990043,
+        "p25": 0.20112466399996265,
+        "p75": 0.20625681699993947,
+        "n": 5
+      },
+      "decode_included_s": {
+        "median": 0.2876325520001046,
+        "min": 0.2818960290001087,
+        "max": 0.31633260399985375,
+        "p25": 0.28460215499990227,
+        "p75": 0.3103207610001846,
+        "n": 5
+      },
+      "decode_only_est_s": {
+        "median": 0.08650788800014197,
+        "min": 0.07563921200016921,
+        "max": 0.11833043900014673,
+        "p25": 0.07716389600000184,
+        "p75": 0.11409502400010751,
+        "n": 5
+      },
+      "fps_excluded": 593.3615305332994,
+      "fps_included": 417.1989545882705,
+      "realtime_factor_excluded": 19.77871768444331,
+      "realtime_factor_included": 13.906631819609016
+    }
+  },
+  "price_per_hour_usd": null,
+  "micro_ms": {
+    "cv2.LUT (sRGB->linear, 720p x3ch)": {
+      "median": 0.3203889996257203,
+      "min": 0.25340399997730856,
+      "max": 0.5961669999123842,
+      "p25": 0.28924200023539015,
+      "p75": 0.3630720002547605,
+      "n": 25
+    },
+    "cv2.transform (weighted sum -> luminance)": {
+      "median": 1.3196340000831697,
+      "min": 1.2203609999232867,
+      "max": 1.4491490001091734,
+      "p25": 1.2882999999419553,
+      "p75": 1.3572960001511092,
+      "n": 25
+    },
+    "cv2.resize INTER_AREA 1280x720 -> 64x48": {
+      "median": 0.3945980001844873,
+      "min": 0.3394049999769777,
+      "max": 0.5353450001166493,
+      "p25": 0.37983899983373703,
+      "p75": 0.4424550002113392,
+      "n": 25
+    },
+    "cv2.resize INTER_AREA 1280x720 -> 256x192": {
+      "median": 1.5131700001802528,
+      "min": 1.4114650002738927,
+      "max": 1.799158000267198,
+      "p25": 1.4687170000797778,
+      "p75": 1.655384000059712,
+      "n": 25
+    },
+    "cv2.boxFilter 21x16 on 64x48 mask": {
+      "median": 0.01296700020247954,
+      "min": 0.012165000043751206,
+      "max": 0.054320000344887376,
+      "p25": 0.012602999959199224,
+      "p75": 0.013377999948716024,
+      "n": 25
+    },
+    "cv2.GaussianBlur 11x11 s1.5 on 720p gray": {
+      "median": 1.2901709997095168,
+      "min": 1.24105100030647,
+      "max": 2.108141999997315,
+      "p25": 1.2746150000566558,
+      "p75": 1.3137450000613171,
+      "n": 25
+    },
+    "cv2.GaussianBlur sigma 25 on 720p mask": {
+      "median": 36.662318000253435,
+      "min": 35.08074899991698,
+      "max": 38.72070099987468,
+      "p25": 36.577630000010686,
+      "p75": 36.74139499980811,
+      "n": 25
+    },
+    "cv2.connectedComponentsWithStats 64x48": {
+      "median": 0.047015999825816834,
+      "min": 0.04166200005784049,
+      "max": 0.09774900036063627,
+      "p25": 0.04508700021688128,
+      "p75": 0.0501720001011563,
+      "n": 25
+    },
+    "cv2.accumulateWeighted 720p float": {
+      "median": 1.5993970000636182,
+      "min": 1.52056300021286,
+      "max": 2.639591999923141,
+      "p25": 1.565491999826918,
+      "p75": 1.646807999804878,
+      "n": 25
+    },
+    "cv2.dft 256x192": {
+      "median": 1.3341969997782144,
+      "min": 1.3073949999125034,
+      "max": 1.658455999859143,
+      "p25": 1.3165140003366105,
+      "p75": 1.3852779998160258,
+      "n": 25
+    }
+  },
+  "profile": {
+    "total_s": 0.20339645199999998,
+    "time_in_cv2_builtins_s": 0.159932052,
+    "fraction_in_cv2": 0.7863069902517278,
+    "top": "         13608 function calls (13368 primitive calls) in 0.203 seconds\n\n   Ordered by: internal time\n   List reduced from 92 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n      120    0.105    0.001    0.105    0.001 {resize}\n      120    0.050    0.000    0.050    0.000 {LUT}\n      240    0.013    0.000    0.016    0.000 /home/user/SteadyFrame/steadyframe/flash.py:43(push)\n      120    0.006    0.000    0.009    0.000 /home/user/SteadyFrame/steadyframe/luminance.py:46(red_metrics_linear)\n      120    0.004    0.000    0.202    0.002 /home/user/SteadyFrame/steadyframe/analyzer.py:103(push)\n     1826    0.003    0.000    0.003    0.000 {method 'reduce' of 'numpy.ufunc' objects}\n       90    0.002    0.000    0.002    0.000 {boxFilter}\n      120    0.002    0.000    0.002    0.000 {transform}\n      120    0.002    0.000    0.170    0.001 /home/user/SteadyFrame/steadyframe/luminance.py:76(grid_maps)\n      120    0.002    0.000    0.004    0.000 /home/user/SteadyFrame/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:115(_mean)\n      120    0.001    0.000    0.002    0.000 /home/user/SteadyFrame/.venv/lib/python3.11/site-packages/numpy/_core/numeric.py:97(zeros_like)\n      120    0.001    0.000    0.001    0.000 /home/user/SteadyFrame/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:73(_count_reduce_items)\n      120    0.001    0.000    0.106    0.001 /home/user/SteadyFrame/steadyframe/luminance.py:69(downsample)\n      240    0.001    0.000    0.001    0.000 /home/user/SteadyFrame/steadyframe/analyzer.py:136(_update_segment)\n      120    0.001    0.000    0.001    0.000 {max}\n      240    0.001    0.000    0.001    0.000 /home/user/SteadyFrame/steadyframe/flash.py:100(push)\n      120    0.001    0.000    0.001    0.000 {method 'reshape' of 'numpy.ndarray' objects}\n      569    0.001    0.000    0.001    0.000 {method 'astype' of 'numpy.ndarray' objects}\n     1286    0.001    0.000    0.003    0.000 /home/user/SteadyFrame/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:55(_any)\n     1286    0.001    0.000    0.003    0.000 {method 'any' of 'numpy.ndarray' objects}\n       90    0.000    0.000    0.003    0.000 /home/user/SteadyFrame/steadyframe/area.py:32(fraction_map)\n      120    0.000    0.000    0.050    0.000 /home/user/SteadyFrame/steadyframe/luminance.py:22(linearize)\n        1    0.000    0.000    0.204    0.204 /home/user/SteadyFrame/bench/run.py:171(analyze_frames)\n      120    0.000    0.000    0.006    0.000 /home/user/SteadyFrame/steadyframe/redflash.py:31(push_grids)\n      120    0.000    0.000    0.000    0.000 <string>:2(__init__)\n\n\n"
+  },
+  "summary": {
+    "median_realtime_factor_excluded": 20.071706573130818,
+    "median_realtime_factor_included": 13.906631819609016,
+    "usd_per_video_hour_excluded": null,
+    "usd_per_video_hour_included": null
+  }
+}

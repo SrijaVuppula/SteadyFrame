@@ -1,0 +1,36 @@
+{
+  "crf_correct": 16,
+  "crf_total": 16,
+  "grid": [
+    {
+      "grid": "32x24",
+      "wrong_verdicts": 1,
+      "of": 28,
+      "median_rtf": 57.189499999999995
+    },
+    {
+      "grid": "48x36",
+      "wrong_verdicts": 1,
+      "of": 28,
+      "median_rtf": 49.3305
+    },
+    {
+      "grid": "64x48",
+      "wrong_verdicts": 0,
+      "of": 28,
+      "median_rtf": 51.951
+    },
+    {
+      "grid": "96x72",
+      "wrong_verdicts": 1,
+      "of": 28,
+      "median_rtf": 40.9745
+    },
+    {
+      "grid": "128x96",
+      "wrong_verdicts": 0,
+      "of": 28,
+      "median_rtf": 36.5435
+    }
+  ]
+}

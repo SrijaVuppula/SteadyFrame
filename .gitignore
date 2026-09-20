@@ -25,8 +25,7 @@ data/real/**
 eval/results/*
 !eval/results/frozen/
 !eval/results/frozen/**
-bench/results/*
-!bench/results/.gitkeep
+bench/results/*.buildinfo.txt
 
 # node
 web/node_modules/
