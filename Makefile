@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 SEED ?= 1234
 
-.PHONY: help venv install test lint synth real eval bench deploy destroy smoke web local clean
+.PHONY: help venv install test lint synth real eval freeze report bench deploy destroy smoke web local clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -36,8 +36,18 @@ eval: ## run every evaluation script; writes eval/results/
 	$(BIN)/python -m eval.agent_vs_fixed
 	$(BIN)/python -m eval.failures
 
+freeze: ## copy eval/results into eval/results/frozen (the copy the report is rendered from) and re-render the report
+	mkdir -p eval/results/frozen
+	cp eval/results/*.json eval/results/*.md eval/results/*.png eval/results/frozen/
+	rm -rf eval/results/frozen/failures && cp -r eval/results/failures eval/results/frozen/failures
+	$(BIN)/python -m eval.report
+
+report: ## render docs/report/REPORT.md from the frozen results
+	$(BIN)/python -m eval.report
+
 bench: ## run the analysis benchmark on this machine (see bench/README.md for the 3-config protocol)
 	$(BIN)/python -m bench.run --out bench/results
+	$(BIN)/python -m bench.compare bench/results/*.json --out bench/results/comparison.md
 
 web: ## build the frontend
 	cd web && npm ci && npm run build
