@@ -1,0 +1,51 @@
+# Local mode without AWS: `docker compose up --build`, then open http://localhost:8080
+# (web) or talk to the API at http://localhost:8000 (also under /api). The api and the
+# worker share one volume; the API's in-process worker is disabled because the worker
+# container does the work.
+
+services:
+  api:
+    build:
+      context: .
+      target: api
+    ports:
+      - "8000:8000"
+    environment:
+      STEADYFRAME_MODE: local
+      LOCAL_DATA_DIR: /data
+      LOCAL_INLINE_WORKER: "0"
+    volumes:
+      - service-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status == 200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  worker:
+    build:
+      context: .
+      target: worker
+    environment:
+      STEADYFRAME_MODE: local
+      LOCAL_DATA_DIR: /data
+      WORKER_WORKDIR: /tmp/jobs
+      # optional: STEADYFRAME_BEDROCK_MODEL_ID + AWS credentials for policy=agent; without
+      # them the agent policy falls back to the fixed policy and says so in the trace.
+    volumes:
+      - service-data:/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  service-data:
