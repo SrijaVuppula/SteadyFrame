@@ -1,0 +1,1033 @@
+{
+ "records": [
+  {
+   "seq": 1,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.0,
+   "ts": "2026-09-20T01:18:43Z",
+   "kind": "tool_call",
+   "name": "analyze_video",
+   "args": {},
+   "iteration": 0,
+   "by": "policy"
+  },
+  {
+   "seq": 2,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.742,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_result",
+   "name": "analyze_video",
+   "result": {
+    "job_id": "70cf3ada2259",
+    "verdict": "fail",
+    "video": {
+     "width": 320,
+     "height": 240,
+     "fps": 30.0,
+     "frames_analyzed": 300,
+     "duration_analyzed_s": 10.0,
+     "has_audio": false
+    },
+    "profile": "wcag",
+    "segments": [
+     {
+      "id": "g000",
+      "type": "general",
+      "verdict": "fail",
+      "start_s": 1.0,
+      "end_s": 3.4333,
+      "peak_flash_rate_hz": 6.5,
+      "max_area_fraction": 1.0,
+      "max_delta_L": 0.5015,
+      "regions": [
+       {
+        "x": 0.0938,
+        "y": 0.0833,
+        "w": 0.4062,
+        "h": 0.4167
+       }
+      ],
+      "severity_score": 0.75,
+      "status": "open"
+     },
+     {
+      "id": "g001",
+      "type": "general",
+      "verdict": "fail",
+      "start_s": 6.0,
+      "end_s": 9.2,
+      "peak_flash_rate_hz": 10.0,
+      "max_area_fraction": 1.0,
+      "max_delta_L": 0.4405,
+      "regions": [
+       {
+        "x": 0.5,
+        "y": 0.5,
+        "w": 0.4531,
+        "h": 0.4583
+       }
+      ],
+      "severity_score": 0.976,
+      "status": "open"
+     }
+    ],
+    "strategies": [
+     {
+      "id": "S1",
+      "name": "temporal low-pass",
+      "invasiveness": 1,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "alpha": {
+        "default": 0.1,
+        "min": 0.02,
+        "max": 0.6,
+        "doc": "EMA weight of the new frame; lower = stronger smoothing. A square wave with half-period N frames keeps (1-r^N)/(1+r^N) of its swing, r = 1 - alpha; 0.1 leaves ~13% at 6 Hz / 30 fps"
+       }
+      },
+      "doc": "cv2.accumulateWeighted running average in linear light inside the hazard region, feathered mask"
+     },
+     {
+      "id": "S2",
+      "name": "luminance swing compression",
+      "invasiveness": 2,
+      "applies_to": [
+       "general"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "max_swing": {
+        "default": 0.05,
+        "min": 0.02,
+        "max": 0.2,
+        "doc": "allowed peak-to-peak relative-luminance swing around the running mean (WCAG transition threshold is 0.10; the running mean itself wobbles a little on a strobe, so leave margin)"
+       },
+       "mean_alpha": {
+        "default": 0.02,
+        "min": 0.01,
+        "max": 0.3,
+        "doc": "EMA weight for the running mean luminance"
+       }
+      },
+      "doc": "per-pixel gain in linear light so |L - mean_L| <= max_swing/2; colour is preserved"
+     },
+     {
+      "id": "S3",
+      "name": "red desaturation",
+      "invasiveness": 2,
+      "applies_to": [
+       "red"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "strength": {
+        "default": 0.6,
+        "min": 0.2,
+        "max": 1.0,
+        "doc": "how far saturated-red pixels are pulled toward an equal-luminance gray (1.0 = fully)"
+       },
+       "ratio_floor": {
+        "default": 0.7,
+        "min": 0.4,
+        "max": 0.79,
+        "doc": "pixels with R/(R+G+B) above this are treated"
+       }
+      },
+      "doc": "linear-light mix toward gray of the same relative luminance; only pixels near the saturated-red criterion are touched"
+     },
+     {
+      "id": "S4",
+      "name": "global smoothing",
+      "invasiveness": 3,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "global",
+      "requires_approval": false,
+      "params": {
+       "base": {
+        "default": "S1",
+        "doc": "which regional strategy to apply to the whole frame: S1, S2 or S3"
+       },
+       "alpha": {
+        "default": 0.1,
+        "min": 0.02,
+        "max": 0.6,
+        "doc": "EMA weight of the new frame; lower = stronger smoothing. A square wave with half-period N frames keeps (1-r^N)/(1+r^N) of its swing, r = 1 - alpha; 0.1 leaves ~13% at 6 Hz / 30 fps"
+       },
+       "max_swing": {
+        "default": 0.05,
+        "min": 0.02,
+        "max": 0.2,
+        "doc": "allowed peak-to-peak relative-luminance swing around the running mean (WCAG transition threshold is 0.10; the running mean itself wobbles a little on a strobe, so leave margin)"
+       },
+       "mean_alpha": {
+        "default": 0.02,
+        "min": 0.01,
+        "max": 0.3,
+        "doc": "EMA weight for the running mean luminance"
+       },
+       "strength": {
+        "default": 0.6,
+        "min": 0.2,
+        "max": 1.0,
+        "doc": "how far saturated-red pixels are pulled toward an equal-luminance gray (1.0 = fully)"
+       },
+       "ratio_floor": {
+        "default": 0.7,
+        "min": 0.4,
+        "max": 0.79,
+        "doc": "pixels with R/(R+G+B) above this are treated"
+       }
+      },
+      "doc": "S1/S2/S3 applied to the whole frame for large-area hazards"
+     },
+     {
+      "id": "S5",
+      "name": "frame hold rate limit",
+      "invasiveness": 4,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "global",
+      "requires_approval": false,
+      "params": {
+       "target_hz": {
+        "default": 2.5,
+        "min": 1.0,
+        "max": 3.0,
+        "doc": "maximum flash rate after holding; hold = ceil(fps / (2 * target_hz)) frames"
+       }
+      },
+      "doc": "frame selection: output frame changes at most 2*target_hz times per second; frame count and timing are preserved so audio stays in sync"
+     },
+     {
+      "id": "S6",
+      "name": "static warning card",
+      "invasiveness": 6,
+      "applies_to": [
+       "general",
+       "red",
+       "pattern"
+      ],
+      "scope": "global",
+      "requires_approval": true,
+      "params": {
+       "text": {
+        "default": "Flashing sequence removed",
+        "doc": "card text"
+       },
+       "gray": {
+        "default": 40,
+        "min": 0,
+        "max": 120,
+        "doc": "card background gray level"
+       }
+      },
+      "doc": "last resort; the segment becomes a still card. Always needs human approval."
+     }
+    ]
+   },
+   "error": null,
+   "iteration": 0
+  },
+  {
+   "seq": 3,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.744,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_call",
+   "name": "analyze_video",
+   "args": {},
+   "iteration": 0,
+   "by": "fixed"
+  },
+  {
+   "seq": 4,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.744,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_result",
+   "name": "analyze_video",
+   "result": {
+    "job_id": "70cf3ada2259",
+    "verdict": "fail",
+    "video": {
+     "width": 320,
+     "height": 240,
+     "fps": 30.0,
+     "frames_analyzed": 300,
+     "duration_analyzed_s": 10.0,
+     "has_audio": false
+    },
+    "profile": "wcag",
+    "segments": [
+     {
+      "id": "g000",
+      "type": "general",
+      "verdict": "fail",
+      "start_s": 1.0,
+      "end_s": 3.4333,
+      "peak_flash_rate_hz": 6.5,
+      "max_area_fraction": 1.0,
+      "max_delta_L": 0.5015,
+      "regions": [
+       {
+        "x": 0.0938,
+        "y": 0.0833,
+        "w": 0.4062,
+        "h": 0.4167
+       }
+      ],
+      "severity_score": 0.75,
+      "status": "open"
+     },
+     {
+      "id": "g001",
+      "type": "general",
+      "verdict": "fail",
+      "start_s": 6.0,
+      "end_s": 9.2,
+      "peak_flash_rate_hz": 10.0,
+      "max_area_fraction": 1.0,
+      "max_delta_L": 0.4405,
+      "regions": [
+       {
+        "x": 0.5,
+        "y": 0.5,
+        "w": 0.4531,
+        "h": 0.4583
+       }
+      ],
+      "severity_score": 0.976,
+      "status": "open"
+     }
+    ],
+    "strategies": [
+     {
+      "id": "S1",
+      "name": "temporal low-pass",
+      "invasiveness": 1,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "alpha": {
+        "default": 0.1,
+        "min": 0.02,
+        "max": 0.6,
+        "doc": "EMA weight of the new frame; lower = stronger smoothing. A square wave with half-period N frames keeps (1-r^N)/(1+r^N) of its swing, r = 1 - alpha; 0.1 leaves ~13% at 6 Hz / 30 fps"
+       }
+      },
+      "doc": "cv2.accumulateWeighted running average in linear light inside the hazard region, feathered mask"
+     },
+     {
+      "id": "S2",
+      "name": "luminance swing compression",
+      "invasiveness": 2,
+      "applies_to": [
+       "general"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "max_swing": {
+        "default": 0.05,
+        "min": 0.02,
+        "max": 0.2,
+        "doc": "allowed peak-to-peak relative-luminance swing around the running mean (WCAG transition threshold is 0.10; the running mean itself wobbles a little on a strobe, so leave margin)"
+       },
+       "mean_alpha": {
+        "default": 0.02,
+        "min": 0.01,
+        "max": 0.3,
+        "doc": "EMA weight for the running mean luminance"
+       }
+      },
+      "doc": "per-pixel gain in linear light so |L - mean_L| <= max_swing/2; colour is preserved"
+     },
+     {
+      "id": "S3",
+      "name": "red desaturation",
+      "invasiveness": 2,
+      "applies_to": [
+       "red"
+      ],
+      "scope": "regional",
+      "requires_approval": false,
+      "params": {
+       "strength": {
+        "default": 0.6,
+        "min": 0.2,
+        "max": 1.0,
+        "doc": "how far saturated-red pixels are pulled toward an equal-luminance gray (1.0 = fully)"
+       },
+       "ratio_floor": {
+        "default": 0.7,
+        "min": 0.4,
+        "max": 0.79,
+        "doc": "pixels with R/(R+G+B) above this are treated"
+       }
+      },
+      "doc": "linear-light mix toward gray of the same relative luminance; only pixels near the saturated-red criterion are touched"
+     },
+     {
+      "id": "S4",
+      "name": "global smoothing",
+      "invasiveness": 3,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "global",
+      "requires_approval": false,
+      "params": {
+       "base": {
+        "default": "S1",
+        "doc": "which regional strategy to apply to the whole frame: S1, S2 or S3"
+       },
+       "alpha": {
+        "default": 0.1,
+        "min": 0.02,
+        "max": 0.6,
+        "doc": "EMA weight of the new frame; lower = stronger smoothing. A square wave with half-period N frames keeps (1-r^N)/(1+r^N) of its swing, r = 1 - alpha; 0.1 leaves ~13% at 6 Hz / 30 fps"
+       },
+       "max_swing": {
+        "default": 0.05,
+        "min": 0.02,
+        "max": 0.2,
+        "doc": "allowed peak-to-peak relative-luminance swing around the running mean (WCAG transition threshold is 0.10; the running mean itself wobbles a little on a strobe, so leave margin)"
+       },
+       "mean_alpha": {
+        "default": 0.02,
+        "min": 0.01,
+        "max": 0.3,
+        "doc": "EMA weight for the running mean luminance"
+       },
+       "strength": {
+        "default": 0.6,
+        "min": 0.2,
+        "max": 1.0,
+        "doc": "how far saturated-red pixels are pulled toward an equal-luminance gray (1.0 = fully)"
+       },
+       "ratio_floor": {
+        "default": 0.7,
+        "min": 0.4,
+        "max": 0.79,
+        "doc": "pixels with R/(R+G+B) above this are treated"
+       }
+      },
+      "doc": "S1/S2/S3 applied to the whole frame for large-area hazards"
+     },
+     {
+      "id": "S5",
+      "name": "frame hold rate limit",
+      "invasiveness": 4,
+      "applies_to": [
+       "general",
+       "red"
+      ],
+      "scope": "global",
+      "requires_approval": false,
+      "params": {
+       "target_hz": {
+        "default": 2.5,
+        "min": 1.0,
+        "max": 3.0,
+        "doc": "maximum flash rate after holding; hold = ceil(fps / (2 * target_hz)) frames"
+       }
+      },
+      "doc": "frame selection: output frame changes at most 2*target_hz times per second; frame count and timing are preserved so audio stays in sync"
+     },
+     {
+      "id": "S6",
+      "name": "static warning card",
+      "invasiveness": 6,
+      "applies_to": [
+       "general",
+       "red",
+       "pattern"
+      ],
+      "scope": "global",
+      "requires_approval": true,
+      "params": {
+       "text": {
+        "default": "Flashing sequence removed",
+        "doc": "card text"
+       },
+       "gray": {
+        "default": 40,
+        "min": 0,
+        "max": 120,
+        "doc": "card background gray level"
+       }
+      },
+      "doc": "last resort; the segment becomes a still card. Always needs human approval."
+     }
+    ]
+   },
+   "error": null,
+   "iteration": 0
+  },
+  {
+   "seq": 5,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.745,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_call",
+   "name": "get_segment_detail",
+   "args": {
+    "segment_id": "g000"
+   },
+   "iteration": 0,
+   "by": "fixed"
+  },
+  {
+   "seq": 6,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.745,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_result",
+   "name": "get_segment_detail",
+   "result": {
+    "id": "g000",
+    "type": "general",
+    "verdict": "fail",
+    "start_frame": 30,
+    "end_frame": 102,
+    "start_s": 1.0,
+    "end_s": 3.4333,
+    "peak_flash_rate_hz": 6.5,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.5015,
+    "regions": [
+     {
+      "x": 0.0938,
+      "y": 0.0833,
+      "w": 0.4062,
+      "h": 0.4167
+     }
+    ],
+    "severity_score": 0.75,
+    "status": "open",
+    "duration_s": 2.433,
+    "region_area_fraction_of_frame": 0.1693,
+    "region_luminance": {
+     "t": {
+      "_truncated": true,
+      "n": 240,
+      "head": [
+       0.0,
+       0.0333,
+       0.1,
+       0.1333,
+       0.1667,
+       0.2,
+       0.2667,
+       0.3,
+       0.3333,
+       0.3667
+      ]
+     },
+     "L": {
+      "_truncated": true,
+      "n": 240,
+      "head": [
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083,
+       0.1083
+      ]
+     },
+     "min": 0.0532,
+     "max": 0.4983
+    },
+    "applicable_strategies": [
+     "S1",
+     "S2",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "parameter_hints": {
+     "required_swing_attenuation": 0.179,
+     "S1": {
+      "alpha": 0.145,
+      "note": "EMA weight giving the required attenuation at the measured flash rate"
+     },
+     "S2": {
+      "max_swing": 0.05,
+      "mean_alpha": 0.02
+     },
+     "S5": {
+      "target_hz": 2.5
+     },
+     "prefer_regional": false
+    },
+    "attempts": [],
+    "iterations_left_for_segment": 4,
+    "iterations_left_total": 24
+   },
+   "error": null,
+   "iteration": 0
+  },
+  {
+   "seq": 7,
+   "job_id": "fx-passed",
+   "t_rel_s": 0.746,
+   "ts": "2026-09-20T01:18:44Z",
+   "kind": "tool_call",
+   "name": "apply_remediation",
+   "args": {
+    "segment_id": "g000",
+    "strategy": "S1",
+    "params": {}
+   },
+   "iteration": 0,
+   "by": "fixed"
+  },
+  {
+   "seq": 8,
+   "job_id": "fx-passed",
+   "t_rel_s": 1.661,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_result",
+   "name": "apply_remediation",
+   "result": {
+    "candidate_id": "g000-c1",
+    "segment_id": "g000",
+    "strategy": "S1",
+    "params": {
+     "alpha": 0.1
+    },
+    "scope": "regional",
+    "range_s": [
+     0.0,
+     4.9333
+    ],
+    "quality": {
+     "ssim_overall": 0.9540213158685867,
+     "ssim_inside": 0.8483238122234605,
+     "ssim_outside": 0.9999999110012838,
+     "psnr_outside_db": 97.83923624450948,
+     "psnr_outside_is_lossless": false,
+     "mean_abs_dL_inside": 0.11149215787547091,
+     "temporal_step_before": 0.08403796077636293,
+     "temporal_step_after": 0.01224563283418926,
+     "temporal_smoothness_gain": 6.862688267259875,
+     "frames": 73
+    },
+    "verified": null
+   },
+   "error": null,
+   "iteration": 1
+  },
+  {
+   "seq": 9,
+   "job_id": "fx-passed",
+   "t_rel_s": 1.663,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_call",
+   "name": "verify_candidate",
+   "args": {
+    "candidate_id": "g000-c1"
+   },
+   "iteration": 1,
+   "by": "fixed"
+  },
+  {
+   "seq": 10,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.026,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_result",
+   "name": "verify_candidate",
+   "result": {
+    "candidate_id": "g000-c1",
+    "verdict": "pass",
+    "passes_for_type": true,
+    "remaining_same_type": [],
+    "remaining_other_types": [],
+    "quality": {
+     "ssim_overall": 0.9540213158685867,
+     "ssim_inside": 0.8483238122234605,
+     "ssim_outside": 0.9999999110012838,
+     "psnr_outside_db": 97.83923624450948,
+     "psnr_outside_is_lossless": false,
+     "mean_abs_dL_inside": 0.11149215787547091,
+     "temporal_step_before": 0.08403796077636293,
+     "temporal_step_after": 0.01224563283418926,
+     "temporal_smoothness_gain": 6.862688267259875,
+     "frames": 73
+    },
+    "requires_approval": false,
+    "approval_reason": null,
+    "reason": "no remaining general hazard in the re-analysed segment",
+    "opencv": "5.0.0"
+   },
+   "error": null,
+   "iteration": 1
+  },
+  {
+   "seq": 11,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.027,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_call",
+   "name": "accept_candidate",
+   "args": {
+    "candidate_id": "g000-c1"
+   },
+   "iteration": 1,
+   "by": "fixed"
+  },
+  {
+   "seq": 12,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.027,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "decision",
+   "name": "accept",
+   "segment_id": "g000",
+   "candidate_id": "g000-c1",
+   "strategy": "S1",
+   "params": {
+    "alpha": 0.1
+   }
+  },
+  {
+   "seq": 13,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.027,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_result",
+   "name": "accept_candidate",
+   "result": {
+    "ok": true,
+    "segment_id": "g000",
+    "strategy": "S1",
+    "params": {
+     "alpha": 0.1
+    }
+   },
+   "error": null,
+   "iteration": 1
+  },
+  {
+   "seq": 14,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.029,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_call",
+   "name": "get_segment_detail",
+   "args": {
+    "segment_id": "g001"
+   },
+   "iteration": 1,
+   "by": "fixed"
+  },
+  {
+   "seq": 15,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.029,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_result",
+   "name": "get_segment_detail",
+   "result": {
+    "id": "g001",
+    "type": "general",
+    "verdict": "fail",
+    "start_frame": 180,
+    "end_frame": 275,
+    "start_s": 6.0,
+    "end_s": 9.2,
+    "peak_flash_rate_hz": 10.0,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.4405,
+    "regions": [
+     {
+      "x": 0.5,
+      "y": 0.5,
+      "w": 0.4531,
+      "h": 0.4583
+     }
+    ],
+    "severity_score": 0.976,
+    "status": "open",
+    "duration_s": 3.2,
+    "region_area_fraction_of_frame": 0.2077,
+    "region_luminance": {
+     "t": {
+      "_truncated": true,
+      "n": 240,
+      "head": [
+       0.0,
+       0.0333,
+       0.1,
+       0.1333,
+       0.1667,
+       0.2,
+       0.2667,
+       0.3,
+       0.3333,
+       0.3667
+      ]
+     },
+     "L": {
+      "_truncated": true,
+      "n": 240,
+      "head": [
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243,
+       0.1243
+      ]
+     },
+     "min": 0.0967,
+     "max": 0.4726
+    },
+    "applicable_strategies": [
+     "S1",
+     "S2",
+     "S4",
+     "S5",
+     "S6"
+    ],
+    "parameter_hints": {
+     "required_swing_attenuation": 0.204,
+     "S1": {
+      "alpha": 0.241,
+      "note": "EMA weight giving the required attenuation at the measured flash rate"
+     },
+     "S2": {
+      "max_swing": 0.05,
+      "mean_alpha": 0.02
+     },
+     "S5": {
+      "target_hz": 2.5
+     },
+     "prefer_regional": false
+    },
+    "attempts": [],
+    "iterations_left_for_segment": 4,
+    "iterations_left_total": 23
+   },
+   "error": null,
+   "iteration": 1
+  },
+  {
+   "seq": 16,
+   "job_id": "fx-passed",
+   "t_rel_s": 2.031,
+   "ts": "2026-09-20T01:18:45Z",
+   "kind": "tool_call",
+   "name": "apply_remediation",
+   "args": {
+    "segment_id": "g001",
+    "strategy": "S1",
+    "params": {}
+   },
+   "iteration": 1,
+   "by": "fixed"
+  },
+  {
+   "seq": 17,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.202,
+   "ts": "2026-09-20T01:18:46Z",
+   "kind": "tool_result",
+   "name": "apply_remediation",
+   "result": {
+    "candidate_id": "g001-c1",
+    "segment_id": "g001",
+    "strategy": "S1",
+    "params": {
+     "alpha": 0.1
+    },
+    "scope": "regional",
+    "range_s": [
+     4.5,
+     10.7
+    ],
+    "quality": {
+     "ssim_overall": 0.9692751796295246,
+     "ssim_inside": 0.9050503907104334,
+     "ssim_outside": 0.9999994908769926,
+     "psnr_outside_db": 83.3596032374134,
+     "psnr_outside_is_lossless": false,
+     "mean_abs_dL_inside": 0.09584554412867874,
+     "temporal_step_before": 0.12699639568138657,
+     "temporal_step_after": 0.010834296813577806,
+     "temporal_smoothness_gain": 11.72170172800062,
+     "frames": 96
+    },
+    "verified": null
+   },
+   "error": null,
+   "iteration": 2
+  },
+  {
+   "seq": 18,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.203,
+   "ts": "2026-09-20T01:18:46Z",
+   "kind": "tool_call",
+   "name": "verify_candidate",
+   "args": {
+    "candidate_id": "g001-c1"
+   },
+   "iteration": 2,
+   "by": "fixed"
+  },
+  {
+   "seq": 19,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.655,
+   "ts": "2026-09-20T01:18:47Z",
+   "kind": "tool_result",
+   "name": "verify_candidate",
+   "result": {
+    "candidate_id": "g001-c1",
+    "verdict": "pass",
+    "passes_for_type": true,
+    "remaining_same_type": [],
+    "remaining_other_types": [],
+    "quality": {
+     "ssim_overall": 0.9692751796295246,
+     "ssim_inside": 0.9050503907104334,
+     "ssim_outside": 0.9999994908769926,
+     "psnr_outside_db": 83.3596032374134,
+     "psnr_outside_is_lossless": false,
+     "mean_abs_dL_inside": 0.09584554412867874,
+     "temporal_step_before": 0.12699639568138657,
+     "temporal_step_after": 0.010834296813577806,
+     "temporal_smoothness_gain": 11.72170172800062,
+     "frames": 96
+    },
+    "requires_approval": false,
+    "approval_reason": null,
+    "reason": "no remaining general hazard in the re-analysed segment",
+    "opencv": "5.0.0"
+   },
+   "error": null,
+   "iteration": 2
+  },
+  {
+   "seq": 20,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.657,
+   "ts": "2026-09-20T01:18:47Z",
+   "kind": "tool_call",
+   "name": "accept_candidate",
+   "args": {
+    "candidate_id": "g001-c1"
+   },
+   "iteration": 2,
+   "by": "fixed"
+  },
+  {
+   "seq": 21,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.657,
+   "ts": "2026-09-20T01:18:47Z",
+   "kind": "decision",
+   "name": "accept",
+   "segment_id": "g001",
+   "candidate_id": "g001-c1",
+   "strategy": "S1",
+   "params": {
+    "alpha": 0.1
+   }
+  },
+  {
+   "seq": 22,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.657,
+   "ts": "2026-09-20T01:18:47Z",
+   "kind": "tool_result",
+   "name": "accept_candidate",
+   "result": {
+    "ok": true,
+    "segment_id": "g001",
+    "strategy": "S1",
+    "params": {
+     "alpha": 0.1
+    }
+   },
+   "error": null,
+   "iteration": 2
+  },
+  {
+   "seq": 23,
+   "job_id": "fx-passed",
+   "t_rel_s": 3.659,
+   "ts": "2026-09-20T01:18:47Z",
+   "kind": "tool_call",
+   "name": "finalize",
+   "args": {
+    "output": "/work/web_fixed.mp4"
+   },
+   "iteration": 2,
+   "by": "policy"
+  },
+  {
+   "seq": 24,
+   "job_id": "fx-passed",
+   "t_rel_s": 5.333,
+   "ts": "2026-09-20T01:18:48Z",
+   "kind": "decision",
+   "name": "finalize",
+   "status": "passed",
+   "after_verdict": "pass",
+   "frames_out": 300,
+   "sync_ok": true
+  },
+  {
+   "seq": 25,
+   "job_id": "fx-passed",
+   "t_rel_s": 5.333,
+   "ts": "2026-09-20T01:18:48Z",
+   "kind": "tool_result",
+   "name": "finalize",
+   "result": {
+    "status": "passed",
+    "output": "/work/web_fixed.mp4",
+    "after_verdict": "pass",
+    "remaining_segments": [],
+    "frames_out": 300,
+    "frames_in": 300,
+    "sync_ok": true,
+    "audio_remuxed": false,
+    "unresolved": []
+   },
+   "error": null,
+   "iteration": 2
+  }
+ ],
+ "complete": true
+}

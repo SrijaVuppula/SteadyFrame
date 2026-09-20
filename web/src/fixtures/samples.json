@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sample_two_segments",
+    "name": "Two regional strobes",
+    "description": "320x240, 10 s. Two general-flash segments in different corners (6.5 Hz and 10 Hz). Fixed policy resolves both with S1.",
+    "hazard_types": ["general"],
+    "duration_s": 10,
+    "warning": true
+  },
+  {
+    "id": "sample_two_segments_agent",
+    "name": "Two regional strobes (agent policy)",
+    "description": "Same clip under the agent policy. The second segment escalates S1 -> S2 -> S5 and pauses for human approval.",
+    "hazard_types": ["general"],
+    "duration_s": 10,
+    "warning": true
+  },
+  {
+    "id": "sample_red_strobe_region",
+    "name": "Saturated red strobe",
+    "description": "320x240, 5 s. A saturated red region flashing at 5 Hz, flagged as both general and red flash. Resolved with S1 + S3.",
+    "hazard_types": ["general", "red"],
+    "duration_s": 5,
+    "warning": true
+  }
+]
