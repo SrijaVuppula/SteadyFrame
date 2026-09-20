@@ -10,7 +10,12 @@ from .conftest import square_frames
 
 
 def test_fix_passes_and_writes_report_and_trace(tmp_clip, tmp_path):
-    frames = square_frames(120, 30, 6.0, size=(96, 72), region=(24, 18, 72, 54), start=1.0)
+    # hi=200 keeps the swing at ~0.56 so S1's default alpha lands well under the 0.10
+    # threshold on every platform (with hi=230 the residual is exactly 0.10 and the arm64
+    # ffmpeg build tipped it over, sending the policy to S2)
+    frames = square_frames(
+        120, 30, 6.0, hi=(200, 200, 200), size=(96, 72), region=(24, 18, 72, 54), start=1.0
+    )
     src = tmp_clip(frames, codec="h264")
     out = tmp_path / "safe.mp4"
     rep = fix_file(
