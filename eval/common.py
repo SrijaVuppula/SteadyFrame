@@ -42,7 +42,7 @@ def cached_analysis(path: Path, **kw) -> dict:
     h.update(path.read_bytes()[:1_000_000])
     h.update(str(path.stat().st_size).encode())
     h.update(json.dumps(kw, sort_keys=True).encode())
-    h.update(f"{__version__}:{cv2.__version__}:v3".encode())
+    h.update(f"{__version__}:{cv2.__version__}:v4".encode())
     cp = CACHE / f"{path.stem}-{h.hexdigest()[:12]}.json"
     if cp.exists():
         return json.loads(cp.read_text())

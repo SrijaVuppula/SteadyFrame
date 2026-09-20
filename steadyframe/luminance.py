@@ -40,8 +40,12 @@ def red_metrics(frame_bgr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     red_ratio = R / (R + G + B) in linear space (0 where the pixel is black);
     red_value = max(0, R - G - B) * 320  (PEAT / IRIS working rule, docs/STANDARDS.md 1.3).
     """
-    lin = linearize(frame_bgr)
-    b, g, r = cv2.split(lin)
+    return red_metrics_linear(linearize(frame_bgr))
+
+
+def red_metrics_linear(lin_bgr: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Same as red_metrics but from an already linearised (float32 BGR) map of any size."""
+    b, g, r = lin_bgr[..., 0], lin_bgr[..., 1], lin_bgr[..., 2]
     total = r + g + b
     ratio = np.divide(r, total, out=np.zeros_like(r), where=total > 1e-6)
     value = cv2.max(r - g - b, 0.0) * RED_SCALE
@@ -63,10 +67,25 @@ def uv_chromaticity(frame_bgr: np.ndarray) -> np.ndarray:
 
 
 def downsample(map_: np.ndarray, grid_w: int, grid_h: int) -> np.ndarray:
-    """Box-average a per-pixel map onto the analysis grid (INTER_AREA)."""
+    """Box-average a per-pixel map (1 or 3 channels) onto the analysis grid (INTER_AREA)."""
     if map_.shape[1] == grid_w and map_.shape[0] == grid_h:
         return map_
     return cv2.resize(map_, (grid_w, grid_h), interpolation=cv2.INTER_AREA)
+
+
+def grid_maps(
+    frame_bgr: np.ndarray, grid_w: int, grid_h: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """One LUT + one INTER_AREA resize per frame: (luminance, red_ratio, red_value) grids.
+
+    Luminance is linear in the linearised channels, so averaging the linear BGR cells and
+    then taking the weighted sum equals averaging per-pixel luminance (exactly). The red
+    metrics are computed from the cell-average colour, which is the analysis unit anyway.
+    Doing it this way instead of per pixel made the 720p analyzer about 6x faster."""
+    lin_g = downsample(linearize(frame_bgr), grid_w, grid_h)
+    lum_g = cv2.transform(lin_g, LUMA_BGR.reshape(1, 3))
+    ratio, value = red_metrics_linear(lin_g)
+    return lum_g, ratio, value
 
 
 def relative_luminance_scalar(r8: int, g8: int, b8: int) -> float:

@@ -41,3 +41,4 @@ infra/.cdk.staging/
 .env
 *.log
 /tmp/
+bench/clips/

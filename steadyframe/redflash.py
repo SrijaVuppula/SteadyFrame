@@ -26,5 +26,8 @@ class RedTracker:
 
     def push(self, frame_bgr: np.ndarray, t: float):
         ratio_g, value_g = self.grids(frame_bgr)
+        return self.push_grids(ratio_g, value_g, t)
+
+    def push_grids(self, ratio_g: np.ndarray, value_g: np.ndarray, t: float):
         flag = ratio_g >= self.profile.red_saturation_ratio
         return self.tracker.push(value_g, flag, t), value_g
