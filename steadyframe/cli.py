@@ -37,7 +37,12 @@ def _add_fix(sub):
     p.add_argument("input")
     p.add_argument("-o", "--output", required=True)
     p.add_argument("--report", default=None)
-    p.add_argument("--policy", default="fixed", choices=["fixed", "agent"])
+    p.add_argument(
+        "--policy",
+        default="fixed",
+        choices=["fixed", "agent", "heuristic"],
+        help="agent = Bedrock model; heuristic = deterministic stand-in following the same tool protocol",
+    )
     p.add_argument("--profile", default="wcag", choices=["wcag", "broadcast"])
     p.add_argument("--trace", default=None, help="trace.jsonl path (default next to the report)")
     p.add_argument("--workdir", default=None)
