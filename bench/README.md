@@ -30,7 +30,7 @@ IMDS.
     python -m bench.compare bench/results/*.json --out bench/results/comparison.md
 
 Prices are on-demand us-east-1 at the time of the run: check them on the day and record
-them in `docs/DECISIONS.md`. Terminate the instances afterwards.
+them in `docs/NOTES.md`. Terminate the instances afterwards.
 
 `make bench` runs the same harness on the current machine (label defaults to hostname).
 
