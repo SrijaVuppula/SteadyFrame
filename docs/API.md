@@ -24,12 +24,12 @@ created -> uploaded -> queued -> analyzing -> remediating -> rendering -> passed
 | POST | `/jobs` | `{"filename": "clip.mp4", "content_type": "video/mp4", "size_bytes": 123, "profile": "wcag"\|"broadcast", "policy": "fixed"\|"agent", "conservative": false}` | `{"job_id": "...", "upload": {"method": "PUT", "url": "<presigned or /jobs/{id}/upload>", "headers": {"Content-Type": "video/mp4"}}}` |
 | PUT | `/jobs/{id}/upload` | raw bytes (local mode only; AWS uses the presigned S3 URL) | `{"ok": true}` |
 | POST | `/jobs/{id}/start` | | `{"job_id": "...", "status": "queued"}` |
-| POST | `/jobs/from-sample` | `{"sample_id": "...", "profile": "wcag", "policy": "fixed"}` | `{"job_id": "...", "status": "queued"}` |
+| POST | `/jobs/from-sample` | `{"sample_id": "...", "profile": "wcag", "policy": "fixed", "conservative": false}` | `{"job_id": "...", "status": "queued"}` |
 | GET | `/jobs/{id}` | | Job object (below) |
-| GET | `/jobs/{id}/segments` | | `{"segments": [Segment + {"region_series": {"t": [...], "L": [...]}, "remediation": {...} or null}]}` |
+| GET | `/jobs/{id}/segments` | | `{"segments": [Segment + {"region_series": {"t": [...], "L": [...]} or null (null until analysis finished), "remediation": {...} or null}]}` |
 | GET | `/jobs/{id}/trace` | `?after=<seq>` | `{"records": [TraceRecord...], "complete": bool}` |
 | POST | `/jobs/{id}/approve` | `{"segment_id": "g000", "approved": true, "candidate_id": "g000-c2"}` | `{"job_id": "...", "status": "queued"}` |
-| GET | `/jobs/{id}/download` | `?kind=video\|report\|analysis\|trace\|plot\|summary` | `{"url": "<presigned GET, 15 min>", "kind": "video"}` (local mode: a direct URL) |
+| GET | `/jobs/{id}/download` | `?kind=input\|video\|report\|analysis\|trace\|plot\|summary` (`input` = the original upload, for the click-through preview) | `{"url": "<presigned GET, 15 min>", "kind": "video"}` (local mode: a direct URL) |
 | GET | `/jobs/{id}/frames/{segment_id}.png` | | PNG still frame from the middle of the segment with the regions outlined. Never animated. |
 
 Limits enforced server-side: 100 MB, 120 s, container in {mp4, mov, webm, mkv, gif}. Rejected
@@ -54,10 +54,16 @@ uploads get status `error` with `error` = reason.
 }
 ```
 
+`progress.stage` is one of `created, uploaded, queued, analyzing, remediating, rendering,
+needs_approval, done, error`. `input` is filled at upload validation time and never null
+afterwards; `before` is null until analysis finished.
+
 `Segment` is the analysis.json segment (`steadyframe/schema.py`): `{id, type, verdict, start_frame,
 end_frame, start_s, end_s, peak_flash_rate_hz, max_area_fraction, max_delta_L, regions: [{x,y,w,h}],
 severity_score}`. `TraceRecord` is one line of `trace.jsonl` (`steadyframe/agent/trace.py`):
 `{seq, job_id, t_rel_s, ts, kind: tool_call|tool_result|decision|model|error|job, name, args?, result?, error?, iteration?, by?}`.
+Model turns (`kind: model, name: turn`) carry `turn, text, tool_calls: [{name, input}], stop_reason, input_tokens, output_tokens, latency_s`.
+`pending_approvals[].options[].passes` is present only on last-resort requests (every candidate offered, passing ones first).
 
 ## Storage layout (AWS)
 
