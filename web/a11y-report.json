@@ -1,0 +1,27 @@
+{
+  "tool": "axe-core via @axe-core/cli",
+  "axe_version": "4.13.0",
+  "generated_at": "2026-09-20T01:46:00.254Z",
+  "pages": [
+    {
+      "url": "http://127.0.0.1:4173/?fixture=1",
+      "violations": [],
+      "passes": 40,
+      "incomplete": 1
+    },
+    {
+      "url": "http://127.0.0.1:4173/jobs/fx-passed?fixture=1",
+      "violations": [],
+      "passes": 56,
+      "incomplete": 2
+    },
+    {
+      "url": "http://127.0.0.1:4173/jobs/fx-approval?fixture=1",
+      "violations": [],
+      "passes": 25,
+      "incomplete": 0
+    }
+  ],
+  "blocking_count": 0,
+  "passed": true
+}
