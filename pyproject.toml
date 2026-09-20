@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "steadyframe"
+version = "0.1.0"
+description = "Closed-loop photosensitive-hazard analyzer and remediator for video (OpenCV 5 + AWS)"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Srija Vuppula" }]
+dependencies = [
+  "opencv-python-headless==5.0.0.93",
+  "numpy==2.4.6",
+  "pyyaml==6.0.3",
+  "jsonschema==4.26.0",
+  "imageio-ffmpeg==0.6.0",
+  "matplotlib==3.11.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==9.1.1",
+  "hypothesis==6.168.0",
+  "ruff==0.16.8",
+]
+aws = [
+  "boto3==1.43.98",
+]
+service = [
+  "fastapi==0.141.1",
+  "uvicorn==0.53.0",
+  "python-multipart==0.0.32",
+]
+infra = [
+  "aws-cdk-lib==2.270.0",
+  "constructs>=10.0.0,<11.0.0",
+]
+
+[project.scripts]
+steadyframe = "steadyframe.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["steadyframe*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["web", "infra/cdk.out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]
