@@ -1,0 +1,166 @@
+{
+  "policies": {
+    "TaskExecutionRoleDefaultPolicy72339918": {
+      "policy_document": {
+        "Statement": [
+          {
+            "Action": [
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::GetAtt": [
+                "WorkerLogsC1193B08",
+                "Arn"
+              ]
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "roles": [
+        {
+          "Ref": "TaskExecutionRoleEF964934"
+        }
+      ]
+    },
+    "TaskTaskRoleDefaultPolicyC02AED32": {
+      "policy_document": {
+        "Statement": [
+          {
+            "Action": "s3:GetObject",
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                    },
+                    "/uploads/*"
+                  ]
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                    },
+                    "/outputs/*"
+                  ]
+                ]
+              }
+            ],
+            "Sid": "ReadInputsAndPausedState"
+          },
+          {
+            "Action": "s3:PutObject",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                  },
+                  "/outputs/*"
+                ]
+              ]
+            },
+            "Sid": "WriteOutputs"
+          },
+          {
+            "Action": [
+              "dynamodb:GetItem",
+              "dynamodb:UpdateItem"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Data:ExportsOutputFnGetAttJobsDF1CC2D4Arn85C9CFC3"
+            },
+            "Sid": "JobsTable"
+          },
+          {
+            "Action": [
+              "dynamodb:BatchWriteItem",
+              "dynamodb:PutItem"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Data:ExportsOutputFnGetAttTracesF050D86DArnC3018951"
+            },
+            "Sid": "TracesTableWrite"
+          },
+          {
+            "Action": [
+              "sqs:ReceiveMessage",
+              "sqs:DeleteMessage",
+              "sqs:ChangeMessageVisibility",
+              "sqs:GetQueueAttributes"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Queue:ExportsOutputFnGetAttJobsDF1CC2D4Arn85C9CFC3"
+            },
+            "Sid": "ConsumeQueue"
+          },
+          {
+            "Action": "cloudwatch:PutMetricData",
+            "Condition": {
+              "StringEquals": {
+                "cloudwatch:namespace": "SteadyFrame"
+              }
+            },
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "Metrics"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "roles": [
+        {
+          "Ref": "TaskTaskRoleE98524A1"
+        }
+      ]
+    }
+  },
+  "roles": {
+    "TaskExecutionRoleEF964934": {
+      "assume_role_policy": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "ecs-tasks.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "inline_policies": [],
+      "managed_policies": []
+    },
+    "TaskTaskRoleE98524A1": {
+      "assume_role_policy": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "ecs-tasks.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "inline_policies": [],
+      "managed_policies": []
+    }
+  }
+}

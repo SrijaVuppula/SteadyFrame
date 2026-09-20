@@ -1,0 +1,22 @@
+{
+  "app": "../.venv/bin/python app.py",
+  "output": "cdk.out",
+  "watch": {
+    "include": ["**"],
+    "exclude": ["cdk.out", ".samples", "node_modules", "policies"]
+  },
+  "context": {
+    "alert_email": "",
+    "bedrock_model_id": "",
+    "skip_docker_build": false,
+    "web_origin": "*",
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,
+    "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": true,
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/aws-apigateway:disableCloudWatchRole": true,
+    "@aws-cdk/aws-ec2:restrictDefaultSecurityGroup": false,
+    "@aws-cdk/core:defaultCrossStackReferences": "strong"
+  }
+}

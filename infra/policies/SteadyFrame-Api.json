@@ -1,0 +1,151 @@
+{
+  "policies": {
+    "ApiServiceRoleDefaultPolicyB24862FE": {
+      "policy_document": {
+        "Statement": [
+          {
+            "Action": [
+              "s3:PutObject",
+              "s3:DeleteObject"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::Join": [
+                "",
+                [
+                  {
+                    "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                  },
+                  "/uploads/*"
+                ]
+              ]
+            },
+            "Sid": "UploadsPresignAndCleanup"
+          },
+          {
+            "Action": "s3:GetObject",
+            "Effect": "Allow",
+            "Resource": [
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                    },
+                    "/uploads/*"
+                  ]
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                    },
+                    "/outputs/*"
+                  ]
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+                    },
+                    "/samples/*"
+                  ]
+                ]
+              }
+            ],
+            "Sid": "ReadJobObjects"
+          },
+          {
+            "Action": "s3:ListBucket",
+            "Condition": {
+              "StringLike": {
+                "s3:prefix": [
+                  "samples/*",
+                  "uploads/*",
+                  "outputs/*"
+                ]
+              }
+            },
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Storage:ExportsOutputFnGetAttBucket83908E77Arn063C8555"
+            },
+            "Sid": "ListSamplesAndJobPrefixes"
+          },
+          {
+            "Action": [
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem"
+            ],
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Data:ExportsOutputFnGetAttJobsDF1CC2D4Arn85C9CFC3"
+            },
+            "Sid": "JobsTable"
+          },
+          {
+            "Action": "dynamodb:Query",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Data:ExportsOutputFnGetAttTracesF050D86DArnC3018951"
+            },
+            "Sid": "TracesTableRead"
+          },
+          {
+            "Action": "sqs:SendMessage",
+            "Effect": "Allow",
+            "Resource": {
+              "Fn::ImportValue": "SteadyFrame-Queue:ExportsOutputFnGetAttJobsDF1CC2D4Arn85C9CFC3"
+            },
+            "Sid": "EnqueueJobs"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "roles": [
+        {
+          "Ref": "ApiServiceRole1BD550DA"
+        }
+      ]
+    }
+  },
+  "roles": {
+    "ApiServiceRole1BD550DA": {
+      "assume_role_policy": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "inline_policies": [],
+      "managed_policies": [
+        {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}
