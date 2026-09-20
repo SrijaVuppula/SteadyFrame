@@ -55,12 +55,13 @@ web: ## build the frontend
 local: ## run the API + worker locally without AWS
 	docker compose up --build
 
-deploy: ## deploy the AWS stack (needs credentials; prints the endpoint URL)
-	cd infra && ../$(BIN)/cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+deploy: ## deploy the AWS stack (needs credentials + docker; prints the endpoint URL)
+	$(BIN)/pip install -q -r infra/requirements-infra.lock
+	cd infra && npm ci --silent && npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
 	@$(BIN)/python -c "import json;d=json.load(open('infra/cdk-outputs.json'));[print(k,'=',v) for s in d.values() for k,v in s.items()]"
 
 destroy: ## tear the AWS stack down
-	cd infra && ../$(BIN)/cdk destroy --all --force
+	cd infra && npx cdk destroy --all --force
 
 smoke: ## upload a synthetic clip to the deployed endpoint and check the remediated output passes
 	$(BIN)/python service/smoke.py --outputs infra/cdk-outputs.json

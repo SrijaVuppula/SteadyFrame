@@ -31,6 +31,8 @@ def fix_file(
     keep_workdir: bool | None = None,
     approval_min_ssim: float = 0.75,
     detect_patterns: bool = False,
+    trace_sink=None,
+    job_id: str | None = None,
 ) -> dict:
     t0 = time.perf_counter()
     tmp = None
@@ -42,11 +44,12 @@ def fix_file(
         keep_workdir = tmp is None
     from ..agent.trace import Trace
 
-    trace = Trace(trace_path or workdir / "trace.jsonl")
+    trace = Trace(trace_path or workdir / "trace.jsonl", job_id=job_id or "local", sink=trace_sink)
     job = Job(
         src,
         workdir,
         profile=profile,
+        job_id=job_id,
         max_iterations_per_segment=max_iterations,
         max_iterations_total=max_iterations_total,
         trace=trace,
