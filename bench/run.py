@@ -260,7 +260,7 @@ def profile_run(frames, meta, profile) -> dict:
         # "{built-in method builtins.max}" or "{method 'reduce' of ...}"
         if (
             file == "~"
-            and func.startswith("{")
+            and func.startswith("<")
             and "built-in method" not in func
             and "method '" not in func
         ):
