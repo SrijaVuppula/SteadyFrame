@@ -1,0 +1,31 @@
+flowchart TD
+    subgraph P1["Perception (OpenCV 5)"]
+        A[analyze_video<br/>luminance LUT, INTER_AREA grid,<br/>transition tracker, boxFilter area,<br/>connectedComponents regions]
+    end
+    subgraph D["Decision (model or fixed policy)"]
+        B[get_segment_detail<br/>rate, swing, area, regions,<br/>parameter hints, budget]
+        C{choose strategy<br/>and parameters}
+    end
+    subgraph ACT["Action"]
+        E[apply_remediation<br/>S1..S6 rendered on<br/>segment + margins]
+    end
+    subgraph P2["Perception again (OpenCV 5)"]
+        F[verify_candidate<br/>re-run analyzer on the candidate,<br/>SSIM / PSNR / dL quality]
+    end
+    G{passes for<br/>this hazard type?}
+    H{needs human<br/>approval?}
+    I[request_human_approval<br/>job pauses, state persisted]
+    J[accept_candidate]
+    K{segments<br/>left?}
+    L[finalize: full render,<br/>whole-file re-verification]
+    M[failure handling:<br/>timeout / throttle / malformed call /<br/>budget exhausted -> fixed policy]
+
+    A --> B --> C --> E --> F --> G
+    G -- "no: residual swing, rate, area" --> C
+    G -- yes --> H
+    H -- yes --> I --> J
+    H -- no --> J
+    J --> K
+    K -- yes --> B
+    K -- no --> L
+    C -. any provider or tool failure .-> M --> C
