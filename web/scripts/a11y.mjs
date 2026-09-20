@@ -4,7 +4,7 @@
 // violation of impact serious or critical.
 //
 // Browser: CHROME_PATH, else the Playwright chromium under PLAYWRIGHT_BROWSERS_PATH
-// (/opt/pw-browsers by default), else whatever chromedriver finds.
+// (/opt/pw-browsers by default), else google-chrome / chromium on PATH (GitHub runners).
 // Driver: CHROMEDRIVER_PATH, else the pinned chromedriver package's binary. That package's
 // postinstall is skipped in .npmrc (its version lookup host is blocked on some networks), so
 // on first run we install the driver that matches the detected Chrome major version straight
@@ -44,7 +44,17 @@ function findChrome() {
       }
     }
   }
+  for (const name of ['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser']) {
+    const p = onPath(name);
+    if (p) return p;
+  }
   return null;
+}
+
+function onPath(name) {
+  const r = spawnSync(process.platform === 'win32' ? 'where' : 'which', [name], { encoding: 'utf8' });
+  const p = (r.stdout || '').split('\n')[0].trim();
+  return r.status === 0 && p && existsSync(p) ? p : null;
 }
 
 function chromeVersion(chrome) {
@@ -79,7 +89,12 @@ function findChromedriver(chrome) {
     if (r.status === 0 && driverOk(pkgBin)) return pkgBin;
     console.warn('[a11y] chromedriver download failed; falling back to PATH');
   }
-  return null; // let axe/selenium find one on PATH
+  // axe/selenium only looks at the npm package's binary, so a driver on PATH has to be
+  // passed explicitly (--chromedriver-path); without one we cannot run at all.
+  const sys = onPath('chromedriver');
+  if (sys && driverOk(sys)) return sys;
+  if (sys) console.warn(`[a11y] ${sys} does not match Chrome ${version}; trying it anyway`);
+  return sys;
 }
 
 function serve() {
