@@ -32,7 +32,7 @@ luminance swing, region, severity) and exits 2 on `fail`. `fix` writes the remed
 video, a `report.json` and a `trace.jsonl` of every decision.
 
 Web endpoint, local: `docker compose up` then http://localhost:8080. AWS: `make deploy`
-(see `infra/README.md`), then `make smoke`. Deployed endpoint: to be added once it is up.
+(see `infra/README.md`), then `make smoke`. Deployed endpoint: https://d25yofo4x3sac8.cloudfront.net
 
 ## How it works
 
