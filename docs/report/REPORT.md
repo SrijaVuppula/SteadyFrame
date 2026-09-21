@@ -191,10 +191,10 @@ an LLM):
 | runtime per clip (s) | 4.7 | 3.5 |
 
 Live Bedrock results (`eval/results/agent_vs_fixed_bedrock.md`): success
-n/a (not run), iterations per segment
-n/a (not run), SSIM inside
-n/a (not run), cost
-n/a (not run) USD for the suite. Where the agent is worse is
+1.000, iterations per segment
+1.04, SSIM inside
+0.882, cost
+3.0411 USD for the suite. Where the agent is worse is
 listed in that file; if it shows no quality advantage, its value is parameter selection,
 the explanation in the trace, and human control, and we say so.
 

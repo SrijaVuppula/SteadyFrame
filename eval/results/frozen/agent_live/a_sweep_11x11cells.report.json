@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0",
+  "tool": {
+    "name": "steadyframe",
+    "version": "0.1.0",
+    "opencv": {
+      "version": "5.0.0",
+      "file": "/Users/srijayadav/Documents/SteadyFrame/.venv/lib/python3.11/site-packages/cv2/__init__.py",
+      "ffmpeg": "YES",
+      "parallel_framework": "GCD",
+      "baseline": "NEON FP16 NEON_DOTPROD NEON_FP16"
+    }
+  },
+  "input": {
+    "path": "data/synthetic/a_sweep_11x11cells.mp4",
+    "width": 320,
+    "height": 240,
+    "fps": 30.0,
+    "frames_analyzed": 150,
+    "duration_analyzed_s": 5.0
+  },
+  "output": {
+    "path": "/tmp/a_sweep_11x11cells.safe.mp4"
+  },
+  "policy": "agent[bedrock]",
+  "status": "passed",
+  "error": null,
+  "before": {
+    "verdict": "fail",
+    "segments": [
+      {
+        "id": "g000",
+        "type": "general",
+        "verdict": "fail",
+        "start_frame": 15,
+        "end_frame": 149,
+        "start_s": 0.5,
+        "end_s": 5.0,
+        "peak_flash_rate_hz": 8.0,
+        "max_area_fraction": 0.3601,
+        "max_delta_L": 0.6055,
+        "regions": [
+          {
+            "x": 0.3125,
+            "y": 0.2083,
+            "w": 0.1719,
+            "h": 0.2292
+          }
+        ],
+        "severity_score": 0.601
+      }
+    ],
+    "per_second": [
+      {
+        "second": 0,
+        "general": "fail",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "fail",
+        "max_flash_rate_hz": 4.0,
+        "max_area_fraction": 0.3601
+      },
+      {
+        "second": 1,
+        "general": "fail",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "fail",
+        "max_flash_rate_hz": 8.0,
+        "max_area_fraction": 0.3601
+      },
+      {
+        "second": 2,
+        "general": "fail",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "fail",
+        "max_flash_rate_hz": 8.0,
+        "max_area_fraction": 0.3601
+      },
+      {
+        "second": 3,
+        "general": "fail",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "fail",
+        "max_flash_rate_hz": 8.0,
+        "max_area_fraction": 0.3601
+      },
+      {
+        "second": 4,
+        "general": "fail",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "fail",
+        "max_flash_rate_hz": 8.0,
+        "max_area_fraction": 0.3601
+      }
+    ]
+  },
+  "after": {
+    "verdict": "pass",
+    "segments": [],
+    "per_second": [
+      {
+        "second": 0,
+        "general": "pass",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "pass",
+        "max_flash_rate_hz": 2.0,
+        "max_area_fraction": 0.0
+      },
+      {
+        "second": 1,
+        "general": "pass",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "pass",
+        "max_flash_rate_hz": 5.0,
+        "max_area_fraction": 0.0238
+      },
+      {
+        "second": 2,
+        "general": "pass",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "pass",
+        "max_flash_rate_hz": 6.0,
+        "max_area_fraction": 0.131
+      },
+      {
+        "second": 3,
+        "general": "pass",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "pass",
+        "max_flash_rate_hz": 6.0,
+        "max_area_fraction": 0.131
+      },
+      {
+        "second": 4,
+        "general": "pass",
+        "red": "pass",
+        "pattern": "pass",
+        "verdict": "pass",
+        "max_flash_rate_hz": 6.0,
+        "max_area_fraction": 0.1607
+      }
+    ]
+  },
+  "segments": [
+    {
+      "segment_id": "g000",
+      "type": "general",
+      "start_s": 0.5,
+      "end_s": 5.0,
+      "outcome": "accepted",
+      "strategy": "S1",
+      "params": {
+        "alpha": 0.15
+      },
+      "attempts": [
+        {
+          "candidate_id": "g000-c1",
+          "strategy": "S1",
+          "params": {
+            "alpha": 0.15
+          },
+          "verified": {
+            "passes_for_type": true,
+            "verdict": "pass",
+            "ssim_overall": 0.986412477934802,
+            "requires_approval": false
+          }
+        }
+      ],
+      "approval": null,
+      "quality": {
+        "ssim_overall": 0.986412477934802,
+        "ssim_inside": 0.8774778057027746,
+        "ssim_outside": 1.0,
+        "psnr_outside_db": null,
+        "psnr_outside_is_lossless": true,
+        "mean_abs_dL_inside": 0.09097835229778731,
+        "temporal_step_before": 0.09986359167962644,
+        "temporal_step_after": 0.015894065535481353,
+        "temporal_smoothness_gain": 6.283074110692099,
+        "frames": 135
+      }
+    }
+  ],
+  "quality": {
+    "ssim_overall": 0.986412477934802,
+    "ssim_inside": 0.8774778057027746,
+    "ssim_outside": 1.0,
+    "mean_abs_dL_inside": 0.09097835229778731
+  },
+  "trace_path": "/tmp/wd_a_sweep_11x11cells/trace.jsonl",
+  "iterations": 1,
+  "runtime_s": 17.717,
+  "job_id": "0b48ba6a7d9d",
+  "llm": {
+    "provider": "bedrock",
+    "turns": 6,
+    "input_tokens": 29083,
+    "output_tokens": 554,
+    "latency_s": 16.058,
+    "errors": []
+  },
+  "pending_approvals": [],
+  "workdir": "/tmp/wd_a_sweep_11x11cells"
+}
