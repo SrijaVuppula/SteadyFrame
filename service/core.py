@@ -25,6 +25,21 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+
+def _samples_module():
+    """``samples`` is a sibling module in the repo but a top-level one in the Lambda.
+
+    The deployed asset root is ``service/`` (handler ``lambda/handler.handler``), so ``core``
+    has no parent package there and a relative import raises ImportError. Same guard as
+    ``lambda/handler.py`` uses for ``core`` itself.
+    """
+    try:
+        from . import samples as sm
+    except ImportError:  # deployed layout: /var/task/{core.py, samples.py}
+        import samples as sm  # type: ignore[no-redef]
+    return sm
+
+
 MAX_BYTES = 100 * 1024 * 1024
 MAX_DURATION_S = 120.0
 DURATION_TOLERANCE_S = 0.5  # container durations are rounded; do not reject 120.04 s
@@ -756,7 +771,7 @@ class Api:
         }
 
     def samples(self) -> list[dict]:
-        from . import samples as sm
+        sm = _samples_module()
 
         if self.ctx.mode == "local":
             sm.ensure_local(self.ctx.store)
@@ -813,7 +828,7 @@ class Api:
         return self._enqueue(job, "waiting for a worker")
 
     def from_sample(self, body: dict) -> dict:
-        from . import samples as sm
+        sm = _samples_module()
 
         if not isinstance(body, dict):
             raise ApiError(400, "body must be a JSON object")
