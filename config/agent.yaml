@@ -10,8 +10,8 @@ bedrock:
   timeout_s: 60
   max_retries: 3          # on ThrottlingException / transient errors, exponential backoff
   # optional, for the cost column in eval/agent_vs_fixed: USD per 1k tokens. Leave 0 if unknown.
-  price_per_1k_input_usd: 0.0
-  price_per_1k_output_usd: 0.0
+  price_per_1k_input_usd: 0.003
+  price_per_1k_output_usd: 0.015
 
 loop:
   max_turns: 40            # model turns per job before falling back to the fixed policy
