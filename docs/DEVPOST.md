@@ -6,6 +6,14 @@ SteadyFrame
 ## Tagline
 Finds flashing hazards in video, fixes them with the least invasive change, and verifies its own fix. OpenCV 5 + AWS.
 
+## Links
+- Live demo: https://d25yofo4x3sac8.cloudfront.net (press "Try a sample clip"; the first job
+  after a quiet spell waits a few minutes for a worker to start)
+- API: https://9hafgox58k.execute-api.us-east-1.amazonaws.com/health
+- Code: https://github.com/SrijaVuppula/SteadyFrame
+- Technical report: https://github.com/SrijaVuppula/SteadyFrame/blob/main/docs/report/REPORT.md
+- Video: (YouTube link)
+
 ## Inspiration
 Flashing video can trigger seizures for people with photosensitive epilepsy. The standard
 checker (Harding FPA) is commercial; the free one (PEAT) may not be used on commercial
