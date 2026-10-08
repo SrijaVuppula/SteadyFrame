@@ -40,6 +40,12 @@ export function JobStatusPanel({ job, pollError }: { job: Job; pollError: string
             {detail ? ` — ${detail}` : ''}
             <span className="muted"> · polling every 2 s</span>
           </p>
+          {job.status === 'queued' && (
+            <p className="muted">
+              The worker scales to zero when nobody is using it, so the first job after a quiet
+              spell waits a few minutes for one to start. Later jobs start straight away.
+            </p>
+          )}
         </div>
       )}
       {job.status === 'error' && (
