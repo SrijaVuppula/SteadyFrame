@@ -183,6 +183,10 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   S4/S2 is reachable after S4/S1. On IRIS `flashStripes` (12.5 Hz, full swing) the hinted
   alpha 0.165 is right for the steady state but the EMA's start-up steps are transitions too;
   the retry at 0.083 passes.
+- Cost of the episode bookkeeping: one extra `cv2.boxFilter` on the 64x48 at-limit mask per
+  frame and type. Interleaved runs of `bench_strobe.mp4` on this host, previous commit vs
+  this one: 560 / 569 fps vs 558 / 549 fps (median of 9). Within noise, so the frozen
+  benchmark (634 fps on the original build host) still describes the analyzer.
 - The live Bedrock results in `eval/results/frozen/agent_live/` and
   `agent_vs_fixed_bedrock.*` were produced before these changes (commit fdf0c19). On the
   synthetic suite the changes don't alter any plan, so they stand; they were not re-run.
