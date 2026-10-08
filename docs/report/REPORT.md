@@ -173,7 +173,7 @@ Frame rates 24/25/30/60, 16:9 720p and a 9:16 vertical clip all give the expecte
 | SSIM inside regions | 0.860 |
 | mean absolute luminance change inside regions | 0.149 |
 | approvals requested (auto-granted offline) | 1 |
-| mean runtime per clip (analyze + fix + verify, 320x240) | 4.7 s |
+| mean runtime per clip (analyze + fix + verify, 320x240) | 4.4 s |
 
 ![](figures/fig_remediation_quality.png)
 
@@ -188,7 +188,7 @@ an LLM):
 | success rate | 1.000 | 1.000 |
 | iterations per segment | 1.10 | 1.00 |
 | SSIM inside regions | 0.860 | 0.874 |
-| runtime per clip (s) | 4.7 | 3.5 |
+| runtime per clip (s) | 4.5 | 3.4 |
 
 Live Bedrock results (`eval/results/agent_vs_fixed_bedrock.md`): success
 1.000, iterations per segment
@@ -196,9 +196,70 @@ Live Bedrock results (`eval/results/agent_vs_fixed_bedrock.md`): success
 0.882, cost
 3.0411 USD for the suite. Where the agent is worse is
 listed in that file; if it shows no quality advantage, its value is parameter selection,
-the explanation in the trace, and human control, and we say so.
+the explanation in the trace, and human control, and we say so. The live run predates the
+verification and episode changes in 7.5; those leave every synthetic plan unchanged, so it
+was not repeated.
 
-### 7.5 Benchmark: x86, Graviton, COOL (`bench/run.py`)
+### 7.5 External clips (`eval/external.py`)
+
+The synthetic suite checks that the rules are implemented as written. To check the
+analyzer on content it was not built around, 18 openly licensed clips made
+by other people were added (`data/SOURCES.md`, URLs pinned to commits, checksums verified
+before scoring). None of the labels comes from this analyzer:
+
+- EA IRIS's eight test videos (BSD-3-Clause), scored against IRIS's own expected
+  per-frame logs. IRIS applies the area rule to the whole screen, so `broadcast` is the
+  like-for-like profile.
+- Apple's VideoFlashingReduction sample clip (MIT): six bursts of uniform full-frame
+  flashing at about 1, 2, 3, 4, 6 and 12 Hz, labelled by the independent reference rules on
+  the frame-mean luminance (valid because the flashing is uniform: worst quadrant deviation
+  0.007).
+- 9 Intel IoT DevKit camera clips (CC BY 4.0) as calm controls,
+  9.1 minutes in total, every second labelled pass.
+
+| metric | `wcag` | `broadcast` |
+|---|---|---|
+| clip verdicts matching the label | 18 / 18 | 18 / 18 |
+| IRIS clips matching IRIS's flash verdict | 8 / 8 | 8 / 8 |
+| IRIS flash-fail frames inside a detected segment | 35 / 35 | 35 / 35 |
+| per-second precision / recall / F1 | 1.000 / 1.000 / 1.000 | 1.000 / 1.000 / 1.000 |
+| control seconds flagged | 0 / 551 | 0 / 551 |
+
+On the Apple clip the analyzer's failing spans match the reference's failing intervals
+with a mean IoU of 1.000. In the controls, moving objects
+make single cells exceed the rate (up to 5.0 Hz),
+but those cells never cover more than 8.6%
+of a 10-degree window, against the 25% rule. IRIS also implements an "extended failure"
+rule from the broadcast guidance (sustained flashing at four or more transitions a second
+for four of five seconds), which SteadyFrame does not; it is the only verdict IRIS gives on
+1 of its clips, which passes in both tools' flash rule.
+
+![](figures/fig_external_apple.png)
+
+The external clips also exposed two remediation bugs that the synthetic suite never hit,
+both fixed before these numbers were produced (`docs/NOTES.md`, 2026-10-08):
+
+- *Neighbouring hazards.* The Apple bursts are about 0.8 s apart, so the clip that verifies
+  one segment's fix also contains the start of the next, untreated burst, and verification
+  counted it against the fix. Every candidate failed and both policies ran out of attempts.
+  Verification now attributes a remaining hazard to another untreated segment when its
+  failing frames lie inside that segment, and reports it separately; the whole-file
+  re-verification at the end is unchanged.
+- *Flashing at the limit.* IRIS `3Hz_6s` flashes at exactly three flashes a second for six
+  seconds, and frame timing tips a few windows to seven transitions. Treating only those
+  frames adds a transition at the treatment's own edge next to windows that already hold
+  six. The analyzer now reports each segment's at-limit episode, and a plan widens to it
+  when it reaches past the 0.5 s margin (on clean bursts it does not, so the synthetic
+  results above are unchanged).
+
+With both fixes, the fixed policy passes whole-file re-verification on
+3 of 3 external hazard clips
+(1.00 attempts per segment) and the
+heuristic agent on 3 of 3
+(1.33). The two full-swing,
+full-frame IRIS strobes fall below the SSIM bar and go to human approval, as designed.
+
+### 7.6 Benchmark: x86, Graviton, COOL (`bench/run.py`)
 
 Identical analyzer, three 1280x720 clips, ten repetitions after a discarded warm-up,
 decode excluded and included. Evidence of which build executed (version, `cv2.__file__`,
@@ -207,9 +268,10 @@ build information, loaded shared libraries including `kleidicv`, instance type) 
 634 fps analysis-only and
 421 fps with decode, with
 79% of analysis time inside cv2 built-ins
-(`resize`, `LUT`, `transform`, `boxFilter`). The three-configuration table is
-`bench/results/comparison.md` (c7i.xlarge stock, c8g.xlarge stock, c8g.xlarge COOL AMI),
-with USD per video-hour from on-demand prices on the day.
+(`resize`, `LUT`, `transform`, `boxFilter`). The three EC2 configurations (c7i.xlarge
+stock, c8g.xlarge stock, c8g.xlarge COOL AMI) run with `python -m bench.ec2`, one command
+each, and land in `bench/results/comparison.md` with USD per video-hour from on-demand
+prices on the day; every row in that table comes from a JSON file in `bench/results/`.
 
 ![](figures/comparison.png)
 
@@ -226,14 +288,20 @@ with USD per video-hour from on-demand prices on the day.
   warning only.
 - The WCAG exemption for fine balanced patterns is not implemented (over-flagging).
 - No display model: relative luminance from sRGB stands in for cd/m2.
-- Real-world labelled data is small; the synthetic ground truth checks that the rules are
-  implemented as written, not that the rules capture every real hazard.
+- External data is small: 18 clips, of which 3 contain
+  hazards, and none of those is natural footage (concert lighting and emergency vehicles
+  are still missing). The synthetic ground truth checks that the rules are implemented as
+  written, not that the rules capture every real hazard.
+- IRIS's extended-failure rule (sustained flashing below the three-flash limit) is not
+  implemented.
+- Fixing a hazard embedded in at-limit flashing treats the whole episode, which can be long
+  and costly in quality (IRIS `3Hz_6s`: the full six seconds, SSIM inside under 0.4).
 - Heavy compression: measured to CRF 35 on synthetic content only.
 
 ## 9. Reproducible operation
 
 - `make install && make test` (pinned `requirements.lock`, OpenCV 5 asserted).
-- `make synth && make eval && make bench` regenerate every number here; `python -m eval.report` re-renders this file.
+- `make synth && make real && make eval && make bench` regenerate every number here; `python -m eval.report` re-renders this file.
 - `make deploy` (CDK) prints the endpoint; `make smoke` uploads a sample and checks the remediated output passes; `make destroy`.
 - `docker compose up` for the offline reproduction.
 - Observability: structured JSON logs; CloudWatch metrics for job duration, realtime factor, iterations per segment, failures, approvals; one dashboard and alarms in IaC; budget alarm at 50 USD.

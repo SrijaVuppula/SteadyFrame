@@ -60,7 +60,9 @@ afterwards; `before` is null until analysis finished.
 
 `Segment` is the analysis.json segment (`steadyframe/schema.py`): `{id, type, verdict, start_frame,
 end_frame, start_s, end_s, peak_flash_rate_hz, max_area_fraction, max_delta_L, regions: [{x,y,w,h}],
-severity_score}`. `TraceRecord` is one line of `trace.jsonl` (`steadyframe/agent/trace.py`):
+severity_score}` plus, for general and red segments, `detected_s` (first frame that broke the
+rule; `start_s` is back-dated to the first transition in that window) and
+`episode_start_s`/`episode_end_s` (the surrounding frames that flash at exactly the limit). `TraceRecord` is one line of `trace.jsonl` (`steadyframe/agent/trace.py`):
 `{seq, job_id, t_rel_s, ts, kind: tool_call|tool_result|decision|model|error|job, name, args?, result?, error?, iteration?, by?}`.
 Model turns (`kind: model, name: turn`) carry `turn, text, tool_calls: [{name, input}], stop_reason, input_tokens, output_tokens, latency_s`.
 `pending_approvals[].options[].passes` is present only on last-resort requests (every candidate offered, passing ones first).

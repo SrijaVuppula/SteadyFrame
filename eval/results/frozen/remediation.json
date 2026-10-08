@@ -5,10 +5,10 @@
   "success_rate": 1.0,
   "mean_iterations_per_segment": 1.1,
   "mean_ssim_outside": 0.9999678112509506,
-  "mean_ssim_inside": 0.8601118625364139,
-  "mean_dL_inside": 0.1490936777590818,
-  "mean_runtime_s": 4.74128,
-  "mean_realtime_factor": 1.6103619019227715,
+  "mean_ssim_inside": 0.8601966980199842,
+  "mean_dL_inside": 0.1490618848932979,
+  "mean_runtime_s": 4.35336,
+  "mean_realtime_factor": 1.7734146529403072,
   "approvals_requested": 1,
   "strategy_usage": {
     "S1": 24,
@@ -29,7 +29,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8694689476931536,
       "dL_inside": 0.09529544962225137,
-      "runtime_s": 3.344,
+      "runtime_s": 3.208,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -46,7 +46,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8506750879464327,
       "dL_inside": 0.1343927627084432,
-      "runtime_s": 3.213,
+      "runtime_s": 3.049,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -63,7 +63,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8084109613188991,
       "dL_inside": 0.26814684636063046,
-      "runtime_s": 3.1,
+      "runtime_s": 2.821,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -80,7 +80,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8955969725336347,
       "dL_inside": 0.06999297440052032,
-      "runtime_s": 3.2,
+      "runtime_s": 2.882,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -97,7 +97,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.9368586118956258,
       "dL_inside": 0.14605831155987611,
-      "runtime_s": 3.116,
+      "runtime_s": 2.8,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -114,7 +114,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.9525426612760788,
       "dL_inside": 0.07674797488502542,
-      "runtime_s": 3.141,
+      "runtime_s": 2.805,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -131,7 +131,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8488652472694714,
       "dL_inside": 0.23816179235776266,
-      "runtime_s": 2.983,
+      "runtime_s": 2.571,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -148,7 +148,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8445673834893012,
       "dL_inside": 0.2368134623693843,
-      "runtime_s": 3.027,
+      "runtime_s": 2.583,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -165,7 +165,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8714244736565484,
       "dL_inside": 0.13047925669837881,
-      "runtime_s": 3.162,
+      "runtime_s": 2.868,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -182,7 +182,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8490437569441619,
       "dL_inside": 0.13736311522208983,
-      "runtime_s": 3.339,
+      "runtime_s": 2.835,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -199,7 +199,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8634271145828308,
       "dL_inside": 0.1437859808305098,
-      "runtime_s": 3.13,
+      "runtime_s": 2.718,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -216,7 +216,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8616325581880441,
       "dL_inside": 0.13774943522604785,
-      "runtime_s": 3.4,
+      "runtime_s": 2.872,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -233,7 +233,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8567108768003958,
       "dL_inside": 0.1353220676244409,
-      "runtime_s": 3.213,
+      "runtime_s": 2.813,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -250,7 +250,7 @@
       "ssim_outside": 0.9991955803346264,
       "ssim_inside": 0.8058644953624222,
       "dL_inside": 0.13220105324546957,
-      "runtime_s": 3.769,
+      "runtime_s": 3.012,
       "duration_s": 6.0,
       "llm": {},
       "reason": ""
@@ -267,7 +267,7 @@
       "ssim_outside": 0.9999997009391381,
       "ssim_inside": 0.876687101466947,
       "dL_inside": 0.10366885100207482,
-      "runtime_s": 5.497,
+      "runtime_s": 4.319,
       "duration_s": 10.0,
       "llm": {},
       "reason": ""
@@ -284,7 +284,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.7396571160286896,
       "dL_inside": 0.09254762589527193,
-      "runtime_s": 6.849,
+      "runtime_s": 6.126,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -299,9 +299,9 @@
       "approvals": 0,
       "strategies": "S1,S3",
       "ssim_outside": 1.0,
-      "ssim_inside": 0.8774247572879599,
-      "dL_inside": 0.052326529757166756,
-      "runtime_s": 6.146,
+      "ssim_inside": 0.8795456443772172,
+      "dL_inside": 0.05153170811256977,
+      "runtime_s": 5.607,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -318,7 +318,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.7857696552891885,
       "dL_inside": 0.39563292025750685,
-      "runtime_s": 11.398,
+      "runtime_s": 11.347,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -335,7 +335,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.9053354153355349,
       "dL_inside": 0.10837386429165173,
-      "runtime_s": 27.204,
+      "runtime_s": 25.481,
       "duration_s": 4.0,
       "llm": {},
       "reason": ""
@@ -352,7 +352,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.847234329330587,
       "dL_inside": 0.13930659873463283,
-      "runtime_s": 1.764,
+      "runtime_s": 1.631,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -369,7 +369,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8509829022667624,
       "dL_inside": 0.140729206698862,
-      "runtime_s": 1.81,
+      "runtime_s": 1.743,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -386,7 +386,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8563003598299241,
       "dL_inside": 0.13406673570940816,
-      "runtime_s": 7.015,
+      "runtime_s": 7.146,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -403,7 +403,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8364138495653195,
       "dL_inside": 0.2236009325299944,
-      "runtime_s": 1.653,
+      "runtime_s": 1.713,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -420,7 +420,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.9152202421065533,
       "dL_inside": 0.10109340198422698,
-      "runtime_s": 1.982,
+      "runtime_s": 1.919,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""
@@ -437,7 +437,7 @@
       "ssim_outside": 1.0,
       "ssim_inside": 0.8966816859458809,
       "dL_inside": 0.153484794005418,
-      "runtime_s": 2.077,
+      "runtime_s": 1.965,
       "duration_s": 5.0,
       "llm": {},
       "reason": ""

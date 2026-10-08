@@ -1,6 +1,6 @@
 # Detection: synthetic suite
 
-Generated 2026-09-20 01:35 UTC by `python -m eval.detection` at git `8c32e8a`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.15).
+Generated 2026-10-08 21:21 UTC by `python -m eval.detection` at git `60e802c`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.17).
 
 - Clips: **44**, clip-level verdict accuracy **1.000**, hazard-type agreement 1.000
 - Per-second (window-level) with `fail` positive: precision **1.000**, recall **1.000**, F1 **1.000** (tp=107, fp=0, fn=0)
@@ -33,50 +33,50 @@ Generated 2026-09-20 01:35 UTC by `python -m eval.detection` at git `8c32e8a`, s
 
 | clip | expected | got | ok | types_ok | sec_tp | sec_fp | sec_fn | t_iou | s_iou | rtf |
 |---|---|---|---|---|---|---|---|---|---|---|
-| a_sweep_11x11cells.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 57.7 |
-| a_sweep_21x16cells.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 46.0 |
-| a_sweep_3x3cells.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 62.3 |
-| a_sweep_6x6cells.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 57.5 |
-| a_sweep_full.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 57.6 |
-| b_area_24pct.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 58.9 |
-| b_area_26pct.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 51.3 |
-| b_dark_0p79.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 49.6 |
-| b_dark_0p81.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 58.5 |
-| b_delta_0p09.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 55.5 |
-| b_delta_0p11.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 49.0 |
-| b_rate_3hz.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 57.1 |
-| b_rate_3p5hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 1.000 | 1.000 | 54.9 |
-| b_rate_4hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.968 | 1.000 | 48.3 |
-| f_sweep_1.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 65.8 |
-| f_sweep_10.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 52.6 |
-| f_sweep_15.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 51.7 |
-| f_sweep_2.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 54.9 |
-| f_sweep_3.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 62.8 |
-| f_sweep_4.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.968 | 1.000 | 50.0 |
-| f_sweep_6.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 59.0 |
-| m_gradient_bg_strobe.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.889 | 0.950 | 54.1 |
-| m_strobe_on_moving_bg.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.692 | 0.945 | 43.9 |
-| m_two_segments.mp4 | fail | fail | yes | yes | 7 | 0 | 0 | 0.802 | 0.960 | 52.7 |
-| n_moving_texture.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 44.6 |
-| n_near_red_not_saturated.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 54.5 |
-| n_scene_cuts.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 51.4 |
-| n_single_camera_flash.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 52.8 |
-| n_slow_fade.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 56.9 |
-| n_small_strobe_under_area.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 59.8 |
-| n_static_texture.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 53.5 |
-| n_two_distant_strobes.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 51.0 |
-| p_stripes_static.mp4 | warn | warn | yes | yes | 0 | 0 | 0 | 1.000 | 0.640 | 9.3 |
-| r_red_strobe_full.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.930 | 1.000 | 41.1 |
-| r_red_strobe_region.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.909 | 0.985 | 52.0 |
-| r_red_to_white.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.937 | 1.000 | 49.2 |
-| v_720p_16x9.mp4 | fail | fail | yes | yes | 3 | 0 | 0 | 0.874 | 0.945 | 13.1 |
-| v_fps_24.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.906 | 1.000 | 64.9 |
-| v_fps_25.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.900 | 1.000 | 59.3 |
-| v_fps_60.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.906 | 1.000 | 26.3 |
-| v_vertical_9x16.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 48.9 |
-| w_ramp_6hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.874 | 1.000 | 57.2 |
-| w_sine_6hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.888 | 1.000 | 48.9 |
-| w_triangle_2hz.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 59.2 |
+| a_sweep_11x11cells.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 43.1 |
+| a_sweep_21x16cells.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 42.6 |
+| a_sweep_3x3cells.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 45.5 |
+| a_sweep_6x6cells.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 40.2 |
+| a_sweep_full.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 37.3 |
+| b_area_24pct.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 40.0 |
+| b_area_26pct.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 40.5 |
+| b_dark_0p79.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 38.2 |
+| b_dark_0p81.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 51.4 |
+| b_delta_0p09.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 40.8 |
+| b_delta_0p11.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 42.1 |
+| b_rate_3hz.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 44.2 |
+| b_rate_3p5hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 1.000 | 1.000 | 43.6 |
+| b_rate_4hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.968 | 1.000 | 39.5 |
+| f_sweep_1.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 46.1 |
+| f_sweep_10.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 41.2 |
+| f_sweep_15.mp4 | fail | fail | yes | yes | 5 | 0 | 0 | 0.889 | 1.000 | 42.9 |
+| f_sweep_2.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 44.5 |
+| f_sweep_3.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 33.8 |
+| f_sweep_4.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.968 | 1.000 | 44.9 |
+| f_sweep_6.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 43.9 |
+| m_gradient_bg_strobe.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.889 | 0.950 | 47.8 |
+| m_strobe_on_moving_bg.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.692 | 0.945 | 28.6 |
+| m_two_segments.mp4 | fail | fail | yes | yes | 7 | 0 | 0 | 0.802 | 0.960 | 49.2 |
+| n_moving_texture.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 31.8 |
+| n_near_red_not_saturated.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 41.1 |
+| n_scene_cuts.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 47.5 |
+| n_single_camera_flash.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 40.0 |
+| n_slow_fade.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 39.5 |
+| n_small_strobe_under_area.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 46.2 |
+| n_static_texture.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 44.3 |
+| n_two_distant_strobes.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 38.8 |
+| p_stripes_static.mp4 | warn | warn | yes | yes | 0 | 0 | 0 | 1.000 | 0.640 | 8.8 |
+| r_red_strobe_full.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.930 | 1.000 | 36.7 |
+| r_red_strobe_region.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.909 | 0.985 | 37.6 |
+| r_red_to_white.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.937 | 1.000 | 38.5 |
+| v_720p_16x9.mp4 | fail | fail | yes | yes | 3 | 0 | 0 | 0.874 | 0.945 | 10.2 |
+| v_fps_24.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.906 | 1.000 | 51.5 |
+| v_fps_25.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.900 | 1.000 | 39.9 |
+| v_fps_60.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.906 | 1.000 | 21.6 |
+| v_vertical_9x16.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.902 | 1.000 | 38.7 |
+| w_ramp_6hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.874 | 1.000 | 42.4 |
+| w_sine_6hz.mp4 | fail | fail | yes | yes | 4 | 0 | 0 | 0.888 | 1.000 | 40.6 |
+| w_triangle_2hz.mp4 | pass | pass | yes | yes | 0 | 0 | 0 | nan | nan | 47.9 |
 
 ## Misses
 
