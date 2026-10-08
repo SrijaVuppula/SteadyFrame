@@ -41,3 +41,4 @@ infra/.cdk.staging/
 *.log
 /tmp/
 bench/clips/
+bench/results/*.ec2.log

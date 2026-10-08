@@ -24,13 +24,31 @@ IMDS.
 
 ## Running it
 
-    bench/remote.sh ubuntu@<c7i host>  c7i.xlarge-stock --price 0.1785
-    bench/remote.sh ubuntu@<c8g host>  c8g.xlarge-stock --price 0.1530
-    bench/remote.sh ubuntu@<c8g cool>  c8g.xlarge-cool  --cool --price 0.1530   # add the COOL software $/h if the listing charges one
-    python -m bench.compare bench/results/*.json --out bench/results/comparison.md
+One command per configuration, no SSH: `bench/ec2.py` launches the instance, passes it
+presigned S3 URLs in its user-data, waits for the result and terminates the instance (see
+its docstring). It needs AWS credentials (the deploy user) and the storage bucket name that
+`make deploy` printed (`BucketName`).
+
+    B=<BucketName>
+    .venv/bin/python -m bench.ec2 --config c7i.xlarge-stock --bucket $B --price <USD/h>
+    .venv/bin/python -m bench.ec2 --config c8g.xlarge-stock --bucket $B --price <USD/h>
+    .venv/bin/python -m bench.ec2 --config c8g.xlarge-cool  --bucket $B --price <USD/h + COOL USD/h> --ami <COOL AMI id>
+    .venv/bin/python -m bench.compare bench/results/*.json --out bench/results/comparison.md
+    make freeze     # re-renders the report with the new table
+
+For the COOL row: subscribe to "Cloud Optimized OpenCV For AWS Graviton4" on AWS
+Marketplace, then take the AMI id for us-east-1 from the listing's "Continue to
+Configuration" page. `--dry-run` prints the plan and the user-data without touching AWS.
+Each run takes about 10 minutes of instance time, so the three cost well under a dollar.
 
 Prices are on-demand us-east-1 at the time of the run: check them on the day and record
-them in `docs/NOTES.md`. Terminate the instances afterwards.
+them, with the COOL software price and the OpenCV version string the COOL run prints, in
+`docs/NOTES.md`.
+
+With SSH access to an instance you launched yourself, `bench/remote.sh` does the same over
+ssh/rsync:
+
+    bench/remote.sh ubuntu@<host> c8g.xlarge-cool --cool --price <USD/h>
 
 `make bench` runs the same harness on the current machine (label defaults to hostname).
 
