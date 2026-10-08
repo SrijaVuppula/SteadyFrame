@@ -371,18 +371,26 @@ class HeuristicProvider(Provider):
                     ("S5", {}),
                     ("S6", {}),
                 ]
-        # after a failed S1, retry S1 once with a much lower alpha before moving on
-        if tried and tried[-1] == "S1" and tried.count("S1") == 1 and typ == "general":
-            a = max(0.02, round(float(s1["alpha"]) * 0.5, 3))
+        # after a failed low-pass (S1, or S4 on an S1 base), retry it once with a much lower
+        # alpha before moving on
+        attempts = d.get("attempts", [])
+        last = attempts[-1] if attempts else {}
+        last_params = last.get("params") or {}
+        lowpass = last.get("strategy") == "S1" or (
+            last.get("strategy") == "S4" and last_params.get("base") == "S1"
+        )
+        if lowpass and typ == "general" and tried.count(last["strategy"]) == 1:
+            prev = float(last_params.get("alpha", s1["alpha"]))
+            a = max(0.02, round(prev * 0.5, 3))
+            params = {"alpha": a} if last["strategy"] == "S1" else {"base": "S1", "alpha": a}
             return self._call(
                 "apply_remediation",
-                {"segment_id": sid, "strategy": "S1", "params": {"alpha": a}},
-                f"S1 at alpha {s1['alpha']} left a residual swing; halving alpha to {a}.",
+                {"segment_id": sid, "strategy": last["strategy"], "params": params},
+                f"{last['strategy']} at alpha {prev} left a residual swing; halving alpha to {a}.",
             )
-        seen = 0
+        tried_keys = {(a["strategy"], (a.get("params") or {}).get("base")) for a in attempts}
         for strategy, params in ladder:
-            if strategy in tried:
-                seen += 1
+            if (strategy, params.get("base")) in tried_keys:
                 continue
             why = f"{typ} hazard at {d['peak_flash_rate_hz']} Hz, dL {d['max_delta_L']}, area {d['max_area_fraction']}; {'regional' if regional else 'global'} fix, {strategy} with params from the measurements."
             return self._call(

@@ -42,6 +42,7 @@ class _OpenSegment:
     end_t: float
     verdict: str
     mask: np.ndarray
+    detect_t: float = 0.0  # first frame that broke the rule (start_t is back-dated from here)
     peak_rate: float = 0.0
     max_area: float = 0.0
     max_delta: float = 0.0
@@ -55,6 +56,7 @@ class _Frame:
     mean_L: float
     rate: dict = field(default_factory=dict)  # type -> max cell flash rate (Hz)
     area: dict = field(default_factory=dict)  # type -> max window fraction
+    near: dict = field(default_factory=dict)  # type -> max window fraction of cells at the limit
     verdict: dict = field(default_factory=dict)  # type -> pass/warn/fail
 
 
@@ -112,6 +114,7 @@ class FlashAnalyzer:
         for typ, ev in (("general", ev_l), ("red", ev_r)):
             count = self.counters[typ].push(ev)
             fail_cells = count > limit
+            rec.near[typ] = self.area.max_fraction(count >= limit)
             rec.rate[typ] = float(count.max()) / 2.0 / p.window_s
             frac = self.area.max_fraction(fail_cells)
             verdict = "pass"
@@ -143,7 +146,9 @@ class FlashAnalyzer:
                 # segment from the first transition that window contains
                 t0 = self.counters[typ].oldest_time(mask, rec.t)
                 idx0 = rec.idx - int(round((rec.t - t0) * self.fps))
-                seg = _OpenSegment(typ, max(0, idx0), t0, rec.idx, rec.t, verdict, mask.copy())
+                seg = _OpenSegment(
+                    typ, max(0, idx0), t0, rec.idx, rec.t, verdict, mask.copy(), detect_t=rec.t
+                )
                 self.open[typ] = seg
             seg.end_idx, seg.end_t = rec.idx, rec.t
             seg.mask |= mask
@@ -179,6 +184,7 @@ class FlashAnalyzer:
                 "end_frame": seg.end_idx,
                 "start_s": round(seg.start_t, 4),
                 "end_s": round(seg.end_t + 1.0 / self.fps, 4),
+                "detected_s": round(seg.detect_t, 4),
                 "peak_flash_rate_hz": round(seg.peak_rate, 3),
                 "max_area_fraction": round(float(seg.max_area), 4),
                 "max_delta_L": round(float(max_delta), 4),
@@ -188,6 +194,34 @@ class FlashAnalyzer:
                 ),
             }
         )
+
+    def _episode(self, seg: dict) -> tuple[float, float]:
+        """The run of frames around a segment where flashing sits at or above the limit.
+
+        Frames next to a violation often have exactly the maximum number of transitions in
+        their window (a 3 Hz flash whose frame timing tips one second over). They pass, but
+        with no headroom: a remediation confined to the failing frames adds one transition at
+        its own boundary and they fail. Remediation widens its range to this run when the run
+        reaches past the margin. Bounded by the neighbouring segments of the same type.
+        """
+        typ, thr = seg["type"], self.p.area_fraction
+        same = [o for o in self.segments if o is not seg and o["type"] == typ]
+        lo = max(
+            (o["end_frame"] + 1 for o in same if o["end_frame"] < seg["start_frame"]), default=0
+        )
+        hi = min(
+            (o["start_frame"] - 1 for o in same if o["start_frame"] > seg["end_frame"]),
+            default=len(self.frames) - 1,
+        )
+        i = min(seg["start_frame"], len(self.frames) - 1)
+        while i - 1 >= lo and self.frames[i - 1].near.get(typ, 0.0) > thr:
+            i -= 1
+        j = min(seg["end_frame"], len(self.frames) - 1)
+        while j + 1 <= hi and self.frames[j + 1].near.get(typ, 0.0) > thr:
+            j += 1
+        start = min(seg["start_s"], round(self.frames[i].t, 4))
+        end = max(seg["end_s"], round(self.frames[j].t + 1.0 / self.fps, 4))
+        return start, end
 
     def _regions(self, mask: np.ndarray) -> list[dict]:
         if not mask.any():
@@ -215,6 +249,8 @@ class FlashAnalyzer:
     def finish(self, meta: VideoMeta | dict | None = None) -> dict:
         for typ in HAZARD_TYPES:
             self._close_segment(typ)
+        for seg in self.segments:
+            seg["episode_start_s"], seg["episode_end_s"] = self._episode(seg)
         pattern_segments = []
         if self.pattern is not None:
             for ps in self.pattern.segments():

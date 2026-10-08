@@ -211,6 +211,7 @@ class Job:
                 **s,
                 "status": st["status"],
                 "duration_s": round(s["end_s"] - s["start_s"], 3),
+                "treated_range_s": list(self._plan_bounds(s)),
                 "region_area_fraction_of_frame": round(
                     sum(r["w"] * r["h"] for r in s["regions"]), 4
                 ),
@@ -251,8 +252,7 @@ class Job:
             plan = Plan(
                 segment_id,
                 s["type"],
-                s["start_s"],
-                s["end_s"],
+                *self._plan_bounds(s),
                 s["regions"],
                 strategy,
                 dict(params or {}),
@@ -311,12 +311,22 @@ class Job:
                 rec["path"], profile=self.profile, detect_patterns=self.detect_patterns
             )
             t0 = rec["range_s"][0]
-            same_type = [
-                x for x in res["segments"] if x["type"] == s["type"] and x["verdict"] == "fail"
-            ]
-            other = [
-                x for x in res["segments"] if x["type"] != s["type"] and x["verdict"] == "fail"
-            ]
+            fails = [_shift(x, t0) for x in res["segments"] if x["verdict"] == "fail"]
+            other = [x for x in fails if x["type"] != s["type"]]
+            # The candidate clip spans the segment plus margins and padding, so it can contain
+            # the start or tail of a neighbouring hazard that has not been treated yet. That
+            # hazard belongs to the neighbour (and the whole-file re-verification sees it at the
+            # end); it counts against this candidate only if its failing frames reach this
+            # segment or fall outside every untreated segment.
+            same_type, elsewhere = [], []
+            for x in fails:
+                if x["type"] != s["type"]:
+                    continue
+                owner = self._untreated_owner(st["segment"]["id"], x)
+                if owner is None:
+                    same_type.append(x)
+                else:
+                    elsewhere.append({**x, "belongs_to": owner})
             q = rec["quality"] or {}
             spec = SPECS[rec["strategy"]]
             low_quality = (
@@ -333,12 +343,17 @@ class Job:
                     for x in same_type
                 )
             )
+            if elsewhere:
+                reason += "; untreated neighbour(s) in the padding: " + ", ".join(
+                    sorted({x["belongs_to"] for x in elsewhere})
+                )
             v = {
                 "candidate_id": candidate_id,
                 "verdict": res["verdict"],
                 "passes_for_type": passes,
-                "remaining_same_type": [_shift(x, t0) for x in same_type],
-                "remaining_other_types": [_shift(x, t0) for x in other],
+                "remaining_same_type": same_type,
+                "remaining_in_untreated_segments": elsewhere,
+                "remaining_other_types": other,
                 "quality": q,
                 "requires_approval": requires_approval,
                 "approval_reason": f"strategy {spec.id} always needs approval"
@@ -363,6 +378,36 @@ class Job:
             return v
 
         return self._tool("verify_candidate", {"candidate_id": candidate_id}, run, by=by)
+
+    def _plan_bounds(self, seg: dict) -> tuple[float, float]:
+        """Time range a plan treats: the segment, widened to its at-limit episode on a side
+        where that episode reaches past the margin (see FlashAnalyzer._episode)."""
+        start, end = seg["start_s"], seg["end_s"]
+        ep0, ep1 = seg.get("episode_start_s", start), seg.get("episode_end_s", end)
+        if ep0 < start - self.margin_s:
+            start = ep0
+        if ep1 > end + self.margin_s:
+            end = ep1
+        return start, end
+
+    def _untreated_owner(self, segment_id: str, hazard: dict) -> str | None:
+        """Id of another not-yet-accepted segment that explains a remaining hazard, if any.
+
+        Uses the hazard's failing frames (`detected_s`..`end_s`), not its back-dated start,
+        and the original timeline. Accepted segments are rendered into every candidate, so a
+        hazard inside one of them is a regression and is never excused.
+        """
+        lo, hi = hazard.get("detected_s", hazard["start_s"]), hazard["end_s"]
+        own0, own1 = self._plan_bounds(self.seg(segment_id)["segment"])
+        if lo < own1 and hi > own0:
+            return None
+        for k, o in self.state["segments"].items():
+            g = o["segment"]
+            if k == segment_id or o["status"] == "accepted" or g["type"] != hazard["type"]:
+                continue
+            if lo < g["end_s"] and hi > g["start_s"]:
+                return k
+        return None
 
     def request_human_approval(
         self,
@@ -444,8 +489,7 @@ class Job:
             plan = Plan(
                 st["segment"]["id"],
                 st["segment"]["type"],
-                st["segment"]["start_s"],
-                st["segment"]["end_s"],
+                *self._plan_bounds(st["segment"]),
                 st["segment"]["regions"],
                 rec["strategy"],
                 rec["params"],
@@ -686,7 +730,10 @@ def _brief(s: dict, status: str) -> dict:
 
 
 def _shift(seg: dict, t0: float) -> dict:
-    return {**seg, "start_s": round(seg["start_s"] + t0, 3), "end_s": round(seg["end_s"] + t0, 3)}
+    out = {**seg, "start_s": round(seg["start_s"] + t0, 3), "end_s": round(seg["end_s"] + t0, 3)}
+    if "detected_s" in seg:
+        out["detected_s"] = round(seg["detected_s"] + t0, 3)
+    return out
 
 
 def _downsample(xs: list, n: int) -> list:
