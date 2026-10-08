@@ -88,7 +88,23 @@ Sources: ITU-R BT.1702-2 "Guidance for the reduction of photosensitive epileptic
 caused by television" and Ofcom Broadcasting Code Annex 1 "Guidance notes on flashing images
 and regular patterns in television". The PDFs could not be fetched from my machine
 (see NOTES.md); the values below are as summarised by Epilepsy Action, the ASA and the
-ACM TACCESS 2024 gap analysis (10.1145/3694790). **TODO: paste the exact Annex 1 wording here.**
+ACM TACCESS 2024 gap analysis (10.1145/3694790).
+
+One sentence read verbatim on 2026-10-08 from the text of the legacy guidance note PDF
+(https://www.ofcom.org.uk/__data/assets/pdf_file/0021/16248/gn_flash.pdf, "ITC Guidance Note
+for Licensees", revised July 2001 with a 2002 editorial amendment) through a search index's
+extract, because the PDF itself still would not open from here:
+
+> A potentially harmful flash occurs when there is a pair of opposing changes in luminance
+> (i.e., an increase in luminance followed by a decrease, or a decrease followed by an
+> increase) of 20 candelas per square metre (cd.m-2) or more. This applies only when the
+> screen luminance of the darker image is below 160 cd.m-2.
+
+Ofcom's technical analysis in the 2012 ASA ruling on a Citroën advertisement (A11-164759)
+names the three conditions it checks for a breach: a change in brightness above the defined
+level, more than three pairs of opposing changes in any one second, and more than 25% of the
+screen area changing in brightness. That is the rule set the `broadcast` profile implements.
+The rest of Annex 1 is summarised below rather than quoted.
 
 Reported rules:
 

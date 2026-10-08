@@ -138,3 +138,63 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   exact tool protocol and uses the parameter hints. It is labelled everywhere as a stand-in
   and the report keeps a separate row for the live Bedrock run.
 
+
+## 2026-10-08  External clips
+
+- Wikimedia Commons, the Internet Archive and Pexels still don't load from the build machine,
+  but GitHub does. Three openly licensed sets found there: EA IRIS's test videos (BSD-3)
+  with IRIS's own expected per-frame logs, Apple's VideoFlashingReduction sample clip (MIT),
+  and the Intel IoT DevKit sample videos (CC BY 4.0, real camera footage). URLs pinned to
+  commits in `data/SOURCES.md`, labels and sha256 in `data/external.yaml`,
+  scored by `eval/external.py`.
+- IRIS applies the area rule to the whole screen, so `broadcast` is the like-for-like
+  profile. IRIS also has an "extended failure" rule (four or more transitions a second for
+  four of five seconds) that we don't implement. It fires on `2Hz_6s` (with no flash
+  failure, so that clip passes in both tools' flash rule) and on `3Hz_6s` (alongside flash
+  failures).
+- The Apple clip is six bursts of uniform full-frame sine flashing (about 1, 2, 3, 4, 6 and
+  12 Hz). Uniform, so the 1-D reference on the frame mean is a valid label; the script checks
+  the quadrant deviation before using it.
+- Still no concert or emergency-vehicle footage.
+
+## 2026-10-08  Two remediation bugs the synthetic suite never hit
+
+- Neighbouring hazards. The Apple bursts are ~0.8 s apart. A candidate clip spans the
+  segment plus 0.5 s margins plus 1 s of padding, so it contains the start of the next burst,
+  which is not treated yet, and `verify_candidate` counted that burst against the current
+  segment. Every strategy "failed" and both policies ran out of attempts. Now each segment
+  records `detected_s` (the first frame that broke the rule, before the start is back-dated),
+  and a remaining hazard whose failing frames lie inside another not-yet-accepted segment is
+  reported as `remaining_in_untreated_segments` and not held against the candidate. Accepted
+  segments are rendered into every candidate, so a hazard there still counts. The whole-file
+  re-verification at the end is unchanged and still decides the job.
+- Flashing at the limit. IRIS `3Hz_6s` flashes at exactly three flashes a second for 6 s;
+  frame timing at 25 fps puts seven transitions in a few windows around 1.2-1.7 s. Treating
+  only those frames adds a transition at the treatment's own boundary next to windows that
+  already hold six, and they fail. The analyzer now reports each segment's "episode" (the
+  contiguous frames where the at-limit cells cover more than the area threshold), and a plan
+  widens to it when it reaches past the 0.5 s margin. On clean bursts it doesn't, so the
+  synthetic suite's plans are unchanged. Re-ran `make eval`: detection, robustness and
+  remediation are identical except `r_red_strobe_region`'s SSIM inside the region (0.877 ->
+  0.880). The previous commit gives 0.880 on this machine too, so that is the encoder build
+  on this host, not the change.
+- Heuristic provider: after a failed S4 on an S1 base it now retries once at half alpha, as
+  it already did for regional S1, and the ladder matches attempts by (strategy, base) so
+  S4/S2 is reachable after S4/S1. On IRIS `flashStripes` (12.5 Hz, full swing) the hinted
+  alpha 0.165 is right for the steady state but the EMA's start-up steps are transitions too;
+  the retry at 0.083 passes.
+- The live Bedrock results in `eval/results/frozen/agent_live/` and
+  `agent_vs_fixed_bedrock.*` were produced before these changes (commit fdf0c19). On the
+  synthetic suite the changes don't alter any plan, so they stand; they were not re-run.
+
+## 2026-10-08  Ofcom wording, infra lockfile, benchmark launcher
+
+- The Ofcom PDF still doesn't open from here. One sentence of the legacy guidance note
+  (20 cd/m2, darker image below 160 cd/m2) is quoted in STANDARDS.md from a search index's
+  extract of the PDF, labelled as such. The rest of Annex 1 still needs pasting from the PDF.
+- `infra/package-lock.json` committed (CDK CLI 2.1142.0), so `npm ci` in `make deploy` works
+  from a clean checkout.
+- `bench/ec2.py`: the three benchmark configurations without SSH. User-data gets presigned S3
+  URLs for the source archive and the results; the instance self-terminates and the script
+  terminates it anyway. Not run yet: needs the deploy credentials and, for COOL, the
+  Marketplace subscription and AMI id.
