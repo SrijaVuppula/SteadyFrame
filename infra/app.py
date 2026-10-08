@@ -9,6 +9,8 @@ Context (cdk.json or `-c key=value`):
   web_origin         CORS origin for browser PUTs to the bucket (default "*")
   web_dist           frontend build directory (default web/dist; a placeholder page is
                      deployed when it does not exist yet)
+  worker_min_tasks   worker tasks kept running when the queue is empty (default 0, scale to
+                     zero). 1 removes the cold start of several minutes, at about 2 USD a day
 """
 
 from __future__ import annotations
@@ -78,6 +80,7 @@ def build(app: App) -> dict:
     alert_email = app.node.try_get_context("alert_email") or ""
     model_id = app.node.try_get_context("bedrock_model_id") or ""
     web_origin = app.node.try_get_context("web_origin") or "*"
+    min_tasks = int(app.node.try_get_context("worker_min_tasks") or 0)
     version, opencv = pinned_versions()
 
     storage = StorageStack(
@@ -104,6 +107,7 @@ def build(app: App) -> dict:
         queue=queue.queue,
         bedrock_model_id=model_id,
         skip_docker_build=skip,
+        min_tasks=min_tasks,
     )
     web = WebStack(app, "SteadyFrame-Web", api_endpoint=api.api_url, dist_dir=web_dist(app))
     obs = ObservabilityStack(

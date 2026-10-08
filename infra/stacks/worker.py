@@ -50,6 +50,7 @@ class WorkerStack(Stack):
         bedrock_model_id: str = "",
         skip_docker_build: bool = False,
         idle_exit_s: int = 600,
+        min_tasks: int = 0,
         **kw,
     ) -> None:
         super().__init__(scope, id, **kw)
@@ -106,9 +107,11 @@ class WorkerStack(Stack):
             "TRACES_TABLE": traces.table_name,
             "QUEUE_URL": queue.queue_url,
             "WORKER_WORKDIR": "/tmp/jobs",
-            "WORKER_IDLE_EXIT_S": str(idle_exit_s),
             "PYTHONUNBUFFERED": "1",
         }
+        if min_tasks == 0:
+            # with a warm task kept on purpose, exiting when idle would only churn it
+            env["WORKER_IDLE_EXIT_S"] = str(idle_exit_s)
         if bedrock_model_id:
             env["STEADYFRAME_BEDROCK_MODEL_ID"] = bedrock_model_id
         self.task.add_container(
@@ -185,7 +188,7 @@ class WorkerStack(Stack):
             "Service",
             cluster=self.cluster,
             task_definition=self.task,
-            desired_count=0,
+            desired_count=min_tasks,
             assign_public_ip=True,
             vpc_subnets=ec2.SubnetSelection(subnet_type=ec2.SubnetType.PUBLIC),
             min_healthy_percent=0,
@@ -193,7 +196,9 @@ class WorkerStack(Stack):
             enable_execute_command=False,
             circuit_breaker=ecs.DeploymentCircuitBreaker(rollback=True),
         )
-        scaling = self.service.auto_scale_task_count(min_capacity=0, max_capacity=2)
+        scaling = self.service.auto_scale_task_count(
+            min_capacity=min_tasks, max_capacity=max(2, min_tasks)
+        )
         # visible + in-flight: a message being worked on is not visible, and a scale-in on
         # "visible == 0" alone would stop the task in the middle of that job
         backlog = cloudwatch.MathExpression(

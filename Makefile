@@ -2,6 +2,8 @@ PY ?= python
 VENV ?= .venv
 BIN := $(VENV)/bin
 SEED ?= 1234
+# extra cdk arguments, e.g. CDK_ARGS="-c bedrock_model_id=us.x.y-v1:0 -c alert_email=me@example.com"
+CDK_ARGS ?=
 
 .PHONY: help venv install test lint synth real eval freeze report bench deploy destroy smoke web local clean
 
@@ -58,11 +60,11 @@ local: ## run the API + worker locally without AWS
 
 deploy: ## deploy the AWS stack (needs credentials + docker; prints the endpoint URL)
 	$(BIN)/pip install -q -r infra/requirements-infra.lock
-	cd infra && npm ci --silent && npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json
+	cd infra && npm ci --silent && npx cdk deploy --all --require-approval never --outputs-file cdk-outputs.json $(CDK_ARGS)
 	@$(BIN)/python -c "import json;d=json.load(open('infra/cdk-outputs.json'));[print(k,'=',v) for s in d.values() for k,v in s.items()]"
 
 destroy: ## tear the AWS stack down
-	cd infra && npx cdk destroy --all --force
+	cd infra && npx cdk destroy --all --force $(CDK_ARGS)
 
 smoke: ## upload a synthetic clip to the deployed endpoint and check the remediated output passes
 	$(BIN)/python service/smoke.py --outputs infra/cdk-outputs.json
