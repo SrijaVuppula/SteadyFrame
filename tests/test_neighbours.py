@@ -10,6 +10,11 @@ from steadyframe.remediate.pipeline import fix_file
 
 from .conftest import run_analyzer, square_frames
 
+# 20 -> 150 is a 0.30 luminance swing: a clear hazard, but S1's default alpha leaves at most
+# 0.08 of it at 3-6 Hz, well clear of the 0.10 threshold. A full 20 -> 230 swing puts the 6 Hz
+# residual at ~0.10, where x86 and arm64 ffmpeg builds land on different sides of it.
+HI = (150, 150, 150)
+
 
 def bursts(fps, pieces, size=(64, 48)):
     """Concatenate (seconds, freq_hz or 0 for calm) pieces of a full-frame square wave."""
@@ -17,7 +22,7 @@ def bursts(fps, pieces, size=(64, 48)):
     for dur, freq in pieces:
         n = int(round(dur * fps))
         if freq:
-            frames += square_frames(n, fps, freq, size=size)
+            frames += square_frames(n, fps, freq, hi=HI, size=size)
         else:
             frames += [np.full((size[1], size[0], 3), 20, np.uint8) for _ in range(n)]
     return frames
@@ -54,7 +59,7 @@ def test_clean_burst_episode_stays_close_to_segment():
 def test_neighbour_in_padding_does_not_fail_the_candidate(tmp_clip, tmp_path):
     src = tmp_clip(two_bursts(), fps=30)
     wd = tmp_path / "wd"
-    # full-swing full-frame strobes need approval (ssim < 0.75); the attribution is the point here
+    # full-frame strobes may need approval (ssim < 0.75); the attribution is the point here
     rep = fix_file(src, tmp_path / "o.mp4", workdir=wd, approve_all=True)
     assert rep["status"] == "passed" and rep["after"]["verdict"] == "pass"
     assert [len(s["attempts"]) for s in rep["segments"]] == [1, 1]
