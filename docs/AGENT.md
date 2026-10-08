@@ -13,9 +13,9 @@ Source: `docs/diagrams/agent_workflow.mmd`.
 | Tool | Returns | OpenCV 5 work behind it |
 |---|---|---|
 | `analyze_video()` | verdict, video metadata, hazard segments (type, times, peak flash rate, area fraction, luminance swing, regions, severity), strategy catalogue | LUT + transform luminance, INTER_AREA grid, transition tracker, boxFilter area, connectedComponentsWithStats regions |
-| `get_segment_detail(segment_id)` | measurements, region luminance series, applicable strategies, **parameter hints**, attempts so far, remaining budget, any human decision | region series from the grid history |
+| `get_segment_detail(segment_id)` | measurements, region luminance series, applicable strategies, **parameter hints**, the time range a fix will treat (`treated_range_s`), attempts so far, remaining budget, any human decision | region series from the grid history |
 | `apply_remediation(segment_id, strategy, params)` | candidate id, quality metrics (SSIM in/out of the regions, dL) | accumulateWeighted / linear-light gain / red desaturation / frame hold / card, GaussianBlur masks, GaussianBlur-based SSIM |
-| `verify_candidate(candidate_id)` | passes_for_type, remaining hazards, quality, requires_approval + reason | the analyzer again, on the candidate clip |
+| `verify_candidate(candidate_id)` | passes_for_type, remaining hazards of this segment, hazards in the padding that belong to other untreated segments (`remaining_in_untreated_segments`, not held against the candidate), quality, requires_approval + reason | the analyzer again, on the candidate clip |
 | `request_human_approval(segment_id, reason, options)` | approved / rejected, or the job pauses | - |
 | `accept_candidate(candidate_id)` | ok | - |
 | `finalize()` | ok, or the list of segments still open | full render + whole-file re-verification happen in the pipeline afterwards |

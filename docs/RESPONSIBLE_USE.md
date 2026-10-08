@@ -59,5 +59,7 @@ photosensitivity thresholds". Wording we never use: "prevents seizures", "medica
 The detection evaluation is against synthetic ground truth produced by an independent
 one-dimensional implementation of the rules and analytic area conditions; it shows that
 the video analyzer implements the rules as written, not that the rules capture every real
-hazard. The real-world set is small and hand-labelled (`data/SOURCES.md`). The comparison
-with EA IRIS is optional and only runs when IRIS output is provided.
+hazard. The external set (`data/SOURCES.md`, `eval/external.py`) is small: EA IRIS's test
+videos scored against IRIS's own expected results, Apple's flashing sample labelled by the
+reference rules, and calm camera footage. It contains no natural flashing footage such as
+concerts or emergency vehicles yet.

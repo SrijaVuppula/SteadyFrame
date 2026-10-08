@@ -1,6 +1,6 @@
 # Agent vs fixed: heuristic
 
-Generated 2026-09-20 01:27 UTC by `python -m eval.agent_vs_fixed` at git `3c6cf81`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.15).
+Generated 2026-10-08 21:27 UTC by `python -m eval.agent_vs_fixed` at git `60e802c`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.17).
 
 | metric | fixed | agent[heuristic] |
 |---|---|---|
@@ -9,7 +9,7 @@ Generated 2026-09-20 01:27 UTC by `python -m eval.agent_vs_fixed` at git `3c6cf8
 | mean SSIM inside regions | 0.860 | 0.874 |
 | mean SSIM outside regions | 1.000 | 1.000 |
 | mean |dL| inside regions | 0.149 | 0.135 |
-| mean runtime per clip (s) | 4.731 | 3.473 |
+| mean runtime per clip (s) | 4.457 | 3.389 |
 | approvals requested | 1 | 1 |
 | model turns (total) | 0 | 167 |
 | tokens in / out | - | 0 / 0 |
@@ -40,7 +40,7 @@ The heuristic provider is a deterministic stand-in for the model that follows th
 | m_strobe_on_moving_bg.mp4 | passed | passed | 1.0 | 1.0 | 0.806 | 0.825 | S1 | S1 | 6 | None |
 | m_two_segments.mp4 | passed | passed | 1.0 | 1.0 | 0.877 | 0.893 | S1,S1 | S1,S1 | 10 | None |
 | r_red_strobe_full.mp4 | passed | passed | 1.0 | 1.0 | 0.740 | 0.758 | S1,S3 | S4,S3 | 11 | None |
-| r_red_strobe_region.mp4 | passed | passed | 1.0 | 1.0 | 0.877 | 0.894 | S1,S3 | S1,S3 | 10 | None |
+| r_red_strobe_region.mp4 | passed | passed | 1.0 | 1.0 | 0.880 | 0.896 | S1,S3 | S1,S3 | 10 | None |
 | r_red_to_white.mp4 | passed | passed | 2.5 | 1.0 | 0.786 | 0.804 | S5,S3 | S4,S3 | 10 | None |
 | v_720p_16x9.mp4 | passed | passed | 1.0 | 1.0 | 0.905 | 0.911 | S1 | S1 | 6 | None |
 | v_fps_24.mp4 | passed | passed | 1.0 | 1.0 | 0.847 | 0.859 | S1 | S1 | 6 | None |

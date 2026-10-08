@@ -1,6 +1,6 @@
 # Robustness: compression, grid, fps, resolution
 
-Generated 2026-09-20 01:35 UTC by `python -m eval.robustness` at git `8c32e8a`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.15).
+Generated 2026-10-08 21:21 UTC by `python -m eval.robustness` at git `60e802c`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.17).
 
 ## H.264 compression (CRF)
 
@@ -31,11 +31,11 @@ Same clips analysed with different cell grids (default 64x48). Boundary clips ar
 
 | grid | wrong_verdicts | of | median_rtf |
 |---|---|---|---|
-| 32x24 | 1 | 28 | 57.2 |
-| 48x36 | 1 | 28 | 49.3 |
-| 64x48 | 0 | 28 | 52.0 |
-| 96x72 | 1 | 28 | 41.0 |
-| 128x96 | 0 | 28 | 36.5 |
+| 32x24 | 1 | 28 | 45.6 |
+| 48x36 | 1 | 28 | 36.9 |
+| 64x48 | 0 | 28 | 41.3 |
+| 96x72 | 1 | 28 | 33.1 |
+| 128x96 | 0 | 28 | 28.6 |
 
 | clip | expected | 32x24 | 48x36 | 64x48 | 96x72 | 128x96 |
 |---|---|---|---|---|---|---|
@@ -72,11 +72,11 @@ Same clips analysed with different cell grids (default 64x48). Boundary clips ar
 
 | clip | fps | size | expected | got | peak_rate_hz | rtf |
 |---|---|---|---|---|---|---|
-| v_720p_16x9.mp4 | 30 | 1280x720 | fail | fail | 6.0 | 14.0 |
-| v_fps_24.mp4 | 24 | 320x240 | fail | fail | 6.0 | 57.5 |
-| v_fps_25.mp4 | 25 | 320x240 | fail | fail | 6.0 | 56.1 |
-| v_fps_60.mp4 | 60 | 320x240 | fail | fail | 6.0 | 24.7 |
-| v_vertical_9x16.mp4 | 30 | 180x320 | fail | fail | 6.0 | 43.2 |
+| v_720p_16x9.mp4 | 30 | 1280x720 | fail | fail | 6.0 | 10.0 |
+| v_fps_24.mp4 | 24 | 320x240 | fail | fail | 6.0 | 45.9 |
+| v_fps_25.mp4 | 25 | 320x240 | fail | fail | 6.0 | 55.5 |
+| v_fps_60.mp4 | 60 | 320x240 | fail | fail | 6.0 | 24.9 |
+| v_vertical_9x16.mp4 | 30 | 180x320 | fail | fail | 6.0 | 43.3 |
 
 ## Frequency sweep
 

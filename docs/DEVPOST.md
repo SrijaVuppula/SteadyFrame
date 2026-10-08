@@ -34,20 +34,28 @@ downloadable video that passes the same check.
 - AWS: S3 + CloudFront frontend, API Gateway + Lambda, SQS, ECS Fargate ARM64 worker,
   DynamoDB, CloudWatch dashboard, all in CDK. `docker compose up` runs the same thing locally.
 - Evaluation: a synthetic suite with every boundary case in the standard generated from an
-  independent 1-D reference; detection, robustness, remediation, agent-vs-fixed and a
-  three-configuration benchmark (x86, Graviton, COOL on Graviton) are each one command.
+  independent 1-D reference; openly licensed external clips (EA IRIS's test videos scored
+  against IRIS's own expected results, Apple's flashing sample, calm camera footage);
+  detection, robustness, remediation, agent-vs-fixed and a three-configuration benchmark
+  (x86, Graviton, COOL on Graviton) are each one command.
 
 ## Challenges
 Averaging frames in sRGB code values left twice the luminance swing the maths predicted;
 temporal smoothing had to move to linear light. A feathered mask that faded *inward* left
 the edge cells of a region half-fixed and the verify step kept failing them, which is the
 loop doing its job. Exactly-three-flashes-per-second is a floating-point boundary case
-in both the generator and the window counter.
+in both the generator and the window counter. The external clips found two bugs the
+synthetic suite never hit: hazards less than a second apart made each fix "fail" because the
+verification clip contained the next, untreated hazard; and a violation inside flashing
+that sits exactly at the limit could not be fixed in place, because the fix's own edge
+added the one transition that tipped the neighbouring windows over.
 
 ## Accomplishments
 Exact agreement with the reference on all 44 synthetic clips and 17 boundary cases;
-every hazard fixed and re-verified; a readable trace where you can see a verify result
-change the next tool call; one-command reproduction of every number in the report.
+the same verdict as IRIS's own expected results on all 8 of its test videos, and no false
+alarm in 9 minutes of camera footage; every hazard fixed and re-verified; a readable trace
+where you can see a verify result change the next tool call; one-command reproduction of
+every number in the report.
 
 ## What we learned
 Localisation is what makes remediation possible; a global dimmer is the only fix you can
@@ -55,8 +63,8 @@ apply without it. And a verification loop catches implementation mistakes that u
 on the pieces do not.
 
 ## What's next
-Real-world labelled data, the fine-pattern exemption, a display model, and a browser
-extension that calls the API.
+Natural flashing footage with labels (concerts, emergency vehicles), IRIS's extended-failure
+rule, the fine-pattern exemption, a display model, and a browser extension that calls the API.
 
 ## Special awards
 - **Agentic Vision Award**: opt in. Evidence: `docs/AGENT.md`, `docs/diagrams/agent_workflow.svg`,

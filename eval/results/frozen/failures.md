@@ -1,6 +1,6 @@
 # Failure gallery
 
-Generated 2026-09-20 01:27 UTC by `python -m eval.failure_gallery` at git `3c6cf81`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.15).
+Generated 2026-10-08 21:27 UTC by `python -m eval.failure_gallery` at git `60e802c`, steadyframe 0.1.0, **OpenCV 5.0.0** (x86_64, CPython 3.11.17).
 
 Stills are dimmed single frames with the detected regions outlined; nothing here animates.
 

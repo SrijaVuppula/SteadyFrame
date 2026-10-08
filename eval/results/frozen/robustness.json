@@ -171,31 +171,31 @@
         "grid": "32x24",
         "wrong_verdicts": 1,
         "of": 28,
-        "median_rtf": 57.189499999999995
+        "median_rtf": 45.6045
       },
       {
         "grid": "48x36",
         "wrong_verdicts": 1,
         "of": 28,
-        "median_rtf": 49.3305
+        "median_rtf": 36.8755
       },
       {
         "grid": "64x48",
         "wrong_verdicts": 0,
         "of": 28,
-        "median_rtf": 51.951
+        "median_rtf": 41.2645
       },
       {
         "grid": "96x72",
         "wrong_verdicts": 1,
         "of": 28,
-        "median_rtf": 40.9745
+        "median_rtf": 33.126000000000005
       },
       {
         "grid": "128x96",
         "wrong_verdicts": 0,
         "of": 28,
-        "median_rtf": 36.5435
+        "median_rtf": 28.6215
       }
     ],
     "rows": [
@@ -462,7 +462,7 @@
         "expected": "fail",
         "got": "fail",
         "peak_rate_hz": 6.0,
-        "rtf": 14.046
+        "rtf": 10.025
       },
       {
         "clip": "v_fps_24.mp4",
@@ -471,7 +471,7 @@
         "expected": "fail",
         "got": "fail",
         "peak_rate_hz": 6.0,
-        "rtf": 57.475
+        "rtf": 45.929
       },
       {
         "clip": "v_fps_25.mp4",
@@ -480,7 +480,7 @@
         "expected": "fail",
         "got": "fail",
         "peak_rate_hz": 6.0,
-        "rtf": 56.135
+        "rtf": 55.526
       },
       {
         "clip": "v_fps_60.mp4",
@@ -489,7 +489,7 @@
         "expected": "fail",
         "got": "fail",
         "peak_rate_hz": 6.0,
-        "rtf": 24.705
+        "rtf": 24.927
       },
       {
         "clip": "v_vertical_9x16.mp4",
@@ -498,7 +498,7 @@
         "expected": "fail",
         "got": "fail",
         "peak_rate_hz": 6.0,
-        "rtf": 43.212
+        "rtf": 43.253
       }
     ]
   },
