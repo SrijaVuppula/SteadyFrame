@@ -261,3 +261,27 @@ def _as_list(x):
     if x is None:
         return []
     return x if isinstance(x, list) else [x]
+
+
+def test_worker_can_be_kept_warm():
+    mod = _load_app_module()
+    app = App(context={"skip_docker_build": "true", "worker_min_tasks": "1"})
+    t = Template.from_stack(mod.build(app)["worker"])
+    t.has_resource_properties("AWS::ECS::Service", {"DesiredCount": 1})
+    t.has_resource_properties(
+        "AWS::ApplicationAutoScaling::ScalableTarget", {"MinCapacity": 1, "MaxCapacity": 2}
+    )
+    env = t.find_resources("AWS::ECS::TaskDefinition")
+    names = [
+        e["Name"]
+        for td in env.values()
+        for c in td["Properties"]["ContainerDefinitions"]
+        for e in c.get("Environment", [])
+    ]
+    assert "WORKER_IDLE_EXIT_S" not in names  # a warm task must not exit when idle
+
+
+def test_worker_scales_to_zero_by_default(templates):
+    t = templates["worker"]
+    t.has_resource_properties("AWS::ECS::Service", {"DesiredCount": 0})
+    t.has_resource_properties("AWS::ApplicationAutoScaling::ScalableTarget", {"MinCapacity": 0})

@@ -48,6 +48,11 @@ elsewhere. Context knobs (`-c key=value` or `cdk.json`):
 | `skip_docker_build` | `true` swaps the worker image for a public placeholder so `synth` needs no Docker (CI, `tests/test_infra.py`, `export_policies.py`). Never deploy with it. |
 | `web_origin` | CORS origin allowed to PUT uploads (default `*`; tighten to the `WebUrl` after the first deploy) |
 | `web_dist` | frontend build directory (default `web/dist`; a placeholder page is deployed if missing) |
+| `worker_min_tasks` | worker tasks kept running with an empty queue (default `0`: scale to zero). `1` removes the cold start (several minutes for the first job after idle) for about 2 USD a day; useful while judges are trying the endpoint |
+
+From the repo root, `make deploy CDK_ARGS="-c bedrock_model_id=... -c alert_email=..."` passes
+the same knobs. Pass them on every deploy: a value left out falls back to `cdk.json`, where
+`bedrock_model_id` and `alert_email` are empty.
 
 The sample clips are rendered into `infra/.samples/` at synth time by `service/samples.py`
 (gitignored: they flash). `web/dist` comes from `make web`.
@@ -77,7 +82,11 @@ stack, which you can leave or `aws cloudformation delete-stack --stack-name CDKT
   when `policy=agent` (a handful of short tool-use turns). Scale-in waits 10 idle minutes.
 - The worker task also exits by itself after `WORKER_IDLE_EXIT_S` (600 s) without messages;
   the service restarts it until the scaling policy has brought the desired count to zero.
-- Set the account budget alarm (50 USD) by hand, see `docs/HUMAN_TASKS.md`.
+- With `worker_min_tasks=1` one task runs all the time: about 0.08 USD/hour for the task plus
+  its public IPv4 address, roughly 2 USD a day. Deploy again with `worker_min_tasks=0` when
+  judging ends.
+- Set an account budget alarm (50 USD) by hand: Billing and Cost Management -> Budgets ->
+  Create budget -> monthly cost budget, 50 USD, e-mail alert at 80% and 100%.
 
 ## IAM
 

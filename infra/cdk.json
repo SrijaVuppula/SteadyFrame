@@ -10,6 +10,7 @@
     "bedrock_model_id": "",
     "skip_docker_build": false,
     "web_origin": "*",
+    "worker_min_tasks": 0,
     "@aws-cdk/aws-iam:minimizePolicies": true,
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,
