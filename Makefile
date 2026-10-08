@@ -5,7 +5,7 @@ SEED ?= 1234
 # extra cdk arguments, e.g. CDK_ARGS="-c bedrock_model_id=us.x.y-v1:0 -c alert_email=me@example.com"
 CDK_ARGS ?=
 
-.PHONY: help venv install test lint synth real eval freeze report bench deploy destroy smoke web local clean
+.PHONY: help venv install test lint synth real eval freeze report slides bench deploy destroy smoke web local clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -47,6 +47,9 @@ freeze: ## copy eval/results into eval/results/frozen (the copy the report is re
 
 report: ## render docs/report/REPORT.md from the frozen results
 	$(BIN)/python -m eval.report
+
+slides: ## results slides for the video from the frozen results -> docs/video/slides/
+	$(BIN)/python -m eval.slides
 
 bench: ## run the analysis benchmark on this machine (see bench/README.md for the 3-config protocol)
 	$(BIN)/python -m bench.run --out bench/results
