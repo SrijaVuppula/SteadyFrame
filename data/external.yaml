@@ -1,0 +1,37 @@
+# Labels for the external clips listed in data/SOURCES.md (downloaded by `make real` to
+# data/real/). Read by eval/external.py, which refuses to score a file whose sha256 differs
+# from the one recorded here. No label below was produced by the SteadyFrame analyzer.
+#
+# label kinds
+#   iris_log        IRIS's own expected per-frame results for the clip (reference: <id>).
+#                   Frame codes: 0 pass, 1 pass with warning, 2 extended failure, 3 flash
+#                   failure. flashStripes uses IRIS's older log layout with a single
+#                   FlashFailedFrames column where 2 marks a flash failure (it starts at the
+#                   seventh transition, 0.28 s in, so it cannot be the 4 s extended rule).
+#   frame_mean_ref  synth/reference.py (the independent 1-D implementation of the rules) run
+#                   on the frame-mean relative luminance with the area condition taken as met.
+#                   Valid only for spatially uniform flashing; the script checks that every
+#                   quadrant's mean stays within `uniform_tol` of the frame mean and refuses
+#                   the label otherwise.
+#   pass            calm camera footage: no flashing light sources, checked by looking at
+#                   stills across each clip. Every second is labelled pass.
+
+clips:
+  - {id: iris_2Hz_5s, set: iris, label: iris_log, reference: iris_2Hz_5s-expected, sha256: 03e03cde6c4918df8e06ddc40fb27c9fe7667c9e15d45ebe950307333df1f901, reference_sha256: 7f12c367eabdb687f95abdc206edf834865d4d69c3f14ef26f8108556ce462b4}
+  - {id: iris_2Hz_6s, set: iris, label: iris_log, reference: iris_2Hz_6s-expected, sha256: cad764f1093a0d4df5230ac80b1ddd41408e80bc6a34c33263dab55d49dcee8f, reference_sha256: 04524f13eb8bab79f85c2a41acd54383adf79a3d110bba86b9b7d2f7b7220a62}
+  - {id: iris_3Hz_6s, set: iris, label: iris_log, reference: iris_3Hz_6s-expected, sha256: 1e8e3898584973c809c0fac470bfda37c7a2a3a4459030d4d2461d9c1cc34218, reference_sha256: f09e7979d2fa3954990bf93aff12bc06ad2fb220109ce6ffdbfdf9bb50507284}
+  - {id: iris_GradualRedIncrease, set: iris, label: iris_log, reference: iris_GradualRedIncrease-expected, sha256: 2e39347655a2bcde894b7ddb4798f975875945eaec012757aea8b7466c5552cf, reference_sha256: 227667295dce6c99cc2d819b72e30403a0e85b73df770ae3438ae27bb1308d89}
+  - {id: iris_extendedFLONG, set: iris, label: iris_log, reference: iris_extendedFLONG-expected, sha256: e423584a10e93df68e498195c94da27176e3b976779897770a4c3f0d5dfcf9c6, reference_sha256: 9a442aad76b45115ee83fb007f21357057e58a07fc0dc6a534a416fa21088d7e}
+  - {id: iris_flashStripes, set: iris, label: iris_log, reference: iris_flashStripes-expected, sha256: b0c104717fe99d07ffc3aed108a3c7b653ac7dba71d01e94febdf1396f95909e, reference_sha256: dae4501ca0e3bed01c06f5832e30504d0e10ef3f7c3e6a1dab8fc48005a45dea}
+  - {id: iris_gray, set: iris, label: iris_log, reference: iris_gray-expected, sha256: d78940e777bed8a3d507c5d2d265931ae112974200e544e6a8a0c8561ad62ea3, reference_sha256: b308bc59b9eb4a7bd52038d0487414e985198ac14d88525dedca86b16c7a7bac}
+  - {id: iris_intermitentEF, set: iris, label: iris_log, reference: iris_intermitentEF-expected, sha256: 6fc55d87f1eaefbc1acf528eb7889132d82dc75eb765164eeca836b3d8ed672f, reference_sha256: fc1350a45b6744424da7e972e503e7a8326ff8866bcb5e5f12e666cbf717d5ec}
+  - {id: apple_test_video, set: apple, label: frame_mean_ref, uniform_tol: 0.02, sha256: 896551b3857a8096d0243046ce21655f858a1e3310d5cf8b43156504b071a25b}
+  - {id: intel_bottle_detection, set: intel, label: pass, sha256: d52ba94aedf8a923c342fe9ea1d2bd85f712c4cc0f49a6de1bac43eebe3a48ff}
+  - {id: intel_car_detection, set: intel, label: pass, sha256: d31e0ebf194cc16e50eea784e7c3b0b1bb7976a4fb9b3fec26cb92a6704cca34}
+  - {id: intel_classroom, set: intel, label: pass, sha256: a69bd5e39ff0e74286d13bcbfdadddd307b85decd2d9853db7518e0028785e31}
+  - {id: intel_face_demographics_walking, set: intel, label: pass, sha256: 91af68da819a9c0caab06c6c21414e6ebdb378ff28fee90e1f937165bc1007c6}
+  - {id: intel_one_by_one_person_detection, set: intel, label: pass, sha256: a5964aa259099a482a8b360ffc2c57b5a30f84d5919236a4dad01f8e929ac07c}
+  - {id: intel_people_detection, set: intel, label: pass, sha256: 18ffe8672d741e3e29c9d891d22c59d453720b086c25b35c88b393d55f92f693}
+  - {id: intel_person_bicycle_car_detection, set: intel, label: pass, sha256: 452b11b7e0efbd019f1d9570d0c790e90416ad4ad29eec6003872d08443140ef}
+  - {id: intel_store_aisle_detection, set: intel, label: pass, sha256: 3526fee39cac70d6366471e4324a6d63b337c8f8ab99c015521bee0d60ed6e04}
+  - {id: intel_worker_zone_detection, set: intel, label: pass, sha256: b8b58b8100a81600bc42ee7ee082ced777b12a32a3619139ef289d27cbdcd284}
