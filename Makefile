@@ -26,7 +26,7 @@ lint: ## ruff check + format check
 synth: ## generate the synthetic hazard suite (deterministic, seeded)
 	$(BIN)/python -m synth.generate --config synth/suite.yaml --out data/synthetic --seed $(SEED)
 
-real: ## download the openly licensed real-world clips listed in data/SOURCES.md
+real: ## download the openly licensed external clips listed in data/SOURCES.md (used by eval.external)
 	$(BIN)/python -m synth.fetch_real --out data/real
 
 eval: ## run every evaluation script; writes eval/results/
@@ -35,6 +35,7 @@ eval: ## run every evaluation script; writes eval/results/
 	$(BIN)/python -m eval.remediation
 	$(BIN)/python -m eval.agent_vs_fixed
 	$(BIN)/python -m eval.failures
+	$(BIN)/python -m eval.external
 
 freeze: ## copy eval/results into eval/results/frozen (the copy the report is rendered from) and re-render the report
 	mkdir -p eval/results/frozen
