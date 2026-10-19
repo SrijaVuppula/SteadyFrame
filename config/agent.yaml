@@ -2,7 +2,7 @@
 # STEADYFRAME_BEDROCK_MODEL_ID overrides bedrock.model_id, AWS_REGION overrides bedrock.region.
 bedrock:
   # Use the cross-region inference profile ID shown in the Bedrock console for a model with
-  # tool-use support (looks like us.<vendor>.<model>-v1:0). fill in after enabling access.
+  # tool-use support (looks like us.<vendor>.<model>-v1:0), or set the environment variable.
   model_id: ""
   region: "us-east-1"
   max_tokens: 1500

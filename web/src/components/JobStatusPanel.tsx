@@ -37,7 +37,7 @@ export function JobStatusPanel({ job, pollError }: { job: Job; pollError: string
           </div>
           <p className="progress-text">
             <strong>{pct}%</strong> · {job.progress?.stage ?? job.status}
-            {detail ? ` — ${detail}` : ''}
+            {detail ? ` - ${detail}` : ''}
             <span className="muted"> · polling every 2 s</span>
           </p>
           {job.status === 'queued' && (
@@ -61,9 +61,9 @@ export function JobStatusPanel({ job, pollError }: { job: Job; pollError: string
 
       <dl className="meta">
         <div><dt>Job</dt><dd><code>{job.job_id}</code></dd></div>
-        <div><dt>File</dt><dd>{job.input?.filename ?? '–'}</dd></div>
+        <div><dt>File</dt><dd>{job.input?.filename ?? '-'}</dd></div>
         <div><dt>Video</dt><dd>
-          {job.input?.width ? `${job.input.width}×${job.input.height} · ${job.input.fps} fps · ${fmtSeconds(job.input.duration_s ?? 0, 1)}` : '–'}
+          {job.input?.width ? `${job.input.width}×${job.input.height} · ${job.input.fps} fps · ${fmtSeconds(job.input.duration_s ?? 0, 1)}` : '-'}
           {job.input?.has_audio === false ? ' · no audio' : job.input?.has_audio ? ' · audio' : ''}
         </dd></div>
         <div><dt>Profile</dt><dd>{job.profile}{job.conservative ? ' (conservative)' : ''}</dd></div>

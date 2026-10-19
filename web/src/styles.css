@@ -106,7 +106,7 @@
   --shadow: none;
 }
 
-/* Rule 5 (spec §3): no animation anywhere when the user asks for reduced motion. Nothing in
+/* Reduced motion: no animation anywhere when the user asks for reduced motion. Nothing in
    this stylesheet changes brightness over time in any mode: the only motion is a reel turning
    while a check runs and a stamp settling once, and both stop under reduced motion. */
 @media (prefers-reduced-motion: reduce) {
@@ -318,7 +318,7 @@ table.data thead th { background: var(--surface-2); }
 .still img { display: block; max-width: 100%; width: 320px; height: auto; border: 1px solid var(--border); border-radius: 4px; background: var(--surface-2); }
 .still-missing { width: 320px; max-width: 100%; aspect-ratio: 4 / 3; display: grid; place-items: center; border: 1px dashed var(--border); border-radius: 4px; color: var(--text-2); }
 
-/* previews (spec §3) */
+/* previews: the original is dimmed, small and slowed (OriginalPreview.tsx) */
 .preview { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--surface-2); }
 .warning-box { border-left: 5px solid var(--st-warning); padding: 4px 12px; background: var(--warn-fill); border-radius: 6px; }
 .video-original {
@@ -552,7 +552,7 @@ table.data thead th { background: var(--surface-2); }
 .sf-log summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; cursor: pointer; list-style: none; }
 .sf-log summary::-webkit-details-marker { display: none; }
 .sf-log summary::before { content: "+"; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border); font-weight: 700; line-height: 1; align-self: center; }
-.sf-log[open] summary::before { content: "–"; }
+.sf-log[open] summary::before { content: "-"; }
 .sf-log-title { font-family: var(--font-display); font-variation-settings: "SOFT" 100; font-size: 1.15rem; font-weight: 650; }
 .sf-log-body { margin-top: 12px; max-height: 460px; overflow-y: auto; padding-right: 4px; }
 .sf-downloads { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }

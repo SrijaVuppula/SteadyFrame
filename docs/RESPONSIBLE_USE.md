@@ -33,7 +33,7 @@ photosensitivity thresholds". Wording we never use: "prevents seizures", "medica
   warning, dimmed, small and slowed. Thumbnails are stills. Docs and the demo video show
   luminance plots and stills, not flashing clips.
 - The remediated video is shown only after the analyzer verified the whole file.
-- The recorded jobs bundled with the web app for the `/judge` tour (`web/public/judge/`)
+- The recorded example jobs bundled with the web app (`web/public/judge/`)
   contain stills, plots, traces, records and the verified remediated output, never the
   hazardous input.
 

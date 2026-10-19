@@ -140,7 +140,7 @@ export function CheckView({ jobId, label, startedAt, example, navigate, onStatus
     : job.after ? [job.after.verdict, TONE[job.after.verdict] ?? 'na']
     : job.status === 'needs_approval' ? ['your call', 'warn']
     : job.status === 'no_hazards' ? ['unchanged', 'ok']
-    : terminal ? ['–', 'na'] : ['…', 'na'];
+    : terminal ? ['-', 'na'] : ['…', 'na'];
 
   return (
     <article className="sf-card sf-check" aria-labelledby="sf-check-h">

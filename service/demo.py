@@ -78,7 +78,7 @@ def main(argv=None) -> int:
         f"\nOpen {out}/<clip>/record.html (verification record), before_after.png (luminance "
         "before and after) and hazards.vtt (viewer warning track).\n"
         "Web UI on this machine, still no credentials: docker compose up --build, then "
-        "http://localhost:8080 (the 90-second tour is at /judge)."
+        "http://localhost:8080 (the same live demo page as the deployed site)."
     )
     ok = all(r["record_holds"] and r["status"] in ("passed", "no_hazards") for r in rows)
     return 0 if ok else 1

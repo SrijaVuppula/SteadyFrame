@@ -16,7 +16,7 @@ export function SegmentInspector({ jobId, segment, remediation }: Props) {
       <div className="inspector-grid">
         <dl className="meta">
           <div><dt>Segment</dt><dd><code>{segment.id}</code> · {HAZARD_LABEL[segment.type]} · verdict {segment.verdict}</dd></div>
-          <div><dt>Range</dt><dd>{fmtRange(segment.start_s, segment.end_s)} (frames {segment.start_frame}–{segment.end_frame})</dd></div>
+          <div><dt>Range</dt><dd>{fmtRange(segment.start_s, segment.end_s)} (frames {segment.start_frame}-{segment.end_frame})</dd></div>
           <div><dt>Peak flash rate</dt><dd>{segment.peak_flash_rate_hz} Hz</dd></div>
           <div><dt>Max area fraction</dt><dd>{fmtNum(segment.max_area_fraction, 2)} of the analysis window</dd></div>
           <div><dt>Max ΔL</dt><dd>{fmtNum(segment.max_delta_L, 3)}</dd></div>

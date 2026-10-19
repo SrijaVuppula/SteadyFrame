@@ -41,7 +41,7 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 
 ## 2026-09-20  Ofcom / ITU-R BT.1702
 
-- Primary PDFs (ofcom.org.uk, itu.int) would not load for me at the time. The values
+- The primary PDFs (ofcom.org.uk, itu.int) did not load from the build machine that day. The values
   below are from the Ofcom "Guidance Note for Licensees on Flashing Images and Regular Patterns
   in Television" (Annex 1) as reproduced by Epilepsy Action / ASA summaries and by the
   ACM TACCESS 2024 gap analysis (dl.acm.org/doi/full/10.1145/3694790):
@@ -53,7 +53,7 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 - Decision: expose these as the `broadcast` profile (area over the whole frame instead of the
   10 degree window; same 3 Hz rule). We do not have absolute cd/m2 without a display model, so
   the broadcast profile keeps the relative-luminance 0.10 transition threshold and says so.
-  TODO: download Annex 1 and paste the exact quotes into STANDARDS.md.
+  Annex 1 still to be quoted from the PDF itself (done on 2026-10-19, below).
 
 ## 2026-09-20  Prior art
 
@@ -74,13 +74,13 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 
 - Sources: AWS Marketplace listings "Cloud Optimized OpenCV For AWS Graviton4"
   (prodview-fdvbfiewzuehs) and "...For Graviton3" (prodview-5b2boxpyztidw); AWS blog
-  "Accelerating OpenCV on Graviton - the COOL framework"; opencv.org/cool. Read via search
-  snippets on 2026-09-20 (the pages themselves were blocked from here).
+  "Accelerating OpenCV on Graviton - the COOL framework"; opencv.org/cool. Read from search
+  results on 2026-09-20 (the listing pages did not load from the build machine).
 - Delivery: **AMIs** (Ubuntu 24.04 LTS) with a precompiled OpenCV build. Based on **OpenCV 5**
   with Arm KleidiCV optimisations. Accelerated operations named: resize, Gaussian / adaptive
   Gaussian threshold, contour detection ("and more"). Reported average speedup about 1.5x
   (blog), 30% in one example. Pricing: the software price per hour was not visible in the
-  snippets; TODO: read it from the listing when subscribing.
+  search results (found on 2026-10-19 with the Pricing API, below).
 - Decision: our core workload (per-frame `cv2.resize` INTER_AREA, `cv2.boxFilter`,
   `cv2.LUT`, `cv2.connectedComponentsWithStats`, `cv2.GaussianBlur` in SSIM and S1) is exactly
   the class of op COOL claims to speed up. Since COOL *is* OpenCV 5, the same code runs in both
@@ -96,8 +96,8 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   results are sent as a user message with `{"toolResult": {"toolUseId", "content":[{"json": ...}],
   "status": "success"|"error"}}`.
 - Model IDs are not hardcoded. `STEADYFRAME_BEDROCK_MODEL_ID` (default in `config/agent.yaml`)
-  is expected to be a cross-region inference profile such as `us.<vendor>.<model>-v1:0`;
-  set to whichever model is enabled in the deploy account.
+  is expected to be a cross-region inference profile such as `us.<vendor>.<model>-v1:0`,
+  whichever model is enabled in the deploy account.
 
 ## 2026-09-20  Project name
 
@@ -193,7 +193,7 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 
 ## 2026-10-08  Ofcom wording, infra lockfile, benchmark launcher
 
-- The Ofcom PDF still doesn't open from here. One sentence of the legacy guidance note
+- The Ofcom PDF still doesn't open from the build machine. One sentence of the legacy guidance note
   (20 cd/m2, darker image below 160 cd/m2) is quoted in STANDARDS.md from a search index's
   extract of the PDF, labelled as such. The rest of Annex 1 still needs pasting from the PDF.
 - `infra/package-lock.json` committed (CDK CLI 2.1142.0), so `npm ci` in `make deploy` works

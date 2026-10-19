@@ -35,7 +35,7 @@ export function RemediationSummary({ job }: { job: Job }) {
               <tr key={s.segment_id}>
                 <th scope="row"><code>{s.segment_id}</code></th>
                 <td>{s.type}</td>
-                <td>{s.start_s !== undefined && s.end_s !== undefined ? fmtRange(s.start_s, s.end_s) : '–'}</td>
+                <td>{s.start_s !== undefined && s.end_s !== undefined ? fmtRange(s.start_s, s.end_s) : '-'}</td>
                 <td><span className={`badge badge-${OUTCOME_TONE[s.outcome] ?? 'neutral'}`}>{s.outcome.replace('_', ' ')}</span></td>
                 <td>{strategyLabel(s.strategy)}</td>
                 <td>{paramsText(s.params)}</td>

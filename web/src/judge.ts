@@ -4,8 +4,6 @@
 import type { Job, SegmentsResponse, TraceResponse } from './types';
 
 export const REPO_URL = 'https://github.com/SrijaVuppula/SteadyFrame';
-/** Filled in once the video is public. Empty hides the link. */
-export const VIDEO_URL = '';
 
 export interface JudgeCase {
   id: string;

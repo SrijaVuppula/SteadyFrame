@@ -83,9 +83,9 @@ FILES = (
     "trace.jsonl",
 )
 
-# (label, lookup path, format, source file) -- every number on the judge page
+# (label, lookup path, format, source file): every number on the judge page
 RESULTS = [
-    # (key, label, lookup path, format, source file) -- every number on the judge page
+    # (key, label, lookup path, format, source file): every number on the judge page
     ("clips", "Synthetic clips with the right verdict", "detection.clip_accuracy", "of:detection.n_clips", "detection"),
     ("boundary", "Boundary cases right (3 vs 3.5 vs 4 Hz, 0.09 vs 0.11 swing, 24% vs 26% area, ...)",
      "detection.boundary_correct/detection.boundary_total", "ratio", "detection"),
@@ -218,7 +218,7 @@ def scrub(o, job_id: str, case: str):
 
 
 def run_case(case: dict, ctx, offline: bool) -> list[tuple[str, dict, Path]]:
-    """Returns [(case id, exported job, outputs dir)] -- two entries for the approval case."""
+    """Returns [(case id, exported job, outputs dir)]; two entries for the approval case."""
     from service import core
     from service.worker import JobRunner
 

@@ -3,10 +3,10 @@ import type { HazardType, JobStatus } from './types';
 
 export const fmtSeconds = (s: number, digits = 2) => `${s.toFixed(digits)} s`;
 
-export const fmtRange = (a: number, b: number) => `${a.toFixed(2)}–${b.toFixed(2)} s`;
+export const fmtRange = (a: number, b: number) => `${a.toFixed(2)}-${b.toFixed(2)} s`;
 
 export function fmtNum(x: number | null | undefined, digits = 3): string {
-  if (x === null || x === undefined || Number.isNaN(x)) return '–';
+  if (x === null || x === undefined || Number.isNaN(x)) return '-';
   return x.toFixed(digits);
 }
 
@@ -33,7 +33,7 @@ export const STRATEGY_NAME: Record<string, string> = {
 };
 
 export const strategyLabel = (id: string | null | undefined) =>
-  id ? `${id} ${STRATEGY_NAME[id] ? `(${STRATEGY_NAME[id]})` : ''}`.trim() : '–';
+  id ? `${id} ${STRATEGY_NAME[id] ? `(${STRATEGY_NAME[id]})` : ''}`.trim() : '-';
 
 export const STATUS_LABEL: Record<JobStatus, string> = {
   created: 'Created',
@@ -50,7 +50,7 @@ export const STATUS_LABEL: Record<JobStatus, string> = {
 };
 
 export function paramsText(params: Record<string, unknown> | undefined | null): string {
-  if (!params) return '–';
+  if (!params) return '-';
   const entries = Object.entries(params);
   if (!entries.length) return 'defaults';
   return entries.map(([k, v]) => `${k}=${typeof v === 'number' ? +v.toFixed(4) : String(v)}`).join(', ');

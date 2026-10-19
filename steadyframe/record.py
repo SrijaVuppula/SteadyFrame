@@ -346,14 +346,14 @@ def record_html(record: dict) -> str:
         rows.append(
             "<tr>"
             f"<td>{e(s['id'])}</td><td>{e(s['type'])}</td>"
-            f"<td>{s['start_s']:.2f}–{s['end_s']:.2f} s</td>"
+            f"<td>{s['start_s']:.2f}-{s['end_s']:.2f} s</td>"
             f"<td>{s['peak_flash_rate_hz']:.1f}</td><td>{s['max_area_fraction']:.2f}</td>"
             f"<td>{s['max_delta_L']:.2f}</td><td>{e(where(s.get('regions') or []))}</td>"
             f"<td>{e(str(s.get('outcome')))}</td>"
-            f"<td>{e(str(s.get('strategy') or '–'))} {e(json.dumps(s.get('params') or {}))}</td>"
+            f"<td>{e(str(s.get('strategy') or '-'))} {e(json.dumps(s.get('params') or {}))}</td>"
             f"<td>{s.get('attempts', 0)}</td>"
             f"<td>{'' if q.get('ssim_inside') is None else format(q['ssim_inside'], '.3f')}</td>"
-            f"<td>{e(('approved' if d.get('approved') else 'rejected') + ' by ' + str(d.get('by'))) if d else '–'}</td>"
+            f"<td>{e(('approved' if d.get('approved') else 'rejected') + ' by ' + str(d.get('by'))) if d else '-'}</td>"
             "</tr>"
         )
     thr = "".join(f"<tr><th>{e(k)}</th><td>{e(str(v))}</td></tr>" for k, v in th.items())

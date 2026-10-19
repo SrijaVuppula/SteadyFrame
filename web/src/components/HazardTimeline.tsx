@@ -114,9 +114,9 @@ export function HazardTimeline({ duration, before, after, selectedId, onSelect }
               {before.per_second.map((s, i) => (
                 <tr key={s.second}>
                   <th scope="row">{s.second}</th>
-                  <td>{s.verdict}</td><td>{s.general}</td><td>{s.red}</td><td>{s.pattern ?? '–'}</td>
-                  <td>{s.max_flash_rate_hz ?? '–'}</td><td>{s.max_area_fraction ?? '–'}</td>
-                  {after && <td>{after.per_second[i]?.verdict ?? '–'}</td>}
+                  <td>{s.verdict}</td><td>{s.general}</td><td>{s.red}</td><td>{s.pattern ?? '-'}</td>
+                  <td>{s.max_flash_rate_hz ?? '-'}</td><td>{s.max_area_fraction ?? '-'}</td>
+                  {after && <td>{after.per_second[i]?.verdict ?? '-'}</td>}
                 </tr>
               ))}
             </tbody>

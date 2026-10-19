@@ -4,7 +4,7 @@ import type { Job } from '../types';
 import { recallUpload } from '../uploadStore';
 
 /**
- * Flash-safety rule 1: the original is never autoplayed. It sits behind an explicit
+ * Flash safety: the original is never autoplayed. It sits behind an explicit
  * click-through, and when shown it is dimmed (brightness 0.4), at most 320 px wide, plays at
  * 0.25x, does not loop and has a stop button. Browsers reset playbackRate on some src changes,
  * so it is re-applied on every play event.

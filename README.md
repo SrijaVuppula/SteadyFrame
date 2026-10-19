@@ -157,15 +157,15 @@ Every number comes from a script and is frozen in [`eval/results/frozen/`](eval/
 
 ## Structure
 
-- `steadyframe/` — the analyzer, threshold profiles, the six repair strategies, the agent's
+- `steadyframe/` - the analyzer, threshold profiles, the six repair strategies, the agent's
   tools and loop, the verification record, and the command line.
-- `service/` — the API (Lambda and a local FastAPI app), the workers (Lambda and ECS), the test
+- `service/` - the API (Lambda and a local FastAPI app), the workers (Lambda and ECS), the test
   clips, `make demo` and the deployed smoke test.
-- `web/` — the live demo and job pages (React, TypeScript), flash-safe and WCAG AA.
-- `infra/` — the AWS CDK app, seven stacks, and the exported IAM policies.
-- `eval/` — every evaluation script; `synth/` — the synthetic clip generator and the independent
-  reference implementation used as ground truth; `bench/` — the throughput benchmark.
-- `docs/` — standards, the agent, the API, prior art, responsible use, the dated engineering log,
+- `web/` - the live demo and job pages (React, TypeScript), flash-safe and WCAG AA.
+- `infra/` - the AWS CDK app, seven stacks, and the exported IAM policies.
+- `eval/` - every evaluation script; `synth/` - the synthetic clip generator and the independent
+  reference implementation used as ground truth; `bench/` - the throughput benchmark.
+- `docs/` - standards, the agent, the API, prior art, responsible use, the dated engineering log,
   the technical report and the rubric-to-evidence map ([`docs/JUDGES.md`](docs/JUDGES.md)).
 
 ## Setup
@@ -214,15 +214,15 @@ tear it down (`make destroy`).
 
 ### Other commands
 
-- `make test` — the test suite (pytest, including the CDK template tests)
-- `make lint` — ruff check and format
-- `make synth` and `make real` — generate the synthetic suite; download the third-party clips
-- `make natural` — fetch the natural-footage clips and label them with EA IRIS (needs Docker)
-- `make mcp` and `make mcp-demo` — serve the tools over MCP; drive them with an MCP client
-- `make eval`, `make freeze`, `make report` — run every evaluation, freeze the results, render the report
-- `make slides` — results slides for the video, from the frozen numbers
-- `make judge` — re-record the example jobs bundled with the web app
-- `make bench` — the analyzer throughput benchmark on this machine
+- `make test` - the test suite (pytest, including the CDK template tests)
+- `make lint` - ruff check and format
+- `make synth` and `make real` - generate the synthetic suite; download the third-party clips
+- `make natural` - fetch the natural-footage clips and label them with EA IRIS (needs Docker)
+- `make mcp` and `make mcp-demo` - serve the tools over MCP; drive them with an MCP client
+- `make eval`, `make freeze`, `make report` - run every evaluation, freeze the results, render the report
+- `make slides` - results slides for the video, from the frozen numbers
+- `make judge` - re-record the example jobs bundled with the web app
+- `make bench` - the analyzer throughput benchmark on this machine
 
 ## Responsible use and privacy
 
@@ -257,6 +257,6 @@ the report:
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). Synthetic test clips are generated
+Apache-2.0 - see [LICENSE](LICENSE) and [NOTICE](NOTICE). Synthetic test clips are generated
 locally and never distributed; third-party clips are listed with their licences in
 [`data/SOURCES.md`](data/SOURCES.md).

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Accessibility check: build, serve dist/ locally, run @axe-core/cli against the start page,
-// two job pages rendered from fixtures (?fixture=1), the judge tour and a recorded job page,
+// two job pages rendered from fixtures (?fixture=1), the demo at /judge and a recorded job page,
 // write a11y-report.json, exit 1 on any
 // violation of impact serious or critical.
 //

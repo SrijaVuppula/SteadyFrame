@@ -1,4 +1,4 @@
-// Shared pieces of the /judge tour: the before/after flash-rate chart, the model/analyzer
+// Shared pieces of the demo page: the before/after flash-rate chart, the model/analyzer
 // conversation built from a trace, and a few line icons. Nothing here animates.
 import { useMemo, type ReactNode } from 'react';
 import { type Bubble, conversation, flashRate, peak } from '../tourData';
