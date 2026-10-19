@@ -142,7 +142,8 @@ Verify (CloudWatch Logs, the `WorkerLogs` group of `SteadyFrame-Worker`, stream 
   the image's install (under `/opt/cool` if the image keeps the AMI's layout), not a
   `site-packages/cv2` from the wheel; `build.version` is `cv2.__version__`, and
   `build.kleidicv` (when the build lists it) comes from `cv2.getBuildInformation()`
-- `GET /jobs/{id}`: `tool.opencv` is the OpenCV version the worker ran
+- `GET /jobs/{id}`: `tool.opencv` is the OpenCV version the worker ran and `tool.engine` is
+  `cool` (the job page shows "COOL build on Graviton4" next to it)
 - a task that stops with exit code 133 failed the entitlement check before running any code:
   check the subscription (same account), the task role's `RegisterUsage` and egress (public
   IP on the instance)
@@ -180,8 +181,10 @@ stack, which you can leave or `aws cloudformation delete-stack --stack-name CDKT
   judging ends.
 - `worker_engine=cool`: instance on-demand price plus 0.03 USD per COOL container hour after
   the free trial, also 0 at an empty queue ([COOL worker](#cool-worker-optional)).
-- Set an account budget alarm (50 USD) by hand: Billing and Cost Management -> Budgets ->
-  Create budget -> monthly cost budget, 50 USD, e-mail alert at 80% and 100%.
+- With `alert_email` set, `SteadyFrame-Observability` also creates an account-wide monthly cost
+  budget (`SteadyFrame-monthly`, 50 USD) that e-mails that address at 80% of actual spend and
+  at 100% of the forecast. AWS Budgets e-mails need no confirmation; the first two budgets
+  are free.
 
 ## IAM
 
