@@ -1,0 +1,4 @@
+# the image runs npm ci and npm run build itself
+node_modules
+dist
+a11y-report.json
