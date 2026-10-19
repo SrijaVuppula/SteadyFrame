@@ -27,8 +27,11 @@ server {
         proxy_request_buffering off;
     }
 
+    # SPA routes (/judge, /jobs/<id>) get index.html; no directory redirects, because
+    # /judge is also the folder of the bundled recordings
+    absolute_redirect off;
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files $uri /index.html;
     }
 }
 EOF
