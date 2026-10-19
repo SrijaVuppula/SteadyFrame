@@ -146,9 +146,9 @@ export function HomePage({ navigate }: Props) {
         <p className="judge-callout">
           Judging, or short on time?{' '}
           <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>
-            Take the 90-second tour
-          </a>{' '}
-          with recorded jobs: no upload, no waiting for a worker.
+            Open the live demo
+          </a>
+          : pick a test clip, press Run, and watch a real job finish on AWS in seconds.
         </p>
       </section>
 

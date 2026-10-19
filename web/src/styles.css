@@ -518,3 +518,47 @@ a.jx-tile:hover { border-color: var(--accent); }
 @media (min-width: 900px) {
   .jx-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
+
+/* live demo panel (inside the dark hero) */
+.jx-live { margin: 4px 0 18px; padding: clamp(16px, 3vw, 28px); border-radius: 20px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); }
+.jx-live-head h2 { color: #ffffff; margin: 8px 0 6px; }
+.jx-live-head p { color: var(--jx-hero-ink-2); margin: 0 0 16px; max-width: 70ch; }
+.jx-live-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: #45e0a0; color: #062b1c; }
+.jx-clips, .jx-planner { border: 0; padding: 0; margin: 0 0 14px; }
+.jx-clips legend, .jx-planner legend { color: var(--jx-hero-ink-2); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; padding: 0; }
+.jx-clips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.jx-clips legend { grid-column: 1 / -1; }
+.jx-clip { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 12px 40px; border-radius: 14px; cursor: pointer; background: rgba(255, 255, 255, 0.05); border: 1.5px solid rgba(255, 255, 255, 0.18); color: #ffffff; }
+.jx-clip input { position: absolute; left: 14px; top: 15px; width: 16px; height: 16px; accent-color: #9fb8ff; }
+.jx-clip span { color: var(--jx-hero-ink-2); font-size: 0.9rem; }
+.jx-clip.on { border-color: #9fb8ff; background: rgba(159, 184, 255, 0.14); }
+.jx-planner { display: flex; flex-wrap: wrap; gap: 8px 22px; color: #ffffff; }
+.jx-planner label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.jx-planner input { accent-color: #9fb8ff; width: 16px; height: 16px; }
+.jx-live .jx-fine { color: var(--jx-hero-ink-2); }
+.jx-hero .jx-btn.jx-run { font-size: 1.08rem; padding: 14px 26px; margin: 4px 0 10px; background: #45e0a0; border-color: #45e0a0; color: #062b1c; }
+.jx-hero .jx-btn.jx-run:hover { background: #6ff0b8; }
+.jx-stepper { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0; margin: 4px 0 12px; color: var(--jx-hero-ink-2); font-weight: 700; font-size: 0.95rem; }
+.jx-stepper li { display: inline-flex; align-items: center; gap: 8px; }
+.jx-step-dot { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; border: 1.5px solid rgba(255, 255, 255, 0.35); }
+.jx-stepper li.now { color: #ffffff; }
+.jx-stepper li.now .jx-step-dot { border-color: #9fb8ff; background: rgba(159, 184, 255, 0.25); }
+.jx-stepper li.done { color: #45e0a0; }
+.jx-stepper li.done .jx-step-dot { border-color: #45e0a0; background: #45e0a0; color: #062b1c; }
+.jx-live-status { color: #ffffff; margin: 0 0 14px; }
+.jx-elapsed { font-variant-numeric: tabular-nums; font-weight: 800; color: #ffd166; }
+.jx-live-convo { max-height: 520px; overflow-y: auto; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 14px; }
+.jx-live-result { margin-top: 6px; }
+.jx-verdicts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
+.jx-verdict { padding: 6px 12px; border-radius: 10px; font-weight: 800; text-transform: capitalize; background: rgba(255, 255, 255, 0.1); color: #ffffff; }
+.jx-verdict.v-fail { background: #ff7a7a; color: #2a0505; }
+.jx-verdict.v-pass { background: #45e0a0; color: #062b1c; }
+.jx-arrow { color: #ffffff; font-weight: 800; }
+.jx-result-time { color: var(--jx-hero-ink-2); font-size: 0.92rem; }
+.jx-live-result p { color: var(--jx-hero-ink); }
+.jx-live-chart { padding: 10px; border-radius: 14px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 12px; }
+.jx-chart-caption { margin: 4px 0 0; color: var(--jx-hero-ink-2); font-size: 0.9rem; }
+.jx-live-finds { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+.jx-live-find { margin: 0; max-width: 240px; color: var(--jx-hero-ink); font-size: 0.88rem; }
+.jx-live-find img { width: 100%; height: auto; display: block; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2); margin-bottom: 6px; }
+.jx-hero-links { margin: 0; }

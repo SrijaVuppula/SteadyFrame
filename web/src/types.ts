@@ -205,6 +205,8 @@ export interface Job {
   downloads: Partial<Record<DownloadKind | 'input', boolean>>;
   error: string | null;
   tool: ToolInfo;
+  /** worker timings, once the job has run */
+  stats?: { fix_s?: number; realtime_factor?: number | null; worker_s?: number };
 }
 
 /** GET /jobs/{id}/segments item. */

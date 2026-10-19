@@ -25,7 +25,7 @@ export function Layout({ children, navigate }: { children: ReactNode; navigate: 
           </a>
           <p className="tagline">Photosensitivity check and repair for video</p>
           <nav className="site-nav" aria-label="Site">
-            <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>The 90-second tour</a>
+            <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>Live demo</a>
             <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Check a clip</a>
             <a href="https://github.com/SrijaVuppula/SteadyFrame">Code</a>
           </nav>
