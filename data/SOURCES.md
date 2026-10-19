@@ -6,11 +6,13 @@ to `data/real/<id>.<ext>` (gitignored) and writes a `.sha256` next to it. URLs a
 commit so the files cannot change under the evaluation. Labels and how each one was made are
 in `data/external.yaml`; none of them comes from this analyzer.
 
-Wikimedia Commons, the Internet Archive and Pexels were not reachable from the machines this
-was built on, so concert and emergency-vehicle footage is still missing. The set below is what
-could be fetched and verified: two other tools' own test content (with their own expected
-results, or a waveform that can be labelled analytically) and real camera footage as calm
-controls.
+This set was fetched when Wikimedia Commons, the Internet Archive and Pexels were not
+reachable, so it holds two other tools' own test content (with their own expected results, or
+a waveform that can be labelled analytically) and real camera footage as calm controls. Natural
+footage of real lights (emergency vehicles, club lights, lightning, fireworks) came later from
+Wikimedia Commons: `data/natural.yaml` lists those 17 clips with their authors, licences and
+checksums, `make natural` fetches them and labels them with EA IRIS, and `eval/natural.py`
+scores them.
 
 The IRIS and Apple clips contain flashing by design. Do not open them in a video player; use
 `steadyframe analyze --plot`.

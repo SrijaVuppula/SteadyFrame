@@ -65,6 +65,19 @@ What the model decides, and what code decides:
   deterministic policy if the model fails, and re-verifies the whole file. Only the analyzer
   can mark a job as passed.
 
+### Bring your own agent (MCP)
+
+`steadyframe mcp` serves the same seven tools over the Model Context Protocol, with the same
+guardrails, so an agent in Kiro, Codex, VS Code or any MCP client can check a video, repair it
+and prove the repair on your machine. A fix that needs approval is put to the person at the
+client (MCP elicitation), never to the agent; `run_on_aws` hands a whole file to the deployed
+pipeline. `make mcp-demo` drives it over stdio; [`docs/MCP.md`](docs/MCP.md) has the client
+configs and a verbatim run.
+
+```json
+{ "mcpServers": { "steadyframe": { "command": "/path/to/SteadyFrame/.venv/bin/steadyframe", "args": ["mcp"] } } }
+```
+
 ### How SteadyFrame uses OpenCV 5
 
 All image work is OpenCV 5 (`opencv-python-headless 5.0.0.93`, asserted at import).
@@ -122,6 +135,12 @@ Every number comes from a script and is frozen in [`eval/results/frozen/`](eval/
   videos SteadyFrame matches IRIS's expected verdict on 8 of 8, and 35 of 35 frames IRIS fails
   fall inside a detected segment. In 9 minutes of real camera footage, 0 of 551 seconds were
   wrongly flagged.
+- **Real lights, against EA's own checker:** 17 openly licensed clips of police cars, fire
+  engines, club lights, lightning and fireworks (10 minutes), labelled frame by frame by EA IRIS
+  1.1.0. Under the same whole-screen rule SteadyFrame agrees on 16 of 17 clips and catches all
+  115 frames IRIS fails; where it differs it is stricter, and the report shows why. All 10 clips
+  either tool flagged were repaired, and **IRIS itself passes all 10 repaired files**
+  ([`eval/natural.py`](eval/natural.py), [`natural.md`](eval/results/frozen/natural.md)).
 - **Repair:** 25 of 25 hazardous clips repaired and passing whole-file re-verification. The
   live Bedrock agent also fixed 25 of 25, with 1.04 attempts per hazard against 1.10 for the
   fixed policy, and kept more of the picture inside the hazard region (SSIM 0.882 against
@@ -198,6 +217,8 @@ tear it down (`make destroy`).
 - `make test` — the test suite (pytest, including the CDK template tests)
 - `make lint` — ruff check and format
 - `make synth` and `make real` — generate the synthetic suite; download the third-party clips
+- `make natural` — fetch the natural-footage clips and label them with EA IRIS (needs Docker)
+- `make mcp` and `make mcp-demo` — serve the tools over MCP; drive them with an MCP client
 - `make eval`, `make freeze`, `make report` — run every evaluation, freeze the results, render the report
 - `make slides` — results slides for the video, from the frozen numbers
 - `make judge` — re-record the example jobs bundled with the web app
@@ -210,7 +231,9 @@ device, and a pass means the thresholds were met as implemented here, not that a
 for every viewer; threshold tests have known misses. The web app never autoplays anything, and
 hazardous inputs are never shown or bundled. Uploads and outputs are deleted after one day, job
 records after seven, and nothing is used for training. The model receives analyzer numbers
-only. See [`docs/RESPONSIBLE_USE.md`](docs/RESPONSIBLE_USE.md).
+only. The public demo caps its own cost: 40 model-planned checks a day (8 per visitor), after
+which checks run with the free fixed policy and say so, 600 checks a day in all, and a request
+rate limit. See [`docs/RESPONSIBLE_USE.md`](docs/RESPONSIBLE_USE.md) and [`docs/API.md`](docs/API.md).
 
 ## Status and limits
 
@@ -223,8 +246,12 @@ the report:
 - The area rule runs on a grid, so a hazard right at the 25% boundary can flip with grid size.
 - A full-screen strobe has no regional repair; when the repair changes the picture too much,
   the job waits for a person.
-- The pattern detector is experimental and off by default. The third-party set is small, with no
-  labelled concert or emergency-vehicle footage yet.
+- The pattern detector is experimental and off by default.
+- On real lights SteadyFrame is stricter than EA's IRIS where parts of the picture brighten
+  while others darken (alternating emergency lights, moving disco spots): IRIS averages those
+  changes away and SteadyFrame's grid cells do not, so it asks for some repairs IRIS would not.
+  The report measures why; neither tool measures harm. The third-party sets are still small
+  (35 clips in all).
 - The optional COOL (Cloud Optimized OpenCV) engine and benchmark are in the code but have not
   been run, because they need a paid AWS Marketplace subscription.
 

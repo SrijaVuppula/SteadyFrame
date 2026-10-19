@@ -1,0 +1,23 @@
+[
+ {
+  "video": "3Hz_6s",
+  "frames": 149,
+  "codes_identical": true,
+  "flash_fail_frames_identical": true,
+  "flash_fail_frames": 6
+ },
+ {
+  "video": "2Hz_6s",
+  "frames": 149,
+  "codes_identical": true,
+  "flash_fail_frames_identical": true,
+  "flash_fail_frames": 0
+ },
+ {
+  "video": "flashStripes",
+  "frames": 36,
+  "codes_identical": false,
+  "flash_fail_frames_identical": true,
+  "flash_fail_frames": 29
+ }
+]

@@ -60,6 +60,15 @@ photosensitivity thresholds". Wording we never use: "prevents seizures", "medica
   frames, file names or container metadata. `eval/guardrails.py` plants instructions in a
   clip's file name and metadata tags and checks that none of that text reaches the model.
 - Local mode (`docker compose up`) keeps everything on the machine.
+- The public demo limits itself, so a visitor cannot run up its cost or crowd out others: 40
+  Bedrock-planned checks a day overall and 8 per visitor (past either, the check runs with the
+  free fixed policy and the page says why), 600 checks a day overall and 60 per visitor (past
+  either, the API answers 429), and 20 requests a second across the API. A visitor is counted
+  by a salted hash of their address and the day, kept for two days; the address itself is not
+  stored. Details in `docs/API.md`.
+- `steadyframe mcp` runs on the user's own machine with their permissions and reads only the
+  files the agent names. Its agent is shown measurements only, like the built-in one, and a
+  decision that needs a person goes to the person at the client (`docs/MCP.md`).
 
 ## Misuse considerations
 
@@ -79,5 +88,8 @@ one-dimensional implementation of the rules and analytic area conditions; it sho
 the video analyzer implements the rules as written, not that the rules capture every real
 hazard. The external set (`data/SOURCES.md`, `eval/external.py`) is small: EA IRIS's test
 videos scored against IRIS's own expected results, Apple's flashing sample labelled by the
-reference rules, and calm camera footage. It contains no natural flashing footage such as
-concerts or emergency vehicles yet.
+reference rules, and calm camera footage. The natural set (`data/natural.yaml`,
+`eval/natural.py`) adds 17 openly licensed clips of real lights (emergency vehicles, club
+lights, lightning, fireworks) labelled frame by frame by EA IRIS; it is ten minutes of video,
+and on it SteadyFrame is stricter than IRIS where parts of the picture brighten while others
+darken. Neither tool measures harm.

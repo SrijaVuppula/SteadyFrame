@@ -116,6 +116,10 @@ fix with overall SSIM under 0.75 require `request_human_approval`; the job pause
 its state persisted and resumes with the decision. Amazon Bedrock is used through the
 Converse API with `toolConfig`; the model id is configuration, never code.
 
+The same tools are served over MCP (`steadyframe mcp`, `docs/MCP.md`), so an outside agent can
+be the planner under the same refusals; there the human approval is asked of the person at the
+client through MCP elicitation, and the agent cannot supply it (`tests/test_mcp.py`).
+
 Annotated traces in `docs/examples/` show a verify result changing the next tool call,
 including a live Bedrock run (`live_bedrock_model_changes_plan.md`) where the first candidate
 fails re-analysis at 5.5 Hz and the model lowers the filter strength because of it.
@@ -125,7 +129,7 @@ refuses unverified, failing or unapproved candidates; `finalize` refuses while s
 open; budgets are counted by the tools; a human decision arrives only through the approve
 endpoint and is consumed once; the job status comes from re-analysing the rendered file.
 The model's context is built from analyzer numbers only, never from file names, container
-metadata or pixels. Section 7.7 attacks all of this.
+metadata or pixels. Section 7.8 attacks all of this.
 
 Outputs a reviewer keeps: the repaired video, a verification record (`record.json` and a
 printable `record.html`: SHA-256 of input and output, every threshold applied, the analyzer and
@@ -145,7 +149,10 @@ worker on ARM64/Graviton (Python 3.11, OpenCV 5, ffmpeg, the agent loop) -> Bedr
 CloudWatch (JSON logs, metrics, dashboard, alarms). Least-privilege IAM per component with
 the policy documents in `infra/policies/`. Limits: 100 MB, 120 s, container validation.
 `make deploy` prints the endpoint; `make destroy` removes it; `docker compose up` runs the
-same worker and API locally.
+same worker and API locally. The public API caps its own cost per UTC day: 40 Bedrock-planned
+jobs overall and 8 per visitor (past either, the fixed policy plans the job and its `notice`
+says so), 600 jobs overall and 60 per visitor (then 429), with a stage throttle of 20 requests a
+second; counters are atomic DynamoDB updates (`service/core.py`, `docs/API.md`).
 
 Jobs are taken first by an arm64 Lambda function built from the same container (`lambda`
 target of the Dockerfile, `service/lambda_worker.py`): one SQS message per invocation, 3 GB,
@@ -302,7 +309,58 @@ heuristic agent on 3 of 3
 (1.33). The two full-swing,
 full-frame IRIS strobes fall below the SSIM bar and go to human approval, as designed.
 
-### 7.6 Benchmark: x86, Graviton, COOL (`bench/run.py`)
+### 7.6 Natural footage against EA IRIS (`eval/natural.py`)
+
+The clips in 7.5 check the rules on test content. To see what happens on real light, 17
+openly licensed Wikimedia Commons clips (10.0 minutes) of things that really flash
+were added: police cars, fire engines and an ambulance, two club lights, a phone's LED effects, a
+neon sign, pedestrian-crossing beacons, lightning and fireworks (`data/natural.yaml`, with
+authors, licences and checksums). The labels come from EA IRIS 1.1.0, the official Ubuntu app
+from EA's GitHub release, run frame by frame on the same H.264 transcode SteadyFrame reads.
+Before use, the app reproduces IRIS's own expected logs on three of its test videos (identical
+per-frame codes on two, identical flash-failure frames on the third). IRIS applies the area rule
+to the whole screen, so `broadcast` is the like-for-like profile.
+
+| metric | `broadcast` | `wcag` |
+|---|---|---|
+| clip verdicts agreeing with IRIS | 16 / 17 | 10 / 17 |
+| IRIS flash-failure frames inside a SteadyFrame segment | 115 / 115 | 115 / 115 |
+| per-second precision / recall | 0.238 / 1.000 | 0.052 / 1.000 |
+| seconds SteadyFrame flags that IRIS passes | 32 / 605 | 182 / 605 |
+
+![](figures/fig_natural.png)
+
+SteadyFrame missed nothing IRIS flagged; where they differ, SteadyFrame is stricter, and the
+difference has a measurable cause. IRIS counts a transition when the *average* luminance of the
+area that changed moves by 0.10. SteadyFrame counts transitions in each cell of its 64 x 48 grid
+and then asks whether the cells over the rate cover a quarter of the screen. When some parts of
+the picture brighten while others darken, as with a fire engine's alternating lights or moving
+disco spots, the changes cancel in IRIS's average and add up across SteadyFrame's cells.
+`eval/natural.py` measures this per frame on the analyzer's own grid: `net`, the size of the
+mean change over the mean size of the cell changes (1 when everything moves together, 0 when it
+cancels). Inside SteadyFrame's segments on the fire engine, 0.44
+of the screen changes within one frame and `net` is 0.035: large,
+simultaneous, opposite changes. On the rotating disco light, `net` is
+0.33 around the frames IRIS fails and
+0.16 across SteadyFrame's segments. The `wcag` profile's 10-degree
+window rule is stricter again by design: a bright light that covers a quarter of the central
+field but not of the screen fails it, which is why six clips fail `wcag` only (two emergency
+vehicles, the small disco, the phone, the lightning time-lapse and the fireworks).
+
+Every clip that failed under either tool was then repaired by both planners and re-checked by
+both tools:
+
+| | fixed policy | heuristic agent |
+|---|---|---|
+| clips repaired | 10 | 10 |
+| passing SteadyFrame's whole-file re-verification (`wcag`) | 10 | 10 |
+| passing SteadyFrame `broadcast` after repair | 10 | 10 |
+| passing **IRIS** after repair | 10 / 10 | 10 / 10 |
+| approvals requested (auto-granted offline) | 7 | 8 |
+
+Per-clip tables: `eval/results/frozen/natural.md`.
+
+### 7.7 Benchmark: x86, Graviton, COOL (`bench/run.py`)
 
 Identical analyzer, three 1280x720 clips, ten repetitions after a discarded warm-up,
 decode excluded and included. Evidence of which build executed (version, `cv2.__file__`,
@@ -319,7 +377,7 @@ types and no Marketplace subscriptions, and the project stays on free services. 
 
 ![](figures/comparison.png)
 
-### 7.7 Guardrails: an adversarial planner (`eval/guardrails.py`)
+### 7.8 Guardrails: an adversarial planner (`eval/guardrails.py`)
 
 The live model has only ever behaved, which says nothing about what happens when it does not.
 A hostile planner speaks the same tool protocol and tries one shortcut per run; one more run
@@ -357,10 +415,15 @@ stall runs out of turns. The planted text appears in nothing the model is shown.
 - Display: luminance is relative to peak white through the sRGB curve. That matches the Ofcom
   note's reference display (gamma 2.2, 200 cd/m2 peak white) closely but not exactly near
   black, and a brighter real display is not modelled.
-- External data is small: 18 clips, of which 3 contain
-  hazards, and none of those is natural footage (concert lighting and emergency vehicles
-  are still missing). The synthetic ground truth checks that the rules are implemented as
-  written, not that the rules capture every real hazard.
+- External data is still small: 18 test clips and 17 natural ones
+  (10.0 minutes; IRIS fails three of them). On natural footage SteadyFrame is
+  stricter than IRIS where parts of the picture brighten while others darken (7.6): it flagged
+  32 seconds IRIS passes, so it would ask for repairs IRIS would not.
+  Whether those alternating flashes are hazardous is not something either tool measures. The
+  synthetic ground truth checks that the rules are implemented as written, not that the rules
+  capture every real hazard.
+- Repairs of full-frame natural flashes (lightning) keep little of the picture inside the region
+  (SSIM down to 0.27) and go to a person, as designed.
 - IRIS's extended-failure rule (sustained flashing below the three-flash limit) is not
   implemented.
 - Fixing a hazard embedded in at-limit flashing treats the whole episode, which can be long
@@ -372,7 +435,8 @@ stall runs out of turns. The planted text appears in nothing the model is shown.
 - `make install && make test` (pinned `requirements.lock`, OpenCV 5 asserted).
 - `make demo`: the whole loop on three sample clips with no credentials (analyze, fix with the
   offline planner, write and re-check the verification record).
-- `make synth && make real && make eval && make bench` regenerate every number here; `python -m eval.report` re-renders this file.
+- `make synth && make real && make natural && make eval && make bench` regenerate every number here (`make natural` needs Docker for EA IRIS); `python -m eval.report` re-renders this file.
+- `make mcp-demo`: an MCP client drives `steadyframe mcp` over stdio (`docs/MCP.md`).
 - `make deploy` (CDK) prints the endpoint; `make smoke` uploads a sample and checks the remediated output passes; `make destroy`.
 - `docker compose up` for the offline reproduction.
 - Observability: structured JSON logs; CloudWatch metrics for job duration, realtime factor, iterations per segment, failures, approvals; one dashboard and alarms in IaC; a 50 USD monthly cost budget with e-mail alerts at 80% actual and 100% forecast, also in IaC.

@@ -1,0 +1,1759 @@
+{
+  "n_clips": 17,
+  "missing": [],
+  "by_profile": {
+    "broadcast": {
+      "clip_agreement": 16,
+      "per_second": {
+        "tp": 10,
+        "fp": 32,
+        "fn": 0,
+        "precision": 0.23809523809523808,
+        "recall": 1.0,
+        "f1": 0.3846153846153846
+      },
+      "tp": 10,
+      "fp": 32,
+      "fn": 0,
+      "seconds": 605,
+      "label_fail_frames": 115,
+      "covered": 115,
+      "fail_clips": [
+        "fire_engine_nl",
+        "disco_rotating",
+        "lightning_germany",
+        "lightning_rolla"
+      ],
+      "disagreements": [
+        "fire_engine_nl"
+      ]
+    },
+    "wcag": {
+      "clip_agreement": 10,
+      "per_second": {
+        "tp": 10,
+        "fp": 182,
+        "fn": 0,
+        "precision": 0.052083333333333336,
+        "recall": 1.0,
+        "f1": 0.09900990099009901
+      },
+      "tp": 10,
+      "fp": 182,
+      "fn": 0,
+      "seconds": 605,
+      "label_fail_frames": 115,
+      "covered": 115,
+      "fail_clips": [
+        "police_se_blue",
+        "police_nl",
+        "fire_engine_nl",
+        "disco_rotating",
+        "disco_mark_bain",
+        "phone_funlights",
+        "lightning_germany",
+        "lightning_rolla",
+        "lightning_colorado_timelapse",
+        "fireworks_rome"
+      ],
+      "disagreements": [
+        "police_se_blue",
+        "police_nl",
+        "fire_engine_nl",
+        "disco_mark_bain",
+        "phone_funlights",
+        "lightning_colorado_timelapse",
+        "fireworks_rome"
+      ]
+    }
+  },
+  "minutes": 10.0,
+  "iris_fail_clips": [
+    "disco_rotating",
+    "lightning_germany",
+    "lightning_rolla"
+  ],
+  "iris_extended_only": [],
+  "differences": {
+    "fire_engine_nl": {
+      "in_segments": {
+        "frames": 54,
+        "max_concurrent_area": 0.4401041567325592,
+        "median_net": 0.03513826572671291
+      },
+      "near_iris_fail": {
+        "frames": 0,
+        "max_concurrent_area": null,
+        "median_net": null
+      }
+    },
+    "disco_rotating": {
+      "in_segments": {
+        "frames": 1119,
+        "max_concurrent_area": 0.9951171875,
+        "median_net": 0.15939245890113646
+      },
+      "near_iris_fail": {
+        "frames": 92,
+        "max_concurrent_area": 0.9951171875,
+        "median_net": 0.32792740326171377
+      }
+    }
+  },
+  "remediation": {
+    "fixed": {
+      "n": 10,
+      "passed": 10,
+      "broadcast_pass_after": 10,
+      "iris_pass_after": 10,
+      "iris_checked": 10,
+      "approvals": 7,
+      "mean_iterations_per_segment": 1.0,
+      "rows": [
+        {
+          "clip": "police_se_blue",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.48523554010469405,
+          "ssim_overall": 0.7631053817076762,
+          "runtime_s": 1.25,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "police_nl",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.6916178899506727,
+          "ssim_overall": 0.8180386597911516,
+          "runtime_s": 49.29,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "fire_engine_nl",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 1,
+          "ssim_inside": 0.498508347257687,
+          "ssim_overall": 0.5253094563818281,
+          "runtime_s": 43.338,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "disco_rotating",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 8,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1,S1,S1,S1,S1",
+          "approvals": 2,
+          "ssim_inside": 0.7720346977693523,
+          "ssim_overall": 0.7755566592517373,
+          "runtime_s": 154.627,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "disco_mark_bain",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.8294438123703003,
+          "ssim_overall": 0.9593125473369252,
+          "runtime_s": 22.169,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "phone_funlights",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 14,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1,S1,S1,S1,S1,S1,S1,S1,S1,S1,S1",
+          "approvals": 1,
+          "ssim_inside": 0.5470024283627444,
+          "ssim_overall": 0.9101901101877802,
+          "runtime_s": 30.814,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_germany",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 1,
+          "ssim_inside": 0.27174083451772557,
+          "ssim_overall": 0.43763690403309363,
+          "runtime_s": 3.733,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_rolla",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 5,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1,S1",
+          "approvals": 2,
+          "ssim_inside": 0.6248060091898587,
+          "ssim_overall": 0.7747988515298861,
+          "runtime_s": 38.641,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_colorado_timelapse",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 4,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1",
+          "approvals": 0,
+          "ssim_inside": 0.9486959105111522,
+          "ssim_overall": 0.9848936961974648,
+          "runtime_s": 120.448,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "fireworks_rome",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 9,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1,S1,S1,S1,S1,S1",
+          "approvals": 0,
+          "ssim_inside": 0.6612557966007161,
+          "ssim_overall": 0.9293743489729446,
+          "runtime_s": 67.732,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        }
+      ]
+    },
+    "heuristic": {
+      "n": 10,
+      "passed": 10,
+      "broadcast_pass_after": 10,
+      "iris_pass_after": 10,
+      "iris_checked": 10,
+      "approvals": 8,
+      "mean_iterations_per_segment": 1.0142857142857142,
+      "rows": [
+        {
+          "clip": "police_se_blue",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.49021103367453717,
+          "ssim_overall": 0.7654707285224415,
+          "runtime_s": 1.193,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "police_nl",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.6936028376221657,
+          "ssim_overall": 0.8192153535783291,
+          "runtime_s": 48.544,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "fire_engine_nl",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S4",
+          "approvals": 1,
+          "ssim_inside": 0.5049363460130752,
+          "ssim_overall": 0.5049363460130752,
+          "runtime_s": 42.164,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "disco_rotating",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 8,
+          "iter_per_seg": 1.0,
+          "strategies": "S4,S4,S4,S4,S4,S4,S4,S4",
+          "approvals": 2,
+          "ssim_inside": 0.7760398266438129,
+          "ssim_overall": 0.7760398266438129,
+          "runtime_s": 138.977,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "disco_mark_bain",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S1",
+          "approvals": 0,
+          "ssim_inside": 0.8938647436373162,
+          "ssim_overall": 0.9746875329451128,
+          "runtime_s": 20.484,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "phone_funlights",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 14,
+          "iter_per_seg": 1.1428571428571428,
+          "strategies": "S1,S1,S1,S1,S1,S1,S1,S1,S1,S4,S1,S1,S1,S1",
+          "approvals": 2,
+          "ssim_inside": 0.5578781425989461,
+          "ssim_overall": 0.8968556912066176,
+          "runtime_s": 32.774,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_germany",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 1,
+          "iter_per_seg": 1.0,
+          "strategies": "S4",
+          "approvals": 1,
+          "ssim_inside": 0.33473105568053396,
+          "ssim_overall": 0.33473105568053396,
+          "runtime_s": 3.434,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_rolla",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 5,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S4,S1,S4,S1",
+          "approvals": 2,
+          "ssim_inside": 0.6429627490098472,
+          "ssim_overall": 0.712619061574856,
+          "runtime_s": 36.469,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "lightning_colorado_timelapse",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 4,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1",
+          "approvals": 0,
+          "ssim_inside": 0.9595227143646023,
+          "ssim_overall": 0.988182030255186,
+          "runtime_s": 112.384,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        },
+        {
+          "clip": "fireworks_rome",
+          "status": "passed",
+          "after": "pass",
+          "broadcast_after": "pass",
+          "segments": 9,
+          "iter_per_seg": 1.0,
+          "strategies": "S1,S1,S1,S1,S1,S1,S1,S1,S1",
+          "approvals": 0,
+          "ssim_inside": 0.6668499927146944,
+          "ssim_overall": 0.9302596626081514,
+          "runtime_s": 62.885,
+          "iris_after": "pass",
+          "iris_after_fail_frames": 0
+        }
+      ]
+    }
+  },
+  "clips": [
+    {
+      "id": "police_se_blue",
+      "category": "emergency",
+      "licence": "CC BY-SA 3.0",
+      "author": "Albin Olsson",
+      "title": "File:Blue emergency lights.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 5,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 8.0,
+          "max_area_over_rate": 0.1165,
+          "realtime_factor": 99.683
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 5,
+          "fn": 0,
+          "seconds": 5,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 0.04,
+              "end_s": 4.92,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.6756
+            }
+          ],
+          "max_cell_rate_hz": 8.0,
+          "max_area_over_rate": 0.6756,
+          "realtime_factor": 95.64
+        }
+      },
+      "resolution": "320x240",
+      "fps": 25.0,
+      "duration_s": 4.9,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "police_memphis",
+      "category": "emergency",
+      "licence": "CC BY 3.0",
+      "author": "Thomas R Machnitzki",
+      "title": "File:Video MPD Cruiser.theora.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 3,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 6.5,
+          "max_area_over_rate": 0.0036,
+          "realtime_factor": 41.013
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 3,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 6.5,
+          "max_area_over_rate": 0.0179,
+          "realtime_factor": 37.095
+        }
+      },
+      "resolution": "640x480",
+      "fps": 30.0,
+      "duration_s": 3.0,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "police_nl",
+      "category": "emergency",
+      "licence": "CC BY-SA 4.0",
+      "author": "S. Perquin",
+      "title": "File:Spoedrit politie.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 32,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 9.0,
+          "max_area_over_rate": 0.182,
+          "realtime_factor": 3.512
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 3,
+          "fn": 0,
+          "seconds": 32,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 15.7,
+              "end_s": 18.9,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.6399
+            }
+          ],
+          "max_cell_rate_hz": 9.0,
+          "max_area_over_rate": 0.6399,
+          "realtime_factor": 3.498
+        }
+      },
+      "resolution": "1920x1080",
+      "fps": 30.0,
+      "duration_s": 31.6,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "fire_engine_nl",
+      "category": "emergency",
+      "licence": "CC BY-SA 4.0",
+      "author": "S. Perquin",
+      "title": "File:Spoedrit brandweer.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 2,
+          "fn": 0,
+          "seconds": 16,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 5.7333,
+              "end_s": 7.5333,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.2669
+            }
+          ],
+          "max_cell_rate_hz": 9.5,
+          "max_area_over_rate": 0.2669,
+          "realtime_factor": 3.38
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 5,
+          "fn": 0,
+          "seconds": 16,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 4.2,
+              "end_s": 9.4333,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.9077
+            }
+          ],
+          "max_cell_rate_hz": 9.5,
+          "max_area_over_rate": 0.9077,
+          "realtime_factor": 3.377
+        }
+      },
+      "resolution": "1920x1080",
+      "fps": 30.0,
+      "duration_s": 15.2,
+      "why": {
+        "in_segments": {
+          "frames": 54,
+          "max_concurrent_area": 0.4401041567325592,
+          "median_net": 0.03513826572671291
+        },
+        "near_iris_fail": {
+          "frames": 0,
+          "max_concurrent_area": null,
+          "median_net": null
+        }
+      },
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "fire_berlin",
+      "category": "emergency",
+      "licence": "CC BY 3.0",
+      "author": "Lear 21",
+      "title": "File:Live Feuerwehr Berlin.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 8,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 6.0,
+          "max_area_over_rate": 0.0195,
+          "realtime_factor": 3.451
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 8,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 6.0,
+          "max_area_over_rate": 0.1726,
+          "realtime_factor": 3.439
+        }
+      },
+      "resolution": "1920x1080",
+      "fps": 29.97,
+      "duration_s": 7.3,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "ambulance_toronto",
+      "category": "emergency",
+      "licence": "CC BY-SA 4.0",
+      "author": "Hillelfrei",
+      "title": "File:Toronto EMS on scene.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 11,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 10.5,
+          "max_area_over_rate": 0.029,
+          "realtime_factor": 17.651
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 11,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 10.5,
+          "max_area_over_rate": 0.131,
+          "realtime_factor": 17.681
+        }
+      },
+      "resolution": "1280x720",
+      "fps": 30.0,
+      "duration_s": 10.1,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "disco_rotating",
+      "category": "club",
+      "licence": "CC BY-SA 4.0",
+      "author": "JJMr19",
+      "title": "File:Rotating disco lights.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 3,
+          "fp": 30,
+          "fn": 0,
+          "seconds": 104,
+          "label_fail_frames": 43,
+          "covered": 43,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 8.3,
+              "end_s": 9.8333,
+              "peak_flash_rate_hz": 7.5,
+              "area": 0.3893
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 13.4333,
+              "end_s": 16.1333,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.4085
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 16.3667,
+              "end_s": 17.4333,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.2754
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 18.8667,
+              "end_s": 20.6333,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.3333
+            },
+            {
+              "id": "g004",
+              "type": "general",
+              "start_s": 28.7,
+              "end_s": 30.4667,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.2969
+            },
+            {
+              "id": "g005",
+              "type": "general",
+              "start_s": 40.7333,
+              "end_s": 41.8,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.276
+            },
+            {
+              "id": "g006",
+              "type": "general",
+              "start_s": 58.6333,
+              "end_s": 60.6,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.3216
+            },
+            {
+              "id": "g007",
+              "type": "general",
+              "start_s": 68.1333,
+              "end_s": 70.3667,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.4596
+            },
+            {
+              "id": "g008",
+              "type": "general",
+              "start_s": 71.0,
+              "end_s": 72.9333,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.3597
+            },
+            {
+              "id": "g009",
+              "type": "general",
+              "start_s": 73.6333,
+              "end_s": 76.0,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.7806
+            },
+            {
+              "id": "g010",
+              "type": "general",
+              "start_s": 76.5667,
+              "end_s": 79.1333,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.7741
+            },
+            {
+              "id": "g011",
+              "type": "general",
+              "start_s": 79.4,
+              "end_s": 80.7333,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.262
+            },
+            {
+              "id": "g012",
+              "type": "general",
+              "start_s": 81.1667,
+              "end_s": 82.8667,
+              "peak_flash_rate_hz": 7.5,
+              "area": 0.5713
+            },
+            {
+              "id": "g013",
+              "type": "general",
+              "start_s": 84.1333,
+              "end_s": 85.6667,
+              "peak_flash_rate_hz": 6.5,
+              "area": 0.6217
+            },
+            {
+              "id": "g014",
+              "type": "general",
+              "start_s": 87.1333,
+              "end_s": 88.9333,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.8366
+            },
+            {
+              "id": "g015",
+              "type": "general",
+              "start_s": 89.1333,
+              "end_s": 92.9667,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.5433
+            },
+            {
+              "id": "g016",
+              "type": "general",
+              "start_s": 94.0667,
+              "end_s": 96.4,
+              "peak_flash_rate_hz": 10.5,
+              "area": 0.5967
+            },
+            {
+              "id": "g017",
+              "type": "general",
+              "start_s": 97.0667,
+              "end_s": 100.9,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.8197
+            }
+          ],
+          "max_cell_rate_hz": 10.5,
+          "max_area_over_rate": 0.8366,
+          "realtime_factor": 38.914
+        },
+        "wcag": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 3,
+          "fp": 99,
+          "fn": 0,
+          "seconds": 104,
+          "label_fail_frames": 43,
+          "covered": 43,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 0.0333,
+              "end_s": 25.2333,
+              "peak_flash_rate_hz": 9.5,
+              "area": 1.0
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 27.4667,
+              "end_s": 52.6,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.8661
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 52.1667,
+              "end_s": 68.0,
+              "peak_flash_rate_hz": 9.5,
+              "area": 0.9702
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 67.8,
+              "end_s": 83.0333,
+              "peak_flash_rate_hz": 9.5,
+              "area": 1.0
+            },
+            {
+              "id": "g004",
+              "type": "general",
+              "start_s": 83.5667,
+              "end_s": 87.0333,
+              "peak_flash_rate_hz": 8.0,
+              "area": 1.0
+            },
+            {
+              "id": "g005",
+              "type": "general",
+              "start_s": 86.7667,
+              "end_s": 89.1,
+              "peak_flash_rate_hz": 7.0,
+              "area": 1.0
+            },
+            {
+              "id": "g006",
+              "type": "general",
+              "start_s": 88.7667,
+              "end_s": 100.9333,
+              "peak_flash_rate_hz": 10.5,
+              "area": 1.0
+            },
+            {
+              "id": "g007",
+              "type": "general",
+              "start_s": 100.8667,
+              "end_s": 103.5,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.3482
+            }
+          ],
+          "max_cell_rate_hz": 10.5,
+          "max_area_over_rate": 1.0,
+          "realtime_factor": 38.502
+        }
+      },
+      "resolution": "640x480",
+      "fps": 30.0,
+      "duration_s": 103.5,
+      "why": {
+        "in_segments": {
+          "frames": 1119,
+          "max_concurrent_area": 0.9951171875,
+          "median_net": 0.15939245890113646
+        },
+        "near_iris_fail": {
+          "frames": 92,
+          "max_concurrent_area": 0.9951171875,
+          "median_net": 0.32792740326171377
+        }
+      },
+      "iris_verdict": "fail",
+      "iris_extended": false
+    },
+    {
+      "id": "disco_mark_bain",
+      "category": "club",
+      "licence": "CC BY-SA 3.0",
+      "author": "Netherlands Media Art Institute, Mark Bain",
+      "title": "File:Mark Bain Disco for None.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 117,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 4.5,
+          "max_area_over_rate": 0.0771,
+          "realtime_factor": 18.127
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 1,
+          "fn": 0,
+          "seconds": 117,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 109.16,
+              "end_s": 110.4401,
+              "peak_flash_rate_hz": 4.5,
+              "area": 0.3393
+            }
+          ],
+          "max_cell_rate_hz": 4.5,
+          "max_area_over_rate": 0.3393,
+          "realtime_factor": 18.294
+        }
+      },
+      "resolution": "720x576",
+      "fps": 24.97,
+      "duration_s": 116.2,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "phone_funlights",
+      "category": "device",
+      "licence": "CC BY-SA 4.0",
+      "author": "Devin Magruder",
+      "title": "File:Motorola funlights.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 66,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 8.0,
+          "max_area_over_rate": 0.1325,
+          "realtime_factor": 36.235
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 36,
+          "fn": 0,
+          "seconds": 66,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 0.2,
+              "end_s": 1.8,
+              "peak_flash_rate_hz": 5.0,
+              "area": 0.4435
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 2.08,
+              "end_s": 9.16,
+              "peak_flash_rate_hz": 7.5,
+              "area": 0.5149
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 8.96,
+              "end_s": 12.16,
+              "peak_flash_rate_hz": 6.5,
+              "area": 0.4226
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 13.0,
+              "end_s": 17.56,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.4137
+            },
+            {
+              "id": "g004",
+              "type": "general",
+              "start_s": 21.24,
+              "end_s": 22.72,
+              "peak_flash_rate_hz": 6.0,
+              "area": 0.2857
+            },
+            {
+              "id": "g005",
+              "type": "general",
+              "start_s": 24.12,
+              "end_s": 25.24,
+              "peak_flash_rate_hz": 4.5,
+              "area": 0.2768
+            },
+            {
+              "id": "g006",
+              "type": "general",
+              "start_s": 25.76,
+              "end_s": 26.96,
+              "peak_flash_rate_hz": 6.0,
+              "area": 0.3095
+            },
+            {
+              "id": "g007",
+              "type": "general",
+              "start_s": 27.16,
+              "end_s": 28.68,
+              "peak_flash_rate_hz": 5.5,
+              "area": 0.3452
+            },
+            {
+              "id": "g008",
+              "type": "general",
+              "start_s": 48.0,
+              "end_s": 50.48,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.5208
+            },
+            {
+              "id": "g009",
+              "type": "general",
+              "start_s": 51.2,
+              "end_s": 53.04,
+              "peak_flash_rate_hz": 6.0,
+              "area": 0.3512
+            },
+            {
+              "id": "g010",
+              "type": "general",
+              "start_s": 54.32,
+              "end_s": 57.68,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.3988
+            },
+            {
+              "id": "g011",
+              "type": "general",
+              "start_s": 57.56,
+              "end_s": 59.36,
+              "peak_flash_rate_hz": 5.5,
+              "area": 0.3899
+            },
+            {
+              "id": "g012",
+              "type": "general",
+              "start_s": 60.8,
+              "end_s": 62.2,
+              "peak_flash_rate_hz": 5.5,
+              "area": 0.3125
+            },
+            {
+              "id": "g013",
+              "type": "general",
+              "start_s": 62.96,
+              "end_s": 64.4,
+              "peak_flash_rate_hz": 5.5,
+              "area": 0.3542
+            }
+          ],
+          "max_cell_rate_hz": 8.0,
+          "max_area_over_rate": 0.5208,
+          "realtime_factor": 34.429
+        }
+      },
+      "resolution": "480x320",
+      "fps": 25.0,
+      "duration_s": 65.7,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "neon_sign_komeda",
+      "category": "signage",
+      "licence": "CC BY-SA 4.0",
+      "author": "Siarhei Besarab",
+      "title": "File:Krzysztof Komeda neon sign working evening sept 2025.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 13,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 1.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 4.735
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 13,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 1.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 4.739
+        }
+      },
+      "resolution": "996x1750",
+      "fps": 25.0,
+      "duration_s": 12.2,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "crossing_beacons",
+      "category": "signage",
+      "licence": "CC BY-SA 4.0",
+      "author": "Qviri",
+      "title": "File:Roncesvalles Ave crossing at Galley Ave, PXO Type A lights flashing, July 2026.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 13,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 2.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 3.537
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 13,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 2.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 3.521
+        }
+      },
+      "resolution": "1920x1080",
+      "fps": 29.83,
+      "duration_s": 13.1,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "lightning_germany",
+      "category": "lightning",
+      "licence": "Public domain",
+      "author": "Stefan von Halenbach (SvonHalenbach (talk))",
+      "title": "File:Flash-Lightning over Germany.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 12,
+          "label_fail_frames": 19,
+          "covered": 19,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 7.32,
+              "end_s": 8.44,
+              "peak_flash_rate_hz": 6.5,
+              "area": 0.474
+            }
+          ],
+          "max_cell_rate_hz": 6.5,
+          "max_area_over_rate": 0.474,
+          "realtime_factor": 19.371
+        },
+        "wcag": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 12,
+          "label_fail_frames": 19,
+          "covered": 19,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 7.32,
+              "end_s": 8.48,
+              "peak_flash_rate_hz": 6.5,
+              "area": 1.0
+            }
+          ],
+          "max_cell_rate_hz": 6.5,
+          "max_area_over_rate": 1.0,
+          "realtime_factor": 18.8
+        }
+      },
+      "resolution": "720x576",
+      "fps": 25.0,
+      "duration_s": 11.7,
+      "iris_verdict": "fail",
+      "iris_extended": false
+    },
+    {
+      "id": "lightning_rolla",
+      "category": "lightning",
+      "licence": "CC BY 3.0",
+      "author": "https://www.youtube.com/user/sterwing",
+      "title": "File:Lightning Storm in Rolla.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 5,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 54,
+          "label_fail_frames": 53,
+          "covered": 53,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 25.8258,
+              "end_s": 27.1271,
+              "peak_flash_rate_hz": 7.5,
+              "area": 0.4427
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 46.0794,
+              "end_s": 47.1805,
+              "peak_flash_rate_hz": 5.0,
+              "area": 0.4795
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 47.2806,
+              "end_s": 48.2816,
+              "peak_flash_rate_hz": 3.5,
+              "area": 0.3447
+            }
+          ],
+          "max_cell_rate_hz": 7.5,
+          "max_area_over_rate": 0.4795,
+          "realtime_factor": 22.467
+        },
+        "wcag": {
+          "label": "fail",
+          "got": "fail",
+          "agree": true,
+          "tp": 5,
+          "fp": 2,
+          "fn": 0,
+          "seconds": 54,
+          "label_fail_frames": 53,
+          "covered": 53,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 19.5529,
+              "end_s": 20.5539,
+              "peak_flash_rate_hz": 4.0,
+              "area": 0.8988
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 25.8258,
+              "end_s": 27.2272,
+              "peak_flash_rate_hz": 7.5,
+              "area": 1.0
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 27.3273,
+              "end_s": 28.3617,
+              "peak_flash_rate_hz": 3.5,
+              "area": 0.5119
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 46.0794,
+              "end_s": 47.1805,
+              "peak_flash_rate_hz": 5.0,
+              "area": 1.0
+            },
+            {
+              "id": "g004",
+              "type": "general",
+              "start_s": 47.2806,
+              "end_s": 48.2816,
+              "peak_flash_rate_hz": 3.5,
+              "area": 1.0
+            }
+          ],
+          "max_cell_rate_hz": 7.5,
+          "max_area_over_rate": 1.0,
+          "realtime_factor": 22.554
+        }
+      },
+      "resolution": "1280x720",
+      "fps": 29.97,
+      "duration_s": 53.5,
+      "iris_verdict": "fail",
+      "iris_extended": false
+    },
+    {
+      "id": "lightning_colorado_timelapse",
+      "category": "lightning",
+      "licence": "CC0",
+      "author": "NathanScientific",
+      "title": "File:Lightning storm over Colorado, USA.ogg",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 25,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 11.5,
+          "max_area_over_rate": 0.0667,
+          "realtime_factor": 4.311
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 14,
+          "fn": 0,
+          "seconds": 25,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 9.6,
+              "end_s": 11.68,
+              "peak_flash_rate_hz": 10.0,
+              "area": 0.2827
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 12.8,
+              "end_s": 14.72,
+              "peak_flash_rate_hz": 10.0,
+              "area": 0.2887
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 14.64,
+              "end_s": 16.12,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.3244
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 16.72,
+              "end_s": 24.8,
+              "peak_flash_rate_hz": 11.5,
+              "area": 0.4673
+            }
+          ],
+          "max_cell_rate_hz": 11.5,
+          "max_area_over_rate": 0.4673,
+          "realtime_factor": 4.319
+        }
+      },
+      "resolution": "1920x1080",
+      "fps": 25.0,
+      "duration_s": 24.8,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "fireworks_rome",
+      "category": "fireworks",
+      "licence": "CC BY-SA 4.0",
+      "author": "Nicholas Gemini",
+      "title": "File:Fireworks in Rome 46.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 52,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 10.0,
+          "max_area_over_rate": 0.0837,
+          "realtime_factor": 10.226
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "fail",
+          "agree": false,
+          "tp": 0,
+          "fp": 17,
+          "fn": 0,
+          "seconds": 52,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [
+            {
+              "id": "g000",
+              "type": "general",
+              "start_s": 4.9991,
+              "end_s": 7.2285,
+              "peak_flash_rate_hz": 10.0,
+              "area": 0.2827
+            },
+            {
+              "id": "g001",
+              "type": "general",
+              "start_s": 11.552,
+              "end_s": 12.6667,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.2589
+            },
+            {
+              "id": "g002",
+              "type": "general",
+              "start_s": 20.8747,
+              "end_s": 21.9556,
+              "peak_flash_rate_hz": 7.5,
+              "area": 0.2649
+            },
+            {
+              "id": "g003",
+              "type": "general",
+              "start_s": 25.0631,
+              "end_s": 27.0898,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.5714
+            },
+            {
+              "id": "g004",
+              "type": "general",
+              "start_s": 28.2044,
+              "end_s": 29.6232,
+              "peak_flash_rate_hz": 7.0,
+              "area": 0.3095
+            },
+            {
+              "id": "g005",
+              "type": "general",
+              "start_s": 29.4542,
+              "end_s": 32.0889,
+              "peak_flash_rate_hz": 9.0,
+              "area": 0.4435
+            },
+            {
+              "id": "g006",
+              "type": "general",
+              "start_s": 35.264,
+              "end_s": 37.9325,
+              "peak_flash_rate_hz": 8.5,
+              "area": 0.619
+            },
+            {
+              "id": "g007",
+              "type": "general",
+              "start_s": 38.3716,
+              "end_s": 39.4187,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.2619
+            },
+            {
+              "id": "g008",
+              "type": "general",
+              "start_s": 43.8773,
+              "end_s": 46.6134,
+              "peak_flash_rate_hz": 8.0,
+              "area": 0.5
+            }
+          ],
+          "max_cell_rate_hz": 10.0,
+          "max_area_over_rate": 0.619,
+          "realtime_factor": 10.165
+        }
+      },
+      "resolution": "1080x606",
+      "fps": 29.57,
+      "duration_s": 52.0,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "fireworks_nagaoka",
+      "category": "fireworks",
+      "licence": "CC BY 3.0",
+      "author": "113icecream Japanese Fireworks",
+      "title": "File:Nagaoka Festival Fireworks 2012 Extra Large Wide Starmine.webm",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 62,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 3.0,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 25.883
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 62,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 3.0,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 26.06
+        }
+      },
+      "resolution": "1280x720",
+      "fps": 25.0,
+      "duration_s": 61.2,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    },
+    {
+      "id": "xenon_flash_slowmo",
+      "category": "flash",
+      "licence": "CC BY-SA 3.0",
+      "author": "Nathan Boor of Aimed Research",
+      "title": "File:Xenon Flash Wiki.ogv",
+      "profiles": {
+        "broadcast": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 12,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 1.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 198.194
+        },
+        "wcag": {
+          "label": "pass",
+          "got": "pass",
+          "agree": true,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "seconds": 12,
+          "label_fail_frames": 0,
+          "covered": 0,
+          "segments": [],
+          "max_cell_rate_hz": 1.5,
+          "max_area_over_rate": 0.0,
+          "realtime_factor": 198.623
+        }
+      },
+      "resolution": "784x152",
+      "fps": 4.83,
+      "duration_s": 11.4,
+      "iris_verdict": "pass",
+      "iris_extended": false
+    }
+  ]
+}

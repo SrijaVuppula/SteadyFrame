@@ -49,9 +49,12 @@ export function Layout({ children, navigate }: { children: ReactNode; navigate: 
             SteadyFrame {WHAT_IT_DOES}. Not a medical device: a pass means the thresholds were met,
             not that a clip is safe for every viewer.
           </p>
-          <a href={href('/jobs/jd-adapt')} onClick={(e) => { e.preventDefault(); navigate('/jobs/jd-adapt'); }}>
-            Recorded run: the model changes its plan
-          </a>
+          <span className="footer-links">
+            <a href={href('/jobs/jd-adapt')} onClick={(e) => { e.preventDefault(); navigate('/jobs/jd-adapt'); }}>
+              Recorded run: the model changes its plan
+            </a>
+            <a href={`${REPO_URL}/blob/main/docs/MCP.md`}>Use it from your own agent (MCP)</a>
+          </span>
         </div>
       </footer>
     </>

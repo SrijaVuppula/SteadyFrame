@@ -62,6 +62,11 @@ instructions. Results, including which calls were refused and why the loop fell 
 backoff on throttling), `ScriptedProvider` (tests), `HeuristicProvider` (offline stand-in).
 Model IDs come from `STEADYFRAME_BEDROCK_MODEL_ID` or `config/agent.yaml`, never code.
 
+An outside agent can also be the planner: `steadyframe mcp` serves the same tools over MCP
+(`steadyframe/mcp_server.py`, guide in `docs/MCP.md`). Its calls are traced as `"by": "mcp"`,
+it gets the same refusals, and a human approval comes from the person at the client through
+MCP elicitation, never from the agent.
+
 ## Running live
 
     export AWS_PROFILE=...  AWS_REGION=us-east-1

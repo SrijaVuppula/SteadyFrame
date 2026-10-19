@@ -335,3 +335,56 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   strobe on a cold worker); Full-screen red paused for approval at 4.0 s and passed after
   Approve. axe-core finds no violations on the demo (light, dark, phone width) or on the four
   other pages the CI audit covers.
+
+## 2026-10-19  The demo caps its own cost; the tools as an MCP server
+
+- The public demo had no limit on Bedrock-planned checks, so anyone could keep pressing Run check
+  and spend the account's credits (about 0.12 USD a check; the 50 USD budget only sends e-mail).
+  `service/core.py` now counts per UTC day, overall and per visitor, with an atomic DynamoDB
+  counter in the jobs table (`limit#<day>#<name>`, which no job id can match, two-day TTL):
+  40 model-planned checks a day and 8 per visitor (past either, the fixed policy plans the check
+  and the job says so in `notice`), 600 checks a day and 60 per visitor (past either, 429). A
+  visitor is a hash of the address CloudFront appends to X-Forwarded-For, the stack's own id as
+  salt, and the day. Calls that go around CloudFront can fake that header, which only weakens
+  the per-visitor caps; the overall caps still bound the cost. The API stage is throttled to 20
+  requests a second (burst 40). Deployed and checked: the counter rows appear and a run with the
+  fixed policy still takes about 6 s.
+- `steadyframe mcp` (`steadyframe/mcp_server.py`, MCP Python SDK 1.30.0) serves the seven tools
+  plus `verify_record` and `run_on_aws`. It wraps the same `Job` toolbox the built-in planner
+  calls, so the refusals are the same code. The one new decision: `request_human_approval` takes
+  a candidate id and asks the person at the client through MCP elicitation; the server records
+  `person (MCP elicitation)` as the approver, a decline rejects the candidate, and a client
+  without elicitation leaves the segment waiting. Tested through an in-memory client session and
+  through a real stdio subprocess (`tests/test_mcp.py`). Analysis and rendering run off the event
+  loop so a long render does not stall the session. The SDK's dependencies are kept out of the
+  worker image. `run_on_aws` on the Flashing box sample: 6.5 s from upload to a passing result.
+
+## 2026-10-19  Natural footage against EA IRIS
+
+- Wikimedia Commons was reachable from this machine, so the gap the report kept listing (no
+  natural footage of real lights) could be closed. 17 openly licensed clips (CC0, PD, CC BY,
+  CC BY-SA; 160 MB): six emergency vehicles, two club lights, a phone's LED effects, a neon sign,
+  crossing beacons, three lightning clips, two fireworks clips and a slow-motion xenon flash.
+  `data/natural.yaml` pins each by its Commons SHA-1 and records the SHA-256 of the download, of
+  the H.264 transcode both tools read (CRF 14, single-threaded, no audio) and of IRIS's CSV.
+  Wikimedia answered 429 to bursts; the fetch now waits as asked and pauses between files.
+- Labels: EA IRIS 1.1.0, the official Ubuntu example app from EA's GitHub release (52 MB), run in
+  an x86-64 Debian container under emulation. Before use it reproduced IRIS's expected logs on
+  three of its test videos: identical per-frame codes on `3Hz_6s` and `2Hz_6s`, identical
+  flash-failure frames on `flashStripes` (the old log there has no warning code).
+- Result under the like-for-like `broadcast` profile: 16 of 17 verdicts agree, all 115 frames
+  IRIS fails fall inside a SteadyFrame segment, but SteadyFrame flags 32 seconds IRIS passes
+  (per-second precision 0.238), almost all on the rotating disco light, plus a fire engine IRIS
+  passes. First guess: SteadyFrame's area rule counts cells over the rate anywhere in the second,
+  so spots sweeping across the wall add up. Measured it (`concurrency()`): wrong, more than a
+  quarter of the screen changes within one frame in both tools' segments. Second look, at IRIS's
+  CSV: its flash area is 95% of the picture but its accumulated average change stays around
+  0.05. IRIS tests the *average* luminance of the changing area; when some lights brighten while
+  others darken they cancel. Measured as `net` (|mean change| / mean |cell change|): 0.035 in the
+  fire engine's segment, 0.16 across the disco segments, 0.33 around the frames IRIS fails.
+  Kept the analyzer as it is (stricter, and every frozen result depends on it) and published the
+  measurement; an IRIS-style averaging option is listed as next work.
+- Repair: the 10 clips either tool flagged, by both planners. All 20 repairs pass SteadyFrame's
+  whole-file re-verification under both profiles, and IRIS passes all 20 repaired files.
+  Full-frame lightning keeps little of the picture inside the region (SSIM 0.27 to 0.34) and
+  asks for approval, as designed.
