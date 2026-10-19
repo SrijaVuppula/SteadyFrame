@@ -165,11 +165,12 @@ each job records which engine ran it. `infra/README.md` has the prerequisites an
 path needs a paid Marketplace subscription and has not been run: the project uses free-tier
 services only.
 
-For judges the web app serves `/judge`: a live run on the deployed worker (pick a clip, press
-Run, watch the plan, the re-checks and the result arrive), then recorded jobs produced by running
-the worker's own code locally (`python -m eval.judge_bundle`: a live Bedrock run, a live run where a failed
-verify changes the plan, and a fixed-policy run that pauses for a person, with both the
-approved and the rejected resume), so the whole loop can be inspected without a running worker.
+The web app opens on a live demo: pick one of four test clips (or upload a clip), choose the
+planner and the standard, and watch the job on the deployed worker, with the planner's and the
+analyzer's messages streaming in and an inline Approve/Reject when a job pauses for a person.
+Recorded jobs made by running the worker's own code locally (`python -m eval.judge_bundle`: two
+live Bedrock runs and a fixed-policy run that pauses, with both the approved and the rejected
+resume) are served as job pages, so the whole loop can be inspected without a running worker.
 
 ## 7. Evaluation
 

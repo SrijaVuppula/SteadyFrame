@@ -85,6 +85,7 @@ Model IDs come from `STEADYFRAME_BEDROCK_MODEL_ID` or `config/agent.yaml`, never
   caused by a verify result.
 - `hints_pick_parameters_first_try.md`, `red_and_general_same_segment.md`: heuristic provider.
 
-The `/judge` page of the web app shows recorded jobs (`web/public/judge/`, written by
-`python -m eval.judge_bundle`) with these decision chains, the approval flow and both outcomes
-of a human decision.
+The live demo runs the same loop on demand, streaming the planner's and the analyzer's messages
+and asking for approval inline. Recorded jobs (`web/public/judge/`, written by
+`python -m eval.judge_bundle`) are served at `/jobs/jd-live`, `/jobs/jd-adapt` and
+`/jobs/jd-approval` (with both outcomes of the human decision).
