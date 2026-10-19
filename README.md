@@ -125,6 +125,7 @@ command per EC2 configuration with `python -m bench.ec2`) and results: `bench/RE
 
 | | |
 |---|---|
+| ![live run](docs/screenshots/live_run.png) | **A live run on AWS.** Press Run on `/judge`: the Bedrock model plans, the OpenCV 5 analyzer re-checks each candidate, and the job goes from Fail to Pass in about 20 seconds, with the before/after flash rate, the still with its region, and the downloads. |
 | ![job page](docs/screenshots/job_live.png) | **A finished job.** Per-second verdicts before and after, the hazard segments, mean luminance and flash rate before (blue) and after (orange) against the 3 Hz limit, the still frame with the region outlined, and the repair with its quality numbers. |
 | ![approval](docs/screenshots/approval.png) | **A person decides.** The only passing candidate changes the picture too much (SSIM 0.69), so the job pauses with its state saved and resumes with the decision. |
 | ![record](docs/screenshots/record.png) | **The verification record.** Hashes of input and output, thresholds applied, every segment and fix; `steadyframe verify` re-checks it on any machine. |
