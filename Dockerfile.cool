@@ -1,0 +1,92 @@
+# check=skip=InvalidDefaultArgInFrom
+# (COOL_IMAGE has no default on purpose: the build stops if it is not given)
+#
+# SteadyFrame worker on the COOL container: AWS Marketplace "Cloud-Optimized OpenCV for AWS
+# Graviton4 [Docker]", delivery option "OpenCV 5 for Graviton4 - Python 3.11". Used by
+# `-c worker_engine=cool` (infra/README.md); runs on ECS on Graviton4 EC2 only.
+#
+#   docker buildx build --platform linux/arm64 -f Dockerfile.cool \
+#       --build-arg COOL_IMAGE=<image URI from the listing's Configuration page> .
+#
+# The image's libopencv_core checks the Marketplace entitlement (RegisterUsage) whenever a
+# process loads it, and the check cannot complete in a local docker build or run. So nothing
+# here imports cv2: the checks below use pip metadata and importlib.util.find_spec, which
+# locate cv2 without loading it. The image's OpenCV stays as it is: opencv-python-headless
+# from the lock is not installed, and no metering code is added.
+#
+# Assumption: the image's Python 3.11 is the first of python3.11 / python3 / python on PATH
+# that reports 3.11 (else the AMI's venv path, /opt/cool/venvs/python_3.11/bin/python), and
+# it has pip. The build stops with a message if not. The interpreter found is pinned in
+# /usr/local/bin/steadyframe-python, which the entrypoint runs.
+
+ARG COOL_IMAGE
+FROM ${COOL_IMAGE}
+
+# installs need root; the image's own user (uid 1000) runs the worker
+USER 0
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HOME=/tmp \
+    MPLCONFIGDIR=/tmp/mpl \
+    WORKER_WORKDIR=/tmp/jobs \
+    STEADYFRAME_MODE=local \
+    STEADYFRAME_OPENCV_ENGINE=cool
+
+WORKDIR /app
+
+RUN set -eu; \
+    py=""; \
+    for c in python3.11 python3 python /opt/cool/venvs/python_3.11/bin/python; do \
+      p=$(command -v "$c" 2>/dev/null) || continue; \
+      if "$p" -c 'import sys; sys.exit(sys.version_info[:2] != (3, 11))'; then py=$p; break; fi; \
+    done; \
+    if [ -z "$py" ]; then echo "no Python 3.11 in the base image (PATH=$PATH)" >&2; exit 1; fi; \
+    mkdir -p /usr/local/bin; \
+    printf '#!/bin/sh\nexec %s "$@"\n' "$py" > /usr/local/bin/steadyframe-python; \
+    chmod 755 /usr/local/bin/steadyframe-python; \
+    echo "image Python 3.11: $py"; \
+    /usr/local/bin/steadyframe-python -m pip --version \
+      || { echo "the image's Python 3.11 ($py) has no pip" >&2; exit 1; }
+
+# runtime deps only: the dev tools stripped exactly as in Dockerfile, and the OpenCV wheel left
+# out so the image's build is the one imported. numpy: the lock's pin, unless the image ships a
+# numpy of another major version, which its cv2 is then built against; that one is kept
+# (pinned to its own version so no other requirement can move it)
+COPY requirements.lock /tmp/requirements.lock
+RUN set -eu; \
+    grep -v -i -E '^(pytest|hypothesis|ruff|iniconfig|pluggy|sortedcontainers|Pygments)==' /tmp/requirements.lock \
+      | grep -v -i '^opencv-python-headless==' > /tmp/requirements.runtime; \
+    pin=$(sed -n 's/^numpy==//p' /tmp/requirements.runtime); \
+    have=$(/usr/local/bin/steadyframe-python -c 'import importlib.metadata as m; print(m.version("numpy"))' 2>/dev/null || true); \
+    if [ -n "$have" ] && [ "${have%%.*}" != "${pin%%.*}" ]; then \
+      echo "numpy: keeping the image's $have (the lock pins $pin)"; \
+      sed -i "s/^numpy==.*/numpy==$have/" /tmp/requirements.runtime; \
+    else \
+      echo "numpy: the lock's $pin (image: ${have:-none})"; \
+    fi; \
+    PIP_BREAK_SYSTEM_PACKAGES=1 /usr/local/bin/steadyframe-python -m pip install --no-cache-dir -r /tmp/requirements.runtime; \
+    rm -f /tmp/requirements.*
+
+COPY pyproject.toml README.md ./
+COPY steadyframe ./steadyframe
+COPY synth ./synth
+COPY config ./config
+COPY service ./service
+RUN PIP_BREAK_SYSTEM_PACKAGES=1 /usr/local/bin/steadyframe-python -m pip install --no-cache-dir --no-deps . \
+    && if /usr/local/bin/steadyframe-python -m pip show -q opencv-python-headless >/dev/null 2>&1; then \
+         echo "opencv-python-headless is installed and would shadow the image's OpenCV" >&2; exit 1; \
+       fi \
+    && /usr/local/bin/steadyframe-python -c "import importlib.util, sys; s = importlib.util.find_spec('cv2'); print('cv2 located (not loaded):', s and s.origin); sys.exit(0 if s else 'no cv2 for this interpreter in the base image')" \
+    && /usr/local/bin/steadyframe-python -c "import importlib.metadata as m; print('steadyframe', m.version('steadyframe'), 'numpy', m.version('numpy'))" \
+    && /usr/local/bin/steadyframe-python -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())"
+
+RUN mkdir -p /tmp/jobs /tmp/mpl \
+    && chown -R 1000:1000 /tmp/jobs /tmp/mpl
+USER 1000
+
+# no ENTRYPOINT in the base image; its default command (the vendor's verifier) is dropped
+ENTRYPOINT ["/usr/local/bin/steadyframe-python", "-m", "service.worker"]
+CMD []

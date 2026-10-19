@@ -1,8 +1,9 @@
-"""One dashboard, three alarms, one SNS topic."""
+"""One dashboard, three alarms, one SNS topic, and a monthly cost budget that e-mails the same address."""
 
 from __future__ import annotations
 
 from aws_cdk import Duration, Stack
+from aws_cdk import aws_budgets as budgets
 from aws_cdk import aws_cloudwatch as cloudwatch
 from aws_cdk import aws_cloudwatch_actions as cw_actions
 from aws_cdk import aws_ecs as ecs
@@ -36,12 +37,41 @@ class ObservabilityStack(Stack):
         service: ecs.FargateService,
         api_function: lambda_.IFunction,
         alert_email: str = "",
+        budget_usd: float = 50.0,
         **kw,
     ) -> None:
         super().__init__(scope, id, **kw)
         self.topic = sns.Topic(self, "Alerts", display_name="SteadyFrame alerts")
         if alert_email:
             self.topic.add_subscription(subs.EmailSubscription(alert_email))
+            # account-wide monthly cost budget: e-mail at 80% of actual spend and at 100% of
+            # the forecast (AWS Budgets is free for the first two budgets)
+            budgets.CfnBudget(
+                self,
+                "MonthlyBudget",
+                budget=budgets.CfnBudget.BudgetDataProperty(
+                    budget_name="SteadyFrame-monthly",
+                    budget_type="COST",
+                    time_unit="MONTHLY",
+                    budget_limit=budgets.CfnBudget.SpendProperty(amount=budget_usd, unit="USD"),
+                ),
+                notifications_with_subscribers=[
+                    budgets.CfnBudget.NotificationWithSubscribersProperty(
+                        notification=budgets.CfnBudget.NotificationProperty(
+                            comparison_operator="GREATER_THAN",
+                            notification_type=kind,
+                            threshold=pct,
+                            threshold_type="PERCENTAGE",
+                        ),
+                        subscribers=[
+                            budgets.CfnBudget.SubscriberProperty(
+                                address=alert_email, subscription_type="EMAIL"
+                            )
+                        ],
+                    )
+                    for kind, pct in (("ACTUAL", 80), ("FORECASTED", 100))
+                ],
+            )
         action = cw_actions.SnsAction(self.topic)
 
         self.dashboard = cloudwatch.Dashboard(

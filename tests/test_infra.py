@@ -247,6 +247,29 @@ def test_web_and_observability(templates):
     o.has_resource_properties(
         "AWS::SNS::Subscription", {"Protocol": "email", "Endpoint": "alerts@example.com"}
     )
+    o.has_resource_properties(
+        "AWS::Budgets::Budget",
+        {
+            "Budget": Match.object_like(
+                {
+                    "BudgetType": "COST",
+                    "TimeUnit": "MONTHLY",
+                    "BudgetLimit": {"Amount": 50, "Unit": "USD"},
+                }
+            ),
+            "NotificationsWithSubscribers": Match.array_with(
+                [
+                    Match.object_like(
+                        {
+                            "Subscribers": [
+                                {"Address": "alerts@example.com", "SubscriptionType": "EMAIL"}
+                            ]
+                        }
+                    )
+                ]
+            ),
+        },
+    )
     templates["storage"].has_output("BucketName", {})
 
 
@@ -285,3 +308,196 @@ def test_worker_scales_to_zero_by_default(templates):
     t = templates["worker"]
     t.has_resource_properties("AWS::ECS::Service", {"DesiredCount": 0})
     t.has_resource_properties("AWS::ApplicationAutoScaling::ScalableTarget", {"MinCapacity": 0})
+
+
+# ---------------------------------------------------------------- worker_engine=cool
+
+COOL_IMAGE = "123456789012.dkr.ecr.us-east-1.amazonaws.com/example/cool-opencv:python-3.11"
+ECS_AL2023_ARM64 = "/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id"
+
+
+def _env(task_definition: dict) -> dict:
+    (c,) = task_definition["Properties"]["ContainerDefinitions"]
+    return {e["Name"]: e["Value"] for e in c.get("Environment", [])}
+
+
+@pytest.fixture(scope="module")
+def cool():
+    mod = _load_app_module()
+    app = App(
+        context={
+            "skip_docker_build": "true",
+            "bedrock_model_id": "us.example.model-v1:0",
+            "worker_engine": "cool",
+            "cool_image": COOL_IMAGE,
+        }
+    )
+    built = mod.build(app)
+    return {k: Template.from_stack(built[k]) for k in ("worker", "observability")}
+
+
+def test_default_engine_is_fargate_without_ec2_capacity(templates):
+    t = templates["worker"]
+    t.resource_count_is("AWS::ECS::Service", 1)
+    t.has_resource_properties("AWS::ECS::Service", {"LaunchType": "FARGATE"})
+    for kind in (
+        "AWS::AutoScaling::AutoScalingGroup",
+        "AWS::EC2::LaunchTemplate",
+        "AWS::ECS::CapacityProvider",
+        "AWS::ECS::ClusterCapacityProviderAssociations",
+    ):
+        assert t.find_resources(kind) == {}, kind
+    doc = json.dumps(t.to_json())
+    assert "aws-marketplace" not in doc and "STEADYFRAME_OPENCV_ENGINE" not in doc
+
+
+def test_cool_engine_runs_on_graviton4_instances_in_public_subnets(cool):
+    t = cool["worker"]
+    t.has_resource_properties(
+        "AWS::EC2::LaunchTemplate",
+        {
+            "LaunchTemplateData": Match.object_like(
+                {
+                    "InstanceType": "c8g.large",
+                    # IMDSv2, one hop: bridge-mode containers cannot reach the instance role
+                    "MetadataOptions": {"HttpTokens": "required", "HttpPutResponseHopLimit": 1},
+                    "NetworkInterfaces": [
+                        Match.object_like({"AssociatePublicIpAddress": True, "DeviceIndex": 0})
+                    ],
+                }
+            )
+        },
+    )
+    params = t.to_json()["Parameters"]
+    assert any(p.get("Default") == ECS_AL2023_ARM64 for p in params.values())
+    (asg,) = t.find_resources("AWS::AutoScaling::AutoScalingGroup").values()
+    assert asg["Properties"]["MinSize"] == "0" and asg["Properties"]["MaxSize"] == "2"
+    assert asg["Properties"]["NewInstancesProtectedFromScaleIn"] is True
+    subnets = [s["Ref"] for s in asg["Properties"]["VPCZoneIdentifier"]]
+    assert len(subnets) == 2 and all("public" in s for s in subnets)
+    assert t.find_resources("AWS::EC2::NatGateway") == {}
+    (cp_id,) = t.find_resources("AWS::ECS::CapacityProvider")
+    t.has_resource_properties(
+        "AWS::ECS::CapacityProvider",
+        {
+            "AutoScalingGroupProvider": Match.object_like(
+                {
+                    "ManagedScaling": Match.object_like({"Status": "ENABLED"}),
+                    "ManagedTerminationProtection": "ENABLED",
+                }
+            )
+        },
+    )
+    t.has_resource_properties(
+        "AWS::ECS::ClusterCapacityProviderAssociations",
+        {"CapacityProviders": [{"Ref": cp_id}]},
+    )
+
+
+def test_cool_task_is_ec2_arm64_bridge_with_the_fargate_env_plus_engine(cool, templates):
+    t = cool["worker"]
+    (td,) = t.find_resources("AWS::ECS::TaskDefinition").values()
+    p = td["Properties"]
+    assert p["RequiresCompatibilities"] == ["EC2"]
+    assert p["NetworkMode"] == "bridge"
+    assert p["PlacementConstraints"] == [
+        {"Type": "memberOf", "Expression": "attribute:ecs.cpu-architecture == arm64"}
+    ]
+    (c,) = p["ContainerDefinitions"]
+    assert c["Cpu"] == 2048 and c["MemoryReservation"] <= 3584  # one task fits a c8g.large
+    assert c["StopTimeout"] == 120 and c["LogConfiguration"]["LogDriver"] == "awslogs"
+    env = _env(td)
+    assert env["STEADYFRAME_OPENCV_ENGINE"] == "cool"
+    assert env["HOME"] == "/tmp"
+    assert env["AWS_REGION"] == {"Ref": "AWS::Region"}
+    (fargate_td,) = templates["worker"].find_resources("AWS::ECS::TaskDefinition").values()
+    assert set(env) == set(_env(fargate_td)) | {"HOME", "STEADYFRAME_OPENCV_ENGINE"}
+    for k, v in _env(fargate_td).items():
+        assert env[k] == v, k
+
+
+def test_cool_service_uses_the_capacity_provider_and_the_same_scaling(cool, templates):
+    t = cool["worker"]
+    t.resource_count_is("AWS::ECS::Service", 1)
+    t.resource_count_is("AWS::ECS::TaskDefinition", 1)
+    ((svc_id, svc),) = t.find_resources("AWS::ECS::Service").items()
+    p = svc["Properties"]
+    assert "LaunchType" not in p and "NetworkConfiguration" not in p
+    (cp_id,) = t.find_resources("AWS::ECS::CapacityProvider")
+    assert p["CapacityProviderStrategy"] == [{"CapacityProvider": {"Ref": cp_id}, "Weight": 1}]
+    assert p["DesiredCount"] == 0
+    (assoc_id,) = t.find_resources("AWS::ECS::ClusterCapacityProviderAssociations")
+    assert assoc_id in svc["DependsOn"]  # created after, deleted before the association
+    t.has_resource_properties(
+        "AWS::ApplicationAutoScaling::ScalableTarget", {"MinCapacity": 0, "MaxCapacity": 2}
+    )
+
+    def steps(tpl):
+        return sorted(
+            json.dumps(r["Properties"]["StepScalingPolicyConfiguration"], sort_keys=True)
+            for r in tpl.find_resources("AWS::ApplicationAutoScaling::ScalingPolicy").values()
+        )
+
+    assert len(steps(t)) == 2 and steps(t) == steps(templates["worker"])
+    # the dashboard follows the one worker service there is
+    assert f"ExportsOutputFnGetAtt{svc_id}Name" in json.dumps(cool["observability"].to_json())
+
+
+def test_register_usage_is_on_the_task_role_only(cool):
+    t = cool["worker"]
+    (td,) = t.find_resources("AWS::ECS::TaskDefinition").values()
+    task_role = td["Properties"]["TaskRoleArn"]["Fn::GetAtt"][0]
+    holders = []
+    for res in t.find_resources("AWS::IAM::Policy").values():
+        roles = [r["Ref"] for r in res["Properties"]["Roles"]]
+        for st in res["Properties"]["PolicyDocument"]["Statement"]:
+            actions = _as_list(st["Action"])
+            if any(a.startswith("aws-marketplace:") for a in actions):
+                assert actions == ["aws-marketplace:RegisterUsage"], st
+                holders.extend(roles)
+            if task_role in roles and "*" in _as_list(st.get("Resource")):
+                assert actions in (["cloudwatch:PutMetricData"], ["aws-marketplace:RegisterUsage"])
+    assert holders == [task_role]
+    for res in t.find_resources("AWS::IAM::Role").values():
+        assert "aws-marketplace" not in json.dumps(res["Properties"])
+
+
+def test_cool_instance_type_can_be_overridden():
+    mod = _load_app_module()
+    app = App(
+        context={
+            "skip_docker_build": "true",
+            "worker_engine": "cool",
+            "cool_image": COOL_IMAGE,
+            "cool_instance_type": "m8g.xlarge",
+            "worker_min_tasks": "1",
+        }
+    )
+    t = Template.from_stack(mod.build(app)["worker"])
+    t.has_resource_properties(
+        "AWS::EC2::LaunchTemplate",
+        {"LaunchTemplateData": Match.object_like({"InstanceType": "m8g.xlarge"})},
+    )
+    t.has_resource_properties("AWS::ECS::Service", {"DesiredCount": 1})
+    t.has_resource_properties(
+        "AWS::ApplicationAutoScaling::ScalableTarget", {"MinCapacity": 1, "MaxCapacity": 2}
+    )
+
+
+@pytest.mark.parametrize(
+    "ctx, message",
+    [
+        ({"worker_engine": "cool"}, "worker_engine=cool needs -c cool_image="),
+        ({"worker_engine": "cool", "cool_image": "  "}, "worker_engine=cool needs -c cool_image="),
+        ({"worker_engine": "ec2"}, "worker_engine must be one of fargate, cool"),
+        (
+            {"worker_engine": "cool", "cool_image": COOL_IMAGE, "cool_instance_type": "c7g.large"},
+            "must be a Graviton4 type",
+        ),
+    ],
+)
+def test_unusable_worker_engine_context_fails_synth(ctx, message):
+    mod = _load_app_module()
+    app = App(context={"skip_docker_build": "true", **ctx})
+    with pytest.raises(ValueError, match=message):
+        mod.build(app)

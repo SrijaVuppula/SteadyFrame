@@ -11,6 +11,12 @@ Context (cdk.json or `-c key=value`):
                      deployed when it does not exist yet)
   worker_min_tasks   worker tasks kept running when the queue is empty (default 0, scale to
                      zero). 1 removes the cold start of several minutes, at about 2 USD a day
+  worker_engine      "fargate" (default): Fargate ARM64 tasks with the opencv-python-headless
+                     wheel. "cool": the Marketplace COOL container on Graviton4 EC2 instances
+                     behind an ECS capacity provider (infra/README.md, COOL worker)
+  cool_image         worker_engine=cool only, required: image URI of the delivery option
+                     "OpenCV 5 for Graviton4 - Python 3.11" (the listing's Configuration page)
+  cool_instance_type worker_engine=cool only: Graviton4 instance type (default c8g.large)
 """
 
 from __future__ import annotations
@@ -31,7 +37,7 @@ from stacks.observability import ObservabilityStack  # noqa: E402
 from stacks.queue import QueueStack  # noqa: E402
 from stacks.storage import StorageStack  # noqa: E402
 from stacks.web import WebStack  # noqa: E402
-from stacks.worker import WorkerStack  # noqa: E402
+from stacks.worker import COOL_INSTANCE_TYPE, WorkerStack, check_worker_engine  # noqa: E402
 
 
 def _flag(app: App, key: str) -> bool:
@@ -81,6 +87,12 @@ def build(app: App) -> dict:
     model_id = app.node.try_get_context("bedrock_model_id") or ""
     web_origin = app.node.try_get_context("web_origin") or "*"
     min_tasks = int(app.node.try_get_context("worker_min_tasks") or 0)
+    engine = str(app.node.try_get_context("worker_engine") or "fargate").strip().lower()
+    cool_image = str(app.node.try_get_context("cool_image") or "").strip()
+    cool_instance_type = str(
+        app.node.try_get_context("cool_instance_type") or COOL_INSTANCE_TYPE
+    ).strip()
+    check_worker_engine(engine, cool_image, cool_instance_type)  # before any stack is built
     version, opencv = pinned_versions()
 
     storage = StorageStack(
@@ -108,6 +120,9 @@ def build(app: App) -> dict:
         bedrock_model_id=model_id,
         skip_docker_build=skip,
         min_tasks=min_tasks,
+        engine=engine,
+        cool_image=cool_image,
+        cool_instance_type=cool_instance_type,
     )
     web = WebStack(app, "SteadyFrame-Web", api_endpoint=api.api_url, dist_dir=web_dist(app))
     obs = ObservabilityStack(

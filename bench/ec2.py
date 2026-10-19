@@ -12,10 +12,13 @@
 2. Presigned URLs (GET for the source, PUT for the results and the log) go into the
    instance's user-data, so the instance needs no IAM role, key pair or open port.
 3. The instance (Canonical's Ubuntu 24.04 from the public SSM parameter, or the COOL AMI
-   given with --ami) installs the pinned requirements, or for COOL everything except the
-   OpenCV wheel so that the AMI's own build is the one imported, runs `python -m bench.run`,
-   uploads `<label>.json`, `<label>.buildinfo.txt` and its log, and powers off. Shutdown
-   behaviour is terminate.
+   given with --ami) installs the pinned requirements into a fresh venv, runs
+   `python -m bench.run`, uploads `<label>.json`, `<label>.buildinfo.txt` and its log, and
+   powers off. Shutdown behaviour is terminate. On COOL it installs into the vendor's venv
+   /opt/cool/venvs/python_3.11 instead, everything except the OpenCV wheel; the pinned numpy
+   stays only if the AMI's cv2 works with it (else the venv's own numpy goes back; the log
+   says which), and the run stops with an error unless cv2 then resolves under /opt/cool and
+   is 5.x.
 4. This script waits for the result, saves it to bench/results/, and terminates the instance
    whatever happens (errors and Ctrl-C included) unless --keep is given.
 
@@ -47,6 +50,20 @@ ARCHIVE_PATHS = [
     "README.md",
 ]
 SSM_UBUNTU = "/aws/service/canonical/ubuntu/server/24.04/stable/current/{arch}/hvm/ebs-gp3/ami-id"
+# COOL AMI layout (Marketplace usage instructions): optimised libraries under /opt/cool, one
+# preconfigured venv per Python version; the project targets 3.11
+COOL_ROOT = "/opt/cool"
+COOL_VENV = f"{COOL_ROOT}/venvs/python_3.11"
+# run on the instance after every install, right before the benchmark: a COOL row measured
+# with any other OpenCV would be wrong, so it fails the run instead
+COOL_CHECK = f"""import sys
+import cv2
+print("COOL check: cv2", cv2.__version__, "at", cv2.__file__)
+if not cv2.__file__.startswith("{COOL_ROOT}/"):
+    sys.exit("FATAL: cv2 resolves to " + cv2.__file__ + ", not under {COOL_ROOT}")
+if not cv2.__version__.startswith("5."):
+    sys.exit("FATAL: cv2 under {COOL_ROOT} is " + cv2.__version__ + ", not OpenCV 5")
+"""
 
 CONFIGS = {
     "c7i.xlarge-stock": {"instance_type": "c7i.xlarge", "arch": "amd64", "cool": False},
@@ -70,24 +87,49 @@ mkdir -p /opt/sf && cd /opt/sf
 curl -sS -f -o src.tar.gz {src_url}
 tar xzf src.tar.gz
 if [ "{cool}" = "1" ]; then
-  python3 -c "import cv2; print('AMI OpenCV', cv2.__version__, cv2.__file__)"
-  python3 -m venv --system-site-packages .venv
-  .venv/bin/pip install -q --upgrade pip
+  # the vendor's venv carries the AMI's OpenCV; install around it, never over it
+  COOL_VENV={cool_venv}
+  if [ ! -x "$COOL_VENV/bin/python" ]; then
+    echo "FATAL: $COOL_VENV/bin/python not found; is this the COOL AMI?"
+    ls -l {cool_root} {cool_root}/venvs || true
+    exit 1
+  fi
+  set +u
+  . "$COOL_VENV/bin/activate"
+  set -u
+  PY="$COOL_VENV/bin/python"
+  if ! "$PY" -c "import sys, cv2, numpy; print('AMI OpenCV', cv2.__version__, cv2.__file__, 'numpy', numpy.__version__, 'python', sys.version.split()[0])"; then
+    echo "FATAL: cv2 does not import from $COOL_VENV as shipped"
+    exit 1
+  fi
+  VENV_NUMPY=$("$PY" -c "import numpy; print(numpy.__version__)")
+  "$PY" -m pip --version >/dev/null 2>&1 || "$PY" -m ensurepip --upgrade
+  "$PY" -m pip install -q --upgrade pip
   grep -v -i '^opencv' requirements.lock > /tmp/req.txt
-  .venv/bin/pip install -q -r /tmp/req.txt
-  if ! .venv/bin/python -c "import cv2" 2>/dev/null; then
-    # the AMI's cv2 was built against the system numpy: use that one instead of the pin
-    echo "AMI cv2 does not import with the pinned numpy; falling back to the system numpy"
-    .venv/bin/pip uninstall -y -q numpy
+  "$PY" -m pip install -q -r /tmp/req.txt
+  CV2_SMOKE="import cv2, numpy; cv2.resize(numpy.zeros((8, 8), numpy.float32), (4, 4))"
+  if "$PY" -c "$CV2_SMOKE"; then
+    echo "numpy: pinned $("$PY" -c "import numpy; print(numpy.__version__)") (the AMI's cv2 works with it)"
+  else
+    echo "numpy: the AMI's cv2 does not work with the pinned numpy; restoring the venv's numpy $VENV_NUMPY"
+    "$PY" -m pip install -q "numpy==$VENV_NUMPY"
+    "$PY" -c "$CV2_SMOKE"
+    echo "numpy: venv $VENV_NUMPY"
   fi
 else
   python3 -m venv .venv
+  PY=.venv/bin/python
   .venv/bin/pip install -q --upgrade pip
   .venv/bin/pip install -q -r requirements.lock
 fi
-.venv/bin/pip install -q -e . --no-deps
-.venv/bin/python -c "import cv2, numpy; print('bench uses cv2', cv2.__version__, cv2.__file__, 'numpy', numpy.__version__)"
-.venv/bin/python -m bench.run --out /opt/sf/out --label {label} --reps {reps}{price_arg}
+"$PY" -m pip install -q -e . --no-deps
+if [ "{cool}" = "1" ]; then
+  "$PY" - <<'COOLCHECK'
+{cool_check}COOLCHECK
+fi
+"$PY" -c "import cv2, numpy; print('bench uses cv2', cv2.__version__, cv2.__file__, 'numpy', numpy.__version__)"
+"$PY" -m bench.run --out /opt/sf/out --label {label} --reps {reps}{price_arg}
+"$PY" -c "import json, sys; e = json.load(open(sys.argv[1]))['env']; print('evidence:', e['opencv_file'], 'kleidicv in build:', e['build_has_kleidicv'], 'kleidicv loaded:', e.get('kleidicv_loaded'), 'numpy', e['numpy'])" out/{label}.json || true
 put out/{label}.json {json_url}
 put out/{label}.buildinfo.txt {buildinfo_url}
 """
@@ -97,6 +139,9 @@ def user_data(label: str, cool: bool, reps: int, price: float | None, urls: dict
     return USER_DATA.format(
         label=shlex.quote(label),
         cool="1" if cool else "0",
+        cool_root=COOL_ROOT,
+        cool_venv=COOL_VENV,
+        cool_check=COOL_CHECK,
         reps=int(reps),
         price_arg=f" --price-per-hour {price}" if price is not None else "",
         **{k: shlex.quote(v) for k, v in urls.items()},
@@ -148,8 +193,16 @@ def main(argv=None) -> int:
     }
     if a.dry_run:
         urls = {k: f"https://<presigned>/{v}" for k, v in keys.items()}
-        ami = a.ami or f"<ssm:{SSM_UBUNTU.format(arch=cfg['arch'])}>"
+        if cfg["cool"]:
+            ami = a.ami or "<COOL AMI id from the Marketplace listing: pass --ami>"
+            opencv = (
+                f"the AMI's, from {COOL_VENV}; the run fails unless cv2 is 5.x under {COOL_ROOT}"
+            )
+        else:
+            ami = a.ami or f"<ssm:{SSM_UBUNTU.format(arch=cfg['arch'])}>"
+            opencv = "opencv-python-headless from requirements.lock, in a fresh venv"
         print(f"config {label}: {cfg['instance_type']} ({cfg['arch']}), AMI {ami}")
+        print(f"OpenCV: {opencv}")
         print(f"archive: {', '.join(ARCHIVE_PATHS)} at HEAD -> s3://<bucket>/{keys['src_url']}")
         print("user-data:\n" + user_data(label, cfg["cool"], a.reps, a.price, urls))
         return 0
