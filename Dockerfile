@@ -50,6 +50,19 @@ ENV LOCAL_DATA_DIR=/data
 EXPOSE 8000
 CMD ["uvicorn", "--factory", "service.local_api:create_app", "--host", "0.0.0.0", "--port", "8000"]
 
+# ---------------------------------------------------------------- worker on AWS Lambda (arm64)
+# Same image plus the Lambda runtime interface client; the function feeds it one SQS message
+# per invocation (service/lambda_worker.py). Only /tmp is writable on Lambda.
+FROM base AS lambda
+USER root
+RUN pip install --no-cache-dir awslambdaric==4.1.0
+ENV WORKER_WORKDIR=/tmp/jobs \
+    MPLCONFIGDIR=/tmp/mpl \
+    HOME=/tmp \
+    STEADYFRAME_MODE=aws
+ENTRYPOINT ["python", "-m", "awslambdaric"]
+CMD ["service.lambda_worker.handler"]
+
 # ---------------------------------------------------------------- worker (default target)
 FROM base AS worker
 ENV WORKER_WORKDIR=/tmp/jobs

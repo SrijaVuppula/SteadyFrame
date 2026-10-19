@@ -17,6 +17,9 @@ Context (cdk.json or `-c key=value`):
   cool_image         worker_engine=cool only, required: image URI of the delivery option
                      "OpenCV 5 for Graviton4 - Python 3.11" (the listing's Configuration page)
   cool_instance_type worker_engine=cool only: Graviton4 instance type (default c8g.large)
+  lambda_worker      "true" (default): an arm64 Lambda function takes each job within seconds
+                     (free tier, nothing while idle) and the ECS service is the fallback.
+                     "false": the ECS service is the only worker
 """
 
 from __future__ import annotations
@@ -89,6 +92,13 @@ def build(app: App) -> dict:
     min_tasks = int(app.node.try_get_context("worker_min_tasks") or 0)
     engine = str(app.node.try_get_context("worker_engine") or "fargate").strip().lower()
     cool_image = str(app.node.try_get_context("cool_image") or "").strip()
+    lambda_worker = str(
+        app.node.try_get_context("lambda_worker") or "true"
+    ).strip().lower() not in (
+        "false",
+        "0",
+        "no",
+    )
     cool_instance_type = str(
         app.node.try_get_context("cool_instance_type") or COOL_INSTANCE_TYPE
     ).strip()
@@ -123,6 +133,7 @@ def build(app: App) -> dict:
         engine=engine,
         cool_image=cool_image,
         cool_instance_type=cool_instance_type,
+        lambda_worker=lambda_worker,
     )
     web = WebStack(app, "SteadyFrame-Web", api_endpoint=api.api_url, dist_dir=web_dist(app))
     obs = ObservabilityStack(

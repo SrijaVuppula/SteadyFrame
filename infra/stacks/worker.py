@@ -1,4 +1,9 @@
-"""ECS worker on ARM64 (Graviton), scaled 0..2 by queue backlog. Two engines:
+"""Workers on ARM64 (Graviton) that consume the jobs queue.
+
+By default a Lambda function (arm64 container image, ``lambda`` target of the Dockerfile) takes
+each message within seconds and costs nothing while idle; the ECS service below stays as the
+fallback and scales out only when messages wait unread (``-c lambda_worker=false`` turns the
+Lambda off and the ECS service is the worker again). The ECS service has two engines:
 
 - ``fargate`` (default): Fargate tasks from the repo ``Dockerfile`` with the
   opencv-python-headless wheel.
@@ -17,15 +22,20 @@ from __future__ import annotations
 
 import re
 
-from aws_cdk import Duration, RemovalPolicy, Stack
+from aws_cdk import Duration, RemovalPolicy, Size, Stack
 from aws_cdk import aws_applicationautoscaling as appscaling
 from aws_cdk import aws_autoscaling as autoscaling
 from aws_cdk import aws_cloudwatch as cloudwatch
 from aws_cdk import aws_dynamodb as ddb
 from aws_cdk import aws_ec2 as ec2
+from aws_cdk import aws_ecr as ecr
 from aws_cdk import aws_ecr_assets as ecr_assets
 from aws_cdk import aws_ecs as ecs
+from aws_cdk import aws_events as events
+from aws_cdk import aws_events_targets as events_targets
 from aws_cdk import aws_iam as iam
+from aws_cdk import aws_lambda as lambda_
+from aws_cdk import aws_lambda_event_sources as lambda_events
 from aws_cdk import aws_logs as logs
 from aws_cdk import aws_s3 as s3
 from aws_cdk import aws_sqs as sqs
@@ -92,6 +102,7 @@ class WorkerStack(Stack):
         engine: str = "fargate",
         cool_image: str = "",
         cool_instance_type: str = COOL_INSTANCE_TYPE,
+        lambda_worker: bool = True,
         **kw,
     ) -> None:
         check_worker_engine(engine, cool_image, cool_instance_type)
@@ -150,7 +161,65 @@ class WorkerStack(Stack):
                     resources=["*"],  # RegisterUsage has no resource-level scope
                 )
             )
-        self.backlog_metric = self._scale_on_backlog(queue, min_tasks)
+        # COOL needs Graviton4 instances, so with that engine the ECS service stays the worker
+        self.lambda_function = None
+        if lambda_worker and engine != "cool":
+            self.lambda_function = self._lambda(env, skip_docker_build, queue)
+            self._grant(self.lambda_function.role, bucket, jobs, traces, queue, bedrock_model_id)
+        self.backlog_metric = self._scale_on_backlog(
+            queue, min_tasks, fallback=self.lambda_function is not None
+        )
+
+    def _lambda(self, env: dict, skip_docker_build: bool, queue: sqs.IQueue):
+        if skip_docker_build:
+            code = lambda_.DockerImageCode.from_ecr(
+                ecr.Repository.from_repository_name(self, "PlaceholderRepo", "placeholder")
+            )
+        else:
+            code = lambda_.DockerImageCode.from_image_asset(
+                str(ROOT),
+                file="Dockerfile",
+                target="lambda",
+                platform=ecr_assets.Platform.LINUX_ARM64,
+            )
+        fn_env = {k: v for k, v in env.items() if k not in ("AWS_REGION", "WORKER_IDLE_EXIT_S")}
+        fn_env.update({"MPLCONFIGDIR": "/tmp/mpl", "HOME": "/tmp", "WORKER_WORKDIR": "/tmp/jobs"})
+        fn = lambda_.DockerImageFunction(
+            self,
+            "LambdaWorker",
+            description="SteadyFrame worker: one SQS job per invocation (same JobRunner as ECS)",
+            code=code,
+            architecture=lambda_.Architecture.ARM_64,
+            # 3008 MB is the most a new account may set; it buys about two vCPUs
+            memory_size=3008,
+            ephemeral_storage_size=Size.mebibytes(2048),
+            timeout=Duration.minutes(15),  # the queue's visibility timeout (20 min) is longer
+            environment=fn_env,
+            log_group=logs.LogGroup(
+                self,
+                "LambdaWorkerLogs",
+                retention=logs.RetentionDays.TWO_WEEKS,
+                removal_policy=RemovalPolicy.DESTROY,
+            ),
+        )
+        fn.add_event_source(
+            lambda_events.SqsEventSource(
+                queue, batch_size=1, max_concurrency=2, report_batch_item_failures=True
+            )
+        )
+        # keep one execution environment warm (OpenCV loaded) so a demo job starts in seconds
+        events.Rule(
+            self,
+            "KeepWarm",
+            description="SteadyFrame: keep one Lambda worker warm",
+            schedule=events.Schedule.rate(Duration.minutes(5)),
+            targets=[
+                events_targets.LambdaFunction(
+                    fn, event=events.RuleTargetInput.from_object({"warmup": True})
+                )
+            ],
+        )
+        return fn
 
     def _worker_image(self, skip_docker_build: bool, **asset) -> ecs.ContainerImage:
         if skip_docker_build:
@@ -379,7 +448,9 @@ class WorkerStack(Stack):
                 )
             )
 
-    def _scale_on_backlog(self, queue: sqs.IQueue, min_tasks: int) -> cloudwatch.MathExpression:
+    def _scale_on_backlog(
+        self, queue: sqs.IQueue, min_tasks: int, *, fallback: bool = False
+    ) -> cloudwatch.MathExpression:
         scaling = self.service.auto_scale_task_count(
             min_capacity=min_tasks, max_capacity=max(2, min_tasks)
         )
@@ -398,16 +469,21 @@ class WorkerStack(Stack):
             period=Duration.minutes(1),
             label="queue backlog",
         )
+        # With the Lambda worker in front, a message is in flight within seconds of arriving;
+        # the ECS service only steps in when messages sit visible (unread) for two minutes.
+        waiting = queue.metric_approximate_number_of_messages_visible(
+            period=Duration.minutes(1), statistic="Maximum"
+        )
         scaling.scale_on_metric(
             "ScaleOutOnBacklog",
-            metric=backlog,
+            metric=waiting if fallback else backlog,
             scaling_steps=[
                 appscaling.ScalingInterval(upper=0, change=0),
                 appscaling.ScalingInterval(lower=1, change=1),
             ],
             adjustment_type=appscaling.AdjustmentType.CHANGE_IN_CAPACITY,
             cooldown=Duration.seconds(60),
-            evaluation_periods=1,
+            evaluation_periods=2 if fallback else 1,
         )
         scaling.scale_on_metric(
             "ScaleInWhenIdle",

@@ -52,6 +52,7 @@ elsewhere. Context knobs (`-c key=value` or `cdk.json`):
 | `worker_engine` | `fargate` (default, the template above) or `cool` (the COOL container on Graviton4 EC2, [COOL worker](#cool-worker-optional)); anything else fails synth |
 | `cool_image` | `worker_engine=cool` only, required (synth fails without it): image URI of the delivery option "OpenCV 5 for Graviton4 - Python 3.11" |
 | `cool_instance_type` | `worker_engine=cool` only: Graviton4 instance type, `c8g`, `m8g` or `r8g` family (default `c8g.large`) |
+| `lambda_worker` | `true` (default): the arm64 Lambda worker takes the jobs and the ECS service is the fallback; `false`: ECS only ([Lambda worker](#lambda-worker-default)) |
 
 From the repo root, `make deploy CDK_ARGS="-c bedrock_model_id=... -c alert_email=..."` passes
 the same knobs. Pass them on every deploy: a value left out falls back to `cdk.json`, where
@@ -63,7 +64,31 @@ The sample clips are rendered into `infra/.samples/` at synth time by `service/s
 Order of operations on a fresh account: `make web` (optional), `make deploy`, `make smoke`,
 open `WebUrl`.
 
+## Lambda worker (default)
+
+An arm64 Lambda function built from the `lambda` target of the repo `Dockerfile` (same code and
+OpenCV wheel as the ECS worker, plus the Lambda runtime interface client) takes the jobs from
+SQS: batch size 1, at most two concurrent invocations, 3008 MB (the most a new account may set),
+2 GB of `/tmp`, 15-minute timeout (the queue's visibility timeout is 20 minutes). Handler:
+`service/lambda_worker.py`. An EventBridge rule invokes it every five minutes with
+`{"warmup": true}` so one execution environment with OpenCV loaded is waiting.
+
+Why: the ECS service scales to zero, and on the deployed stack a job that had to wait for a
+Fargate task to start took 505 s; with the Lambda worker the smoke test takes about 46 s cold
+and under 5 s warm. Lambda's free tier (400,000 GB-seconds and one million requests a month)
+covers thousands of demo jobs and the warm-up pings; idle cost is zero.
+
+The ECS service stays as the fallback: with the Lambda in front it scales out only when messages
+have been visible (unread) for two minutes. `-c lambda_worker=false` removes the function and the
+schedule, and the ECS service is the worker again, scaling on visible plus in-flight messages.
+With `worker_engine=cool` there is no Lambda worker (COOL needs Graviton4 instances).
+
+Logs: the `LambdaWorkerLogs` group of `SteadyFrame-Worker`, one JSON object per line, as on ECS.
+
 ## COOL worker (optional)
+
+Not run: this path needs a paid AWS Marketplace subscription, and the project uses free-tier
+services only. The code and the template tests are kept for anyone who has the subscription.
 
 `-c worker_engine=cool` runs the same worker on "Cloud-Optimized OpenCV for AWS Graviton4
 [Docker]" (AWS Marketplace, https://aws.amazon.com/marketplace/pp/prodview-fsbcuniykfunw)

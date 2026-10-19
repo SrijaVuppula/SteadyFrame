@@ -193,16 +193,16 @@ def test_bedrock_permission_is_scoped_to_the_configured_model(templates):
         for s in statements
         if any(str(a).startswith("bedrock:") for a in _as_list(s.get("Action")))
     ]
-    assert len(bedrock) == 1, bedrock
-    s = bedrock[0]
-    assert set(_as_list(s["Action"])) == {
-        "bedrock:InvokeModel",
-        "bedrock:InvokeModelWithResponseStream",
-    }
-    resources = json.dumps(s["Resource"])
-    assert '"*"' not in json.dumps(_as_list(s["Resource"]))  # no bare wildcard resource
-    assert "inference-profile/us.example.model-v1:0" in resources
-    assert "foundation-model/example.model-v1:0" in resources
+    assert len(bedrock) == 2, bedrock  # the ECS task role and the Lambda worker's role
+    for s in bedrock:
+        assert set(_as_list(s["Action"])) == {
+            "bedrock:InvokeModel",
+            "bedrock:InvokeModelWithResponseStream",
+        }
+        resources = json.dumps(s["Resource"])
+        assert '"*"' not in json.dumps(_as_list(s["Resource"]))  # no bare wildcard resource
+        assert "inference-profile/us.example.model-v1:0" in resources
+        assert "foundation-model/example.model-v1:0" in resources
     # the only "*" resource in the worker is PutMetricData, and it is namespace-conditioned
     for st in statements:
         if "*" in _as_list(st.get("Resource")):
@@ -438,7 +438,8 @@ def test_cool_service_uses_the_capacity_provider_and_the_same_scaling(cool, temp
             for r in tpl.find_resources("AWS::ApplicationAutoScaling::ScalingPolicy").values()
         )
 
-    assert len(steps(t)) == 2 and steps(t) == steps(templates["worker"])
+    # same scaling as the ECS worker has when it is the only worker (no Lambda in front)
+    assert len(steps(t)) == 2 and steps(t) == steps(_worker_template(lambda_worker="false"))
     # the dashboard follows the one worker service there is
     assert f"ExportsOutputFnGetAtt{svc_id}Name" in json.dumps(cool["observability"].to_json())
 
@@ -501,3 +502,59 @@ def test_unusable_worker_engine_context_fails_synth(ctx, message):
     app = App(context={"skip_docker_build": "true", **ctx})
     with pytest.raises(ValueError, match=message):
         mod.build(app)
+
+
+def _worker_template(**ctx) -> Template:
+    mod = _load_app_module()
+    app = App(
+        context={"skip_docker_build": "true", "bedrock_model_id": "us.example.model-v1:0", **ctx}
+    )
+    built = mod.build(app)
+    app.synth()
+    return Template.from_stack(built["worker"])
+
+
+def test_lambda_worker_takes_the_queue_first(templates):
+    t = templates["worker"]
+    fns = [
+        r["Properties"]
+        for r in t.find_resources("AWS::Lambda::Function").values()
+        if r["Properties"].get("PackageType") == "Image"
+    ]
+    assert len(fns) == 1
+    fn = fns[0]
+    assert fn["Architectures"] == ["arm64"]
+    assert fn["MemorySize"] == 3008 and fn["Timeout"] == 900
+    assert fn["EphemeralStorage"] == {"Size": 2048}
+    env = fn["Environment"]["Variables"]
+    assert "AWS_REGION" not in env and "WORKER_IDLE_EXIT_S" not in env  # reserved / ECS only
+    assert env["HOME"] == "/tmp" and env["MPLCONFIGDIR"] == "/tmp/mpl"
+    assert env["STEADYFRAME_MODE"] == "aws" and env["STEADYFRAME_BEDROCK_MODEL_ID"]
+    t.has_resource_properties(
+        "AWS::Lambda::EventSourceMapping",
+        {
+            "BatchSize": 1,
+            "ScalingConfig": {"MaximumConcurrency": 2},
+            "FunctionResponseTypes": ["ReportBatchItemFailures"],
+        },
+    )
+    t.has_resource_properties(
+        "AWS::Events::Rule",
+        {
+            "ScheduleExpression": "rate(5 minutes)",
+            "Targets": Match.array_with([Match.object_like({"Input": '{"warmup":true}'})]),
+        },
+    )
+    # the ECS service is the fallback: it scales out only on messages left visible for 2 min
+    alarms = t.find_resources("AWS::CloudWatch::Alarm")
+    assert any(a["Properties"].get("EvaluationPeriods") == 2 for a in alarms.values())
+
+
+def test_lambda_worker_can_be_turned_off():
+    t = _worker_template(lambda_worker="false")
+    assert not [
+        r
+        for r in t.find_resources("AWS::Lambda::Function").values()
+        if r["Properties"].get("PackageType") == "Image"
+    ]
+    t.resource_count_is("AWS::Lambda::EventSourceMapping", 0)
