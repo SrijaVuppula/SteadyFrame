@@ -1,8 +1,9 @@
 # For judges: where each criterion's evidence is
 
-**Fastest path (90 seconds, nothing to install):** https://d25yofo4x3sac8.cloudfront.net/judge
-— recorded jobs from the worker's own code, the model's decisions, the approval flow, the
-verification record, the measured results and the adversarial test, all on one page.
+**Fastest path (nothing to install):** https://d25yofo4x3sac8.cloudfront.net/judge. Press
+**Run live check** and a real job runs on AWS while you watch (5 to 40 s); below it are recorded
+examples (a live-model run that changes its plan, a job paused for a person), the verification
+record, the measured results and the adversarial test.
 
 **One sentence:** the model picks the fix; the analyzer decides whether it worked; a person
 signs off on anything drastic.
@@ -19,7 +20,7 @@ Every number below is filled in from `eval/results/frozen/*.json` by `python -m 
 | **Real-world impact (20%)** | `README.md` ("The problem": incidents and requirements, sourced), `steadyframe/record.py` | UK broadcast delivery (AS-11 UK DPP) has a mandatory PSE pass/fail field; the verification record fills those fields and can be re-checked by anyone with `steadyframe verify`. The viewer warning track (`hazards.vtt`) helps people who watch the unrepaired original. Free tools exclude commercial use (PEAT) or stop at frame-level detection (IRIS). |
 | **User experience (10%)** | the live site, `/judge`, `web/` | Nothing autoplays; the original sits behind a click-through warning and plays dimmed, small and slowed; `prefers-reduced-motion` respected; WCAG AA contrast; keyboard navigable; axe check in CI (`web/a11y-report.json`). Hazards are shown as stills with the region outlined and as plots, never as moving video. |
 | **Documentation and presentation (10%)** | `README.md`, `docs/report/REPORT.md`, `docs/diagrams/`, the video | Every number in the report is a placeholder filled from a results file; one command reproduces each table (`make eval`, `make freeze`). Dated engineering log with every decision and bug: `docs/NOTES.md`. |
-| **Cloud delivery, reproducibility, responsible operation (10%)** | `infra/` (CDK, 7 stacks), `infra/policies/`, `.github/workflows/ci.yml`, `docs/RESPONSIBLE_USE.md` | `make deploy` from a clean account; least-privilege IAM per component; 1-day object lifecycle, 7-day record TTL; CloudWatch dashboard, alarms to e-mail; scale to zero when idle. `make demo` runs the whole loop locally with no credentials; `docker compose up --build` runs the web app, API and worker locally. |
+| **Cloud delivery, reproducibility, responsible operation (10%)** | `infra/` (CDK, 7 stacks), `infra/policies/`, `.github/workflows/ci.yml`, `docs/RESPONSIBLE_USE.md` | `make deploy` from a clean account; least-privilege IAM per component; 1-day object lifecycle, 7-day record TTL; CloudWatch dashboard, alarms and a cost budget to e-mail. The worker is an arm64 Lambda function fed by SQS (under 5 s end to end when warm, inside the free tier) with an ECS Fargate fallback, so the live demo answers in seconds and idles at about zero. `make demo` runs the whole loop locally with no credentials; `docker compose up --build` runs the web app, API and worker locally. |
 
 ## Agentic Vision Award
 
@@ -31,15 +32,13 @@ Every number below is filled in from `eval/results/frozen/*.json` by `python -m 
 | **Failure handling, observability, security, human control (15%)** | Adversarial planner (`eval/guardrails.py`): {{guardrails.summary.held}}/{{guardrails.summary.runs}} attacks held, {{guardrails.summary.false_pass}} false passes, {{guardrails.summary.refused_calls}} hostile calls refused; instructions planted in the file name and metadata never reach the model. Every provider failure falls back to the deterministic policy and says so in the trace. Strong repairs pause for a person; decisions are consumed once. Every call goes to `trace.jsonl` and DynamoDB; CloudWatch metrics and alarms. |
 | **UX, documentation, demonstration (10%)** | Trace viewer with "this verify result changed the next call" highlights; approval dialog; annotated traces in `docs/examples/`; `/judge`. |
 
-## Best Use of COOL Award
+## Best Use of COOL Award: not entered
 
-| Criterion (weight) | Evidence |
-|---|---|
-| **Verified COOL integration on AWS Graviton (30%)** | Benchmark path: `bench/ec2.py --config c8g.xlarge-cool` runs the analyzer on a Graviton4 instance from the COOL AMI and stops unless `cv2` loads from `/opt/cool` as OpenCV 5; the result JSON records `cv2.__file__`, the full build information and the libraries mapped into the process. Production path (opt-in): `-c worker_engine=cool -c cool_image=<image>` builds the worker FROM the COOL Graviton4 container image and runs it on an ECS capacity provider of c8g instances, because COOL is built for Neoverse-V2 and does not run on Fargate (Graviton2); each job then records `tool.engine = cool`. The template is tested in CI (`tests/test_infra.py`); `infra/README.md` and `bench/README.md` have the steps. |
-| **Architecture and technical quality (25%)** | Same code and same clips on every configuration; the only variable is which OpenCV build executes. Both worker paths scale to zero. |
-| **Measured value (20%)** | `bench/results/comparison.md`. Analyzer fps on 720p, analysis only: x86 stock {{c7i_xlarge_stock.clips["bench_strobe.mp4"].fps_excluded:.0f}}, Graviton4 stock {{c8g_xlarge_stock.clips["bench_strobe.mp4"].fps_excluded:.0f}}, Graviton4 COOL {{c8g_xlarge_cool.clips["bench_strobe.mp4"].fps_excluded:.0f}} ("n/a" = that configuration has not been run yet). |
-| **Innovation (15%)** | The per-frame work of a flash check is exactly the class of operation COOL accelerates: `cv2.resize` INTER_AREA, `cv2.boxFilter`, `cv2.GaussianBlur`, `cv2.LUT`. |
-| **Reproducibility (10%)** | One command per configuration, no SSH, self-terminating instances (`bench/ec2.py`). |
+COOL is sold through AWS Marketplace, and this project deliberately runs on free-tier services
+and credits only, so COOL never executed and no COOL result is claimed. What exists, untested on
+COOL itself: a benchmark launcher that would run the analyzer on a Graviton4 instance from the
+COOL AMI and refuse to start unless `cv2` loads from `/opt/cool` (`bench/ec2.py`), and an opt-in
+worker engine built FROM the COOL container image (`-c worker_engine=cool`, `infra/README.md`).
 
 ## Not claimed
 

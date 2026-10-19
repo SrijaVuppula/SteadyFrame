@@ -147,16 +147,27 @@ the policy documents in `infra/policies/`. Limits: 100 MB, 120 s, container vali
 `make deploy` prints the endpoint; `make destroy` removes it; `docker compose up` runs the
 same worker and API locally.
 
-The worker has two engines selected at deploy time. The default is the Fargate ARM64 task
+Jobs are taken first by an arm64 Lambda function built from the same container (`lambda`
+target of the Dockerfile, `service/lambda_worker.py`): one SQS message per invocation, 3 GB,
+15-minute limit, at most two at a time, with a five-minute schedule keeping one execution
+environment warm. On the deployed stack the smoke test took 505 s when it had to wait for a
+Fargate task to start, 46 s on a cold Lambda and under 5 s on a warm one, inside the Lambda free
+tier. The Fargate service is the fallback: it scales out only when messages sit unread for two
+minutes. `-c lambda_worker=false` makes it the only worker again.
+
+The ECS worker has two engines selected at deploy time. The default is the Fargate ARM64 task
 above with the stock OpenCV 5 wheel. With `-c worker_engine=cool -c cool_image=<uri>` the same
 worker code is built FROM the COOL (Cloud Optimized OpenCV) Graviton4 container image and runs
 on an ECS capacity provider of c8g instances (0..2, scale to zero, bridge networking in the
 public subnets, no NAT), because COOL is built for Neoverse-V2 and does not run on Fargate's
 Graviton2. Its task role adds `aws-marketplace:RegisterUsage` for COOL's entitlement check, and
-each job records which engine ran it. `infra/README.md` has the prerequisites and rollback.
+each job records which engine ran it. `infra/README.md` has the prerequisites and rollback. This
+path needs a paid Marketplace subscription and has not been run: the project uses free-tier
+services only.
 
-For judges the web app serves `/judge`: recorded jobs produced by running the worker's own
-code locally (`python -m eval.judge_bundle`: a live Bedrock run, a live run where a failed
+For judges the web app serves `/judge`: a live run on the deployed worker (pick a clip, press
+Run, watch the plan, the re-checks and the result arrive), then recorded jobs produced by running
+the worker's own code locally (`python -m eval.judge_bundle`: a live Bedrock run, a live run where a failed
 verify changes the plan, and a fixed-policy run that pauses for a person, with both the
 approved and the rejected resume), so the whole loop can be inspected without a running worker.
 
@@ -300,9 +311,10 @@ build information, loaded shared libraries including `kleidicv`, instance type) 
 {{local_x86_stock.clips["bench_strobe.mp4"].fps_included:.0f}} fps with decode, with
 {{local_x86_stock.profile.fraction_in_cv2:.0%}} of analysis time inside cv2 built-ins
 (`resize`, `LUT`, `transform`, `boxFilter`). The three EC2 configurations (c7i.xlarge
-stock, c8g.xlarge stock, c8g.xlarge COOL AMI) run with `python -m bench.ec2`, one command
-each, and land in `bench/results/comparison.md` with USD per video-hour from on-demand
-prices on the day; every row in that table comes from a JSON file in `bench/results/`.
+stock, c8g.xlarge stock, c8g.xlarge COOL AMI) are scripted with `python -m bench.ec2` but have
+not been run: the deploy account is on the AWS Free Plan, which allows only Free Tier instance
+types and no Marketplace subscriptions, and the project stays on free services. The table in
+`bench/results/comparison.md` therefore has the build host only.
 
 ![](figures/comparison.png)
 

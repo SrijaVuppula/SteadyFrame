@@ -296,3 +296,24 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   and `ami-01db31139bc5615d8` (2026-04-22, "v2").
 - On-demand Linux prices in us-east-1 today (Pricing API): c7i.xlarge 0.1785 USD/h,
   c8g.xlarge 0.15952 USD/h. COOL AMI software on c8g.xlarge: 0.01 USD/h after a 7-day trial.
+
+## 2026-10-19  Lambda worker for a live demo that answers in seconds
+
+- Decision: no paid subscriptions; free tiers and the account's credits only. That rules out
+  COOL (Marketplace) and the larger EC2 types, so the COOL award is not entered and its code
+  stays unmeasured. Recorded in JUDGES.md and the report.
+- The problem with a live demo was the worker's cold start: the scale-to-zero Fargate service
+  took 505 s to pick up the first job after a quiet spell. Lambda's always-free tier covers the
+  demo, so the same container now also runs as an arm64 Lambda function (`lambda` target of the
+  Dockerfile, `awslambdaric==4.1.0`, `service/lambda_worker.py`) fed by the queue: batch size 1,
+  maximum concurrency 2, 3008 MB (new-account ceiling), 2 GB `/tmp`, 15 min timeout.
+- Measured with `make smoke` on the deployed stack: cold 46.5 s queued-to-passed (30 s of it the
+  container start), pipeline 15.8 s; warm 3.7 s, pipeline 2.7 s. From the new live panel on
+  `/judge`: Flashing box with the Bedrock planner 27.9 s (8 conversation bubbles streamed while
+  it ran), Red strobe with the fixed policy 9.0 s, Calm clip 4.0 s (no hazards, unchanged).
+- An EventBridge rule pings the function every five minutes with `{"warmup": true}`, which
+  loads OpenCV, the runner and matplotlib (its font cache goes to `/tmp`). About 8,600 short
+  invocations a month, inside the free tier.
+- The ECS service is kept as the fallback. With the Lambda in front, scaling out on "visible +
+  in flight" would start a Fargate task for every job (the message is in flight while Lambda
+  works on it), so the scale-out metric is now visible messages only, two minutes running.

@@ -8,15 +8,20 @@ drastic. Built for the OpenCV AI Competition 2026 (powered by AWS). Solo entry.
 > The model picks the fix. The analyzer decides whether it worked. A person signs off on
 > anything drastic.
 
+**Try it live: [d25yofo4x3sac8.cloudfront.net/judge](https://d25yofo4x3sac8.cloudfront.net/judge).**
+No sign-up, phone or laptop. Pick a test clip and press **Run live check**: a real job runs on
+AWS while you watch. The hazard is found, the model plans a repair, the analyzer re-checks it,
+and you get the repaired video and its verification record, usually in 5 to 40 seconds.
+
 | | |
 |---|---|
-| **90-second tour (no install, no upload, no waiting)** | https://d25yofo4x3sac8.cloudfront.net/judge |
-| Live app (upload a clip or run a sample) | https://d25yofo4x3sac8.cloudfront.net |
+| Live demo (run a job, then recorded examples and the evidence) | https://d25yofo4x3sac8.cloudfront.net/judge |
+| Upload your own clip | https://d25yofo4x3sac8.cloudfront.net |
 | Rubric → evidence map | [`docs/JUDGES.md`](docs/JUDGES.md) |
 | Technical report | [`docs/report/REPORT.md`](docs/report/REPORT.md) |
 | Video | on the Devpost page |
 
-![The 90-second tour: the hazards found, the model's decisions, and the analyzer's answers](docs/screenshots/judge_top.png)
+![The live demo: pick a clip, press Run, and watch the model plan, the analyzer re-check and the result arrive](docs/screenshots/judge_top.png)
 
 **Not a medical device.** A pass means the published thresholds were met as implemented here
 (`docs/STANDARDS.md`); it is not a certification. See `docs/RESPONSIBLE_USE.md`.
@@ -93,9 +98,10 @@ steadyframe verify safe.mp4 --record record.json       # re-hash + re-analyze; e
    never sees pixels, file names or metadata, only analyzer numbers. The tools refuse anything
    unverified, failing or unapproved, every failure falls back to the fixed policy, and every
    call goes to the trace. Details: `docs/AGENT.md`, diagram: `docs/diagrams/agent_workflow.svg`.
-4. **Deliver** (`service/`, `infra/`): S3 + CloudFront, API Gateway + Lambda, SQS, an ECS worker
-   on Graviton (Fargate ARM64 by default, or Graviton4 with the COOL OpenCV build:
-   `-c worker_engine=cool`), DynamoDB, CloudWatch, all in CDK. Scales to zero when idle.
+4. **Deliver** (`service/`, `infra/`): S3 + CloudFront, API Gateway + Lambda, SQS, a worker on
+   Graviton: an arm64 Lambda function takes each job within seconds (4 s end to end when warm,
+   inside the free tier) and an ECS Fargate ARM64 service is the fallback. DynamoDB, CloudWatch,
+   all in CDK. Idle cost about zero.
 
 ## Results (reproduced by `make eval`; external clips need `make real` first)
 
@@ -130,8 +136,8 @@ steadyframe/   analyzer, profiles, remediation strategies, agent loop, verificat
 synth/         synthetic clip generator + independent 1-D reference for ground truth
 eval/          detection, robustness, remediation, agent_vs_fixed, guardrails, external, failures, report, judge bundle
 bench/         x86 / Graviton / COOL benchmark harness
-service/       Lambda handlers, worker, local FastAPI, demo, smoke test     infra/  CDK (Python)
-web/           React UI (flash-safe, WCAG AA, axe check in CI), the /judge tour
+service/       API Lambda, workers (Lambda and ECS), local FastAPI, demo, smoke test     infra/  CDK (Python)
+web/           React UI (flash-safe, WCAG AA, axe check in CI), the /judge live demo
 docs/          STANDARDS, NOTES, PRIOR_ART, AGENT, API, RESPONSIBLE_USE, JUDGES, report, diagrams
 ```
 
