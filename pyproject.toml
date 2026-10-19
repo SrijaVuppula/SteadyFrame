@@ -29,6 +29,9 @@ dev = [
 aws = [
   "boto3==1.43.98",
 ]
+mcp = [
+  "mcp==1.30.0",
+]
 service = [
   "fastapi==0.141.1",
   "uvicorn==0.53.0",

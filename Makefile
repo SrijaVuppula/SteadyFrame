@@ -6,7 +6,7 @@ SEED ?= 1234
 # extra cdk arguments, e.g. CDK_ARGS="-c bedrock_model_id=us.x.y-v1:0 -c alert_email=me@example.com"
 CDK_ARGS ?=
 
-.PHONY: help venv install test lint demo synth real eval freeze report slides judge bench deploy destroy smoke web local clean
+.PHONY: help venv install test lint demo mcp mcp-demo synth real eval freeze report slides judge bench deploy destroy smoke web local clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -24,6 +24,14 @@ test: ## run the test suite
 
 demo: ## the whole loop on this machine, no credentials: sample clips -> analyze -> fix -> verify -> demo/
 	$(BIN)/python -m service.demo --out demo
+
+mcp: ## serve the tools over MCP on stdio (what an agent's MCP config runs; see docs/MCP.md)
+	$(BIN)/steadyframe mcp
+
+mcp-demo: ## an MCP client drives `steadyframe mcp` over stdio on two sample clips; you approve one fix
+	$(BIN)/python -c "from service.samples import generate; generate('demo/mcp', only=['sample_strobe_region', 'sample_red_fullscreen'])"
+	$(BIN)/python -m eval.mcp_walkthrough demo/mcp/sample_strobe_region.mp4 --workdir demo/mcp/jobs
+	$(BIN)/python -m eval.mcp_walkthrough demo/mcp/sample_red_fullscreen.mp4 --workdir demo/mcp/jobs
 
 lint: ## ruff check + format check
 	$(BIN)/ruff check .

@@ -3,6 +3,7 @@
 steadyframe analyze input.mp4 [--profile wcag|broadcast] [--json out.json] [--plot out.png] [--vtt hazards.vtt]
 steadyframe fix input.mp4 --policy fixed|agent -o safe.mp4 --report report.json [--record record.json] [--vtt hazards.vtt]
 steadyframe verify safe.mp4 --record record.json
+steadyframe mcp [--http PORT]   (the tools as an MCP server, for any agent)
 """
 
 from __future__ import annotations
@@ -73,6 +74,26 @@ def _add_verify(sub):
     p.add_argument("--record", required=True)
     p.add_argument("--backend", default="auto", choices=["auto", "opencv", "ffmpeg"])
     p.set_defaults(func=cmd_verify)
+
+
+def _add_mcp(sub):
+    p = sub.add_parser(
+        "mcp", help="serve the analyze/repair/verify tools over MCP (stdio by default)"
+    )
+    p.add_argument("--http", type=int, metavar="PORT", help="streamable HTTP on 127.0.0.1:PORT")
+    p.add_argument("--workdir", help="where jobs keep candidates and traces")
+    p.set_defaults(func=cmd_mcp)
+
+
+def cmd_mcp(args) -> int:
+    import os
+
+    if args.workdir:
+        os.environ["STEADYFRAME_MCP_DIR"] = args.workdir
+    from .mcp_server import serve
+
+    serve(args.http)
+    return 0
 
 
 def cmd_analyze(args) -> int:
@@ -172,6 +193,7 @@ def main(argv=None) -> int:
     _add_analyze(sub)
     _add_fix(sub)
     _add_verify(sub)
+    _add_mcp(sub)
     args = ap.parse_args(argv)
     return args.func(args)
 

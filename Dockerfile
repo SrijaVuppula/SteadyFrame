@@ -23,9 +23,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libstdc++6 zlib1g ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# runtime deps only: the lock also pins the dev tools, which the image does not need
+# runtime deps only: the lock also pins the dev tools and the MCP server's SDK (it runs on
+# the user's machine, next to their agent), which the image does not need
 COPY requirements.lock /tmp/requirements.lock
-RUN grep -v -i -E '^(pytest|hypothesis|ruff|iniconfig|pluggy|sortedcontainers|Pygments)==' /tmp/requirements.lock \
+RUN grep -v -i -E '^(pytest|hypothesis|ruff|iniconfig|pluggy|sortedcontainers|Pygments|mcp|httpx-sse|sse-starlette|pydantic-settings|PyJWT|cryptography|cffi|pycparser|python-dotenv)==' /tmp/requirements.lock \
         > /tmp/requirements.runtime \
     && pip install --no-cache-dir -r /tmp/requirements.runtime \
     && rm -rf /tmp/requirements.*
