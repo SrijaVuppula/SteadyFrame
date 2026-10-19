@@ -505,6 +505,7 @@ table.data thead th { background: var(--surface-2); }
 .sf-strip li.done { background: #23392a; color: #a6e0b4; }
 .sf-strip li.now { background: #3b3018; color: #f6efe2; box-shadow: inset 0 0 0 2px #f2b84b; }
 @media (max-width: 480px) { .sf-strip { gap: 4px; padding: 16px 6px; } .sf-strip li { font-size: 0.68rem; } }
+.sf-notice { margin: -4px 0 14px; padding: 8px 12px; border-radius: 10px; background: var(--warn-fill); color: var(--text); font-size: 0.88rem; border: 1px solid var(--border); }
 .sf-progress { margin: 0 0 16px; color: var(--text-2); font-size: 0.9rem; }
 
 /* verdicts as rubber stamps */

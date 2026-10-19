@@ -13,6 +13,7 @@ light and the local mode must work without AWS.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -88,6 +89,20 @@ DOWNLOAD_KINDS = {
 INPUT_KIND = "input"  # the original upload (uploads/<id>/input.<ext>) for the click-through preview
 PRESIGN_TTL_S = 15 * 60
 TTL_S = 7 * 24 * 3600  # DynamoDB TTL for job records and trace rows
+
+# Daily limits on the public API (UTC days). Every job uses the worker's free tier and every
+# Bedrock-planned job costs money (about 0.12 USD), so both are capped overall and per client.
+# Past a model cap the job is planned by the fixed policy and says so; past a job cap the API
+# answers 429. The overall caps bound the cost; the per-client caps keep one visitor from using
+# all of it. A client is a hash of the viewer address with a per-deployment salt and the day.
+# 0 turns a limit off, which is the default outside AWS.
+LIMITS: dict[str, tuple[str, int]] = {
+    "agent_day": ("STEADYFRAME_AGENT_DAILY", 40),
+    "agent_client_day": ("STEADYFRAME_AGENT_CLIENT_DAILY", 8),
+    "jobs_day": ("STEADYFRAME_JOBS_DAILY", 600),
+    "jobs_client_day": ("STEADYFRAME_JOBS_CLIENT_DAILY", 60),
+}
+LIMIT_TTL_S = 2 * 24 * 3600
 
 _JOB_ID_RE = re.compile(r"^[0-9a-f]{32}$")
 _SEGMENT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,32}$")
@@ -325,6 +340,17 @@ class LocalJobs:
             self.put(job)
             return job
 
+    def take(self, counter: str, limit: int) -> bool:
+        """Count one use of ``counter``; False (and no count) once it has reached ``limit``."""
+        p = self.root / "limits.json"
+        with self._lock:
+            counts = json.loads(p.read_text()) if p.exists() else {}
+            if counts.get(counter, 0) >= limit:
+                return False
+            counts[counter] = counts.get(counter, 0) + 1
+            _atomic_write(p, json.dumps(counts))
+            return True
+
     def append_traces(self, records: list[dict]) -> None:
         if not records:
             return
@@ -391,6 +417,28 @@ class DynamoJobs:
             ReturnValues="ALL_NEW",
         )
         return from_dynamo(out["Attributes"])
+
+    def take(self, counter: str, limit: int) -> bool:
+        """Atomic counter in the jobs table (key ``limit#...``, which no job id can match)."""
+        from botocore.exceptions import ClientError
+
+        try:
+            self.jobs.update_item(
+                Key={"job_id": counter},
+                UpdateExpression="ADD n :one SET #t = :ttl",
+                ConditionExpression="attribute_not_exists(n) OR n < :limit",
+                ExpressionAttributeNames={"#t": "_ttl"},
+                ExpressionAttributeValues={
+                    ":one": 1,
+                    ":limit": limit,
+                    ":ttl": int(time.time()) + LIMIT_TTL_S,
+                },
+            )
+            return True
+        except ClientError as e:
+            if e.response.get("Error", {}).get("Code") == "ConditionalCheckFailedException":
+                return False
+            raise
 
     def append_traces(self, records: list[dict]) -> None:
         if not records:
@@ -576,6 +624,8 @@ class Context:
     queue: Any
     approval_min_ssim: float = 0.75
     data_dir: Path | None = None
+    limits: dict[str, int] | None = None
+    client_salt: str = ""
 
     @classmethod
     def from_env(cls) -> Context:
@@ -590,6 +640,8 @@ class Context:
                 jobs=DynamoJobs(os.environ["JOBS_TABLE"], os.environ["TRACES_TABLE"]),
                 queue=SqsQueue(os.environ["QUEUE_URL"]),
                 approval_min_ssim=ssim,
+                limits=read_limits(aws=True),
+                client_salt=os.environ.get("STEADYFRAME_CLIENT_SALT", ""),
             )
         return cls.local(os.environ.get("LOCAL_DATA_DIR", "./data/service"), ssim)
 
@@ -606,7 +658,37 @@ class Context:
             queue=LocalQueue(root),
             approval_min_ssim=approval_min_ssim,
             data_dir=root,
+            limits=read_limits(aws=False),
         )
+
+
+def read_limits(aws: bool) -> dict[str, int]:
+    """The daily limits from the environment; the defaults apply on AWS only."""
+    out = {}
+    for name, (env, default) in LIMITS.items():
+        raw = os.environ.get(env)
+        out[name] = int(raw) if raw not in (None, "") else (default if aws else 0)
+    return out
+
+
+def client_key(salt: str, day: str, address: str) -> str:
+    return hashlib.sha256(f"{salt}|{day}|{address}".encode()).hexdigest()[:20]
+
+
+def viewer_address(event: dict) -> str | None:
+    """The viewer's address for an API Gateway event, through CloudFront when it is in front.
+
+    CloudFront appends the viewer address to X-Forwarded-For, so the last entry that is not
+    the immediate caller is the viewer. A caller that goes around CloudFront can put anything
+    there, which only weakens the per-client caps; the overall caps still hold.
+    """
+    http = (event.get("requestContext") or {}).get("http") or {}
+    source = http.get("sourceIp")
+    headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    parts = [p.strip() for p in str(headers.get("x-forwarded-for") or "").split(",") if p.strip()]
+    if parts and parts[-1] == source:
+        parts = parts[:-1]
+    return parts[-1] if parts else source
 
 
 # ---------------------------------------------------------------- job records
@@ -764,6 +846,40 @@ class Api:
         self.ctx.queue.send({"job_id": job["job_id"]})
         return {"job_id": job["job_id"], "status": "queued"}
 
+    def _admit(self, job: dict, client: str | None) -> None:
+        """Apply the daily limits (see LIMITS) to a new job before it is stored."""
+        limits = self.ctx.limits or {}
+        day = time.strftime("%Y-%m-%d", time.gmtime())
+        who = client_key(self.ctx.client_salt, day, client) if client else None
+
+        def take(name: str, scoped: bool) -> bool:
+            n = int(limits.get(name, 0))
+            if n <= 0 or (scoped and not who):
+                return True
+            return self.ctx.jobs.take(f"limit#{day}#{name}" + (f"#{who}" if scoped else ""), n)
+
+        if not take("jobs_client_day", True) or not take("jobs_day", False):
+            raise ApiError(
+                429,
+                "The live demo has run its checks for today; it resets at 00:00 UTC. "
+                "`make demo` runs the same loop on your machine.",
+            )
+        if job["policy"] != "agent":
+            return
+        if not take("agent_client_day", True):
+            note = (
+                f"You have used today's {limits['agent_client_day']} model-planned checks, "
+                "so the fixed policy planned this one. It resets at 00:00 UTC."
+            )
+        elif not take("agent_day", False):
+            note = (
+                "The demo's model budget for today is used up, so the fixed policy planned "
+                "this one. It resets at 00:00 UTC."
+            )
+        else:
+            return
+        job.update(policy="fixed", policy_requested="agent", notice=note)
+
     # endpoints
     def health(self) -> dict:
         return {
@@ -781,8 +897,9 @@ class Api:
         present = {k.rsplit("/", 1)[-1].rsplit(".", 1)[0] for k in self.ctx.store.list("samples/")}
         return [sm.public(s) for s in sm.SAMPLES if s["id"] in present]
 
-    def create_job(self, body: dict, prefix: str = "") -> dict:
+    def create_job(self, body: dict, prefix: str = "", client: str | None = None) -> dict:
         job = new_job(body)
+        self._admit(job, client)
         self.ctx.jobs.put(job)
         target = self.ctx.store.upload_target(
             job["job_id"], job["_input_key"], job["input"]["content_type"], prefix
@@ -830,7 +947,7 @@ class Api:
         self.ctx.jobs.update(job_id, {"input": job["input"], "downloads": job["downloads"]})
         return self._enqueue(job, "waiting for a worker")
 
-    def from_sample(self, body: dict) -> dict:
+    def from_sample(self, body: dict, client: str | None = None) -> dict:
         sm = _samples_module()
 
         if not isinstance(body, dict):
@@ -856,6 +973,7 @@ class Api:
             }
         )
         job["input"]["sample_id"] = sid
+        self._admit(job, client)
         self.ctx.jobs.put(job)
         self.ctx.store.copy(src, job["_input_key"])
         job = self._set_status(job, "uploaded", downloads={**job["downloads"], INPUT_KIND: True})

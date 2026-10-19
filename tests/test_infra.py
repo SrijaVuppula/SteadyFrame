@@ -175,6 +175,22 @@ def test_api_lambda_is_light_and_routes_everything(templates):
     )
     t.has_resource_properties("AWS::ApiGatewayV2::Api", {"ProtocolType": "HTTP"})
     t.has_resource_properties("AWS::ApiGatewayV2::Route", {"RouteKey": "$default"})
+    t.has_resource_properties(
+        "AWS::ApiGatewayV2::Stage",
+        {
+            "StageName": "$default",
+            "DefaultRouteSettings": {"ThrottlingRateLimit": 20, "ThrottlingBurstLimit": 40},
+        },
+    )
+    t.has_resource_properties(
+        "AWS::Lambda::Function",
+        {
+            "Handler": "lambda/handler.handler",
+            "Environment": {
+                "Variables": Match.object_like({"STEADYFRAME_CLIENT_SALT": Match.any_value()})
+            },
+        },
+    )
     t.has_output("ApiUrl", {})
     # the packaged asset must not carry the worker
     for res in t.find_resources("AWS::Lambda::Function").values():

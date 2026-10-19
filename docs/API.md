@@ -35,6 +35,15 @@ created -> uploaded -> queued -> analyzing -> remediating -> rendering -> passed
 Limits enforced server-side: 100 MB, 120 s, container in {mp4, mov, webm, mkv, gif}. Rejected
 uploads get status `error` with `error` = reason.
 
+Daily limits on the deployed API (`service/core.py` `LIMITS`, UTC days, environment overrides
+`STEADYFRAME_*_DAILY`; off in local mode). Jobs: 600 a day overall and 60 per client; past either,
+`POST /jobs` and `POST /jobs/from-sample` answer 429. Bedrock-planned jobs (`"policy": "agent"`):
+40 a day overall and 8 per client; past either, the job is still created but planned by the fixed
+policy, and the Job object says so with `policy: "fixed"`, `policy_requested: "agent"` and a
+`notice` the page shows. A client is a hash of the viewer address (the last X-Forwarded-For entry
+that CloudFront adds), a per-deployment salt and the day, kept two days. The API stage is also
+throttled to 20 requests a second (burst 40) across all callers.
+
 ## Job object
 
 ```json

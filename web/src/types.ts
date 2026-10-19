@@ -195,6 +195,9 @@ export interface Job {
   updated_at: string;
   profile: Profile;
   policy: Policy;
+  /** Set when a daily limit changed the planner: what was asked for, and why it changed. */
+  policy_requested?: Policy;
+  notice?: string;
   conservative: boolean;
   input: JobInput | null;
   progress: JobProgress | null;

@@ -6,7 +6,7 @@ effective policy is readable (see infra/policies/)."""
 
 from __future__ import annotations
 
-from aws_cdk import CfnOutput, Duration, RemovalPolicy, Stack
+from aws_cdk import CfnOutput, Duration, Fn, RemovalPolicy, Stack
 from aws_cdk import aws_apigatewayv2 as apigw
 from aws_cdk import aws_apigatewayv2_integrations as integrations
 from aws_cdk import aws_dynamodb as ddb
@@ -18,6 +18,12 @@ from aws_cdk import aws_sqs as sqs
 from constructs import Construct
 
 from . import ROOT
+
+# Requests per second for the whole API, across all callers (API Gateway stage throttle). The
+# demo page polls about once a second per open check, so this leaves room for a dozen viewers
+# and turns a flood into 429s instead of Lambda time. The daily caps per job are in core.LIMITS.
+THROTTLE_RATE = 20
+THROTTLE_BURST = 40
 
 LAMBDA_EXCLUDES = [
     "worker.py",
@@ -69,6 +75,8 @@ class ApiStack(Stack):
                 "QUEUE_URL": queue.queue_url,
                 "STEADYFRAME_VERSION": version,
                 "STEADYFRAME_OPENCV_VERSION": opencv_version,
+                # salt for the per-client daily caps: the stack's own id, unique and not public
+                "STEADYFRAME_CLIENT_SALT": Fn.select(2, Fn.split("/", self.stack_id)),
             },
             description="SteadyFrame HTTP API (create/presign/status/approve/download)",
         )
@@ -134,6 +142,12 @@ class ApiStack(Stack):
                 max_age=Duration.hours(1),
             ),
             default_integration=integrations.HttpLambdaIntegration("LambdaProxy", self.function),
+        )
+        stage = self.http_api.default_stage
+        assert stage is not None
+        stage.node.default_child.add_property_override(  # type: ignore[union-attr]
+            "DefaultRouteSettings",
+            {"ThrottlingRateLimit": THROTTLE_RATE, "ThrottlingBurstLimit": THROTTLE_BURST},
         )
         self.api_url = self.http_api.api_endpoint
         CfnOutput(self, "ApiUrl", value=self.api_url)

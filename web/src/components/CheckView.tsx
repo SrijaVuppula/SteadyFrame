@@ -160,6 +160,7 @@ export function CheckView({ jobId, label, startedAt, example, navigate, onStatus
           </p>
         )}
       </header>
+      {job?.notice && <p className="sf-notice" role="note">{job.notice}</p>}
       <p className="sr-only" role="status" aria-live="polite">{status ?? job?.progress?.detail ?? 'Starting'}</p>
 
       {!terminal && (

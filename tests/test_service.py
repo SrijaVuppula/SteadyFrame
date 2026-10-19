@@ -295,3 +295,53 @@ def test_dynamo_conversion_round_trip():
     doc = {"a": 1.5, "b": [1, 2, {"c": 0.25}], "d": "x", "e": None, "f": True}
     conv = core.to_dynamo(doc)
     assert str(conv["a"]) == "1.5" and core.from_dynamo(conv) == doc
+
+
+def test_daily_limits(tmp_path, monkeypatch):
+    for name, (env, _default) in core.LIMITS.items():
+        monkeypatch.setenv(
+            env, {"agent_day": "3", "agent_client_day": "2", "jobs_day": "10"}.get(name, "5")
+        )
+    monkeypatch.setenv("STEADYFRAME_MODE", "local")
+    api = core.Api(core.Context.local(tmp_path / "data"))
+    body = {"filename": "a.mp4", "content_type": "video/mp4", "size_bytes": 10, "policy": "agent"}
+
+    def policy(client):
+        job_id = api.create_job(dict(body), client=client)["job_id"]
+        return api.get_job(job_id)
+
+    a1, a2, a3 = policy("10.0.0.1"), policy("10.0.0.1"), policy("10.0.0.1")
+    assert [j["policy"] for j in (a1, a2, a3)] == ["agent", "agent", "fixed"]
+    assert a3["policy_requested"] == "agent" and "2 model-planned checks" in a3["notice"]
+    assert "notice" not in a1
+    # another visitor still gets the model until the overall cap (3) is reached
+    b1, b2 = policy("10.0.0.2"), policy("10.0.0.2")
+    assert b1["policy"] == "agent" and b2["policy"] == "fixed"
+    assert "model budget for today" in b2["notice"]
+    # the job caps answer 429: 5 per client, so a1..a3 plus two more
+    api.create_job({**body, "policy": "fixed"}, client="10.0.0.1")
+    api.create_job({**body, "policy": "fixed"}, client="10.0.0.1")
+    with pytest.raises(core.ApiError) as e:
+        api.create_job({**body, "policy": "fixed"}, client="10.0.0.1")
+    assert e.value.status == 429
+
+
+def test_limits_are_off_locally_by_default(ctx):
+    assert set(ctx.limits.values()) == {0}
+    assert core.read_limits(aws=True)["agent_day"] > 0
+
+
+def test_viewer_address_behind_cloudfront():
+    def ev(xff, source):
+        return {
+            "headers": {"X-Forwarded-For": xff},
+            "requestContext": {"http": {"sourceIp": source}},
+        }
+
+    # CloudFront appends the viewer; API Gateway sees the edge as the caller
+    assert core.viewer_address(ev("198.51.100.7, 203.0.113.9", "203.0.113.9")) == "198.51.100.7"
+    assert core.viewer_address(ev("198.51.100.7", "203.0.113.9")) == "198.51.100.7"
+    assert (
+        core.viewer_address({"requestContext": {"http": {"sourceIp": "192.0.2.1"}}}) == "192.0.2.1"
+    )
+    assert core.client_key("s", "2026-10-19", "a") != core.client_key("s", "2026-10-20", "a")

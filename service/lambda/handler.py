@@ -74,8 +74,16 @@ def _no_raw_upload():
 ROUTES = [
     ("GET", re.compile(r"^/health$"), lambda a, m, ev, q: a.health()),
     ("GET", re.compile(r"^/samples$"), lambda a, m, ev, q: a.samples()),
-    ("POST", re.compile(r"^/jobs$"), lambda a, m, ev, q: a.create_job(_body(ev))),
-    ("POST", re.compile(r"^/jobs/from-sample$"), lambda a, m, ev, q: a.from_sample(_body(ev))),
+    (
+        "POST",
+        re.compile(r"^/jobs$"),
+        lambda a, m, ev, q: a.create_job(_body(ev), client=core.viewer_address(ev)),
+    ),
+    (
+        "POST",
+        re.compile(r"^/jobs/from-sample$"),
+        lambda a, m, ev, q: a.from_sample(_body(ev), client=core.viewer_address(ev)),
+    ),
     ("PUT", re.compile(r"^/jobs/([^/]+)/upload$"), lambda a, m, ev, q: _no_raw_upload()),
     ("POST", re.compile(r"^/jobs/([^/]+)/start$"), lambda a, m, ev, q: a.start(m[1])),
     ("GET", re.compile(r"^/jobs/([^/]+)$"), lambda a, m, ev, q: a.get_job(m[1])),
