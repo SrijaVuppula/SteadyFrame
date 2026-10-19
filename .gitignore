@@ -15,6 +15,7 @@ data/synthetic/**
 !data/synthetic/.gitkeep
 data/real/**
 !data/real/README.md
+data/natural/
 *.mp4
 *.avi
 *.mov

@@ -1,0 +1,222 @@
+# Natural footage with real light sources that flash, from Wikimedia Commons (read by
+# synth/fetch_natural.py and eval/natural.py). Every file is openly licensed; nothing is
+# redistributed: the fetch script downloads each one to data/natural/ (gitignored).
+#
+# Labels come from EA IRIS 1.1.0 (BSD-3-Clause), the official Ubuntu example app from EA's GitHub
+# release, run on the same H.264 transcode SteadyFrame analyzes. Before use it is checked against
+# IRIS's own expected logs for three of its test videos. Nothing below comes from this analyzer.
+#
+# sha1: the Commons file version (from the API); sha256: the downloaded file; mp4_sha256: the
+# transcode both tools read; iris_sha256: IRIS's per-frame CSV for it. The fetch script refuses a
+# file whose checksum differs; `--freeze` records them after the first run.
+
+iris:
+  url: https://github.com/electronicarts/IRIS/releases/download/1.1.0/iris-1.1.0-ubuntu-example-app.tar.gz
+  sha256: 440eb0cb814a03a4eff7c8c4f499492b669a33cf2ba4f23843b479365eeedaeb
+  licence: BSD-3-Clause (Copyright (c) 2023 Electronic Arts Inc.)
+
+clips:
+  - id: police_se_blue
+    category: emergency
+    title: "File:Blue emergency lights.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Blue_emergency_lights.ogv"
+    licence: CC BY-SA 3.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/3.0"
+    author: "Albin Olsson"
+    content: "Bleu emergency lights on the roof of a Swedish police car."
+    sha1: 34158132a57f142e6296730cc9d999a2cc9f936b
+    sha256: 8100102e58d440ecd5801c0d6e87c45d21bf1732c41ddf85d1e4aec451a25aaa
+    mp4_sha256: 3e85f863e944f0468c2f6cad734f77e69b9c640b81b8ae4a08868c4a71d6d78a
+    iris_sha256: 04a61a2a926cd0cf31939def181afc55402e01ab70265d587625dca0f6ae208a
+  - id: police_memphis
+    category: emergency
+    title: "File:Video MPD Cruiser.theora.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/7/74/Video_MPD_Cruiser.theora.ogv"
+    licence: CC BY 3.0
+    licence_url: "https://creativecommons.org/licenses/by/3.0"
+    author: "Thomas R Machnitzki"
+    content: "Memphis, Tennessee.\n\nMPD cruiser with lights flashing at Pawn USA on Lamar Avenue."
+    sha1: 9112c28eca2857a4d08370991758f626745671aa
+    sha256: 9d7fb2243461cd7f1be715c9abbed97b4313cdf18f0e8ea63cf95f5d1d7251c5
+    mp4_sha256: 15a28135c964a140433e196b46068cbeb79afb5de221440234b51ac06575e052
+    iris_sha256: a3f6683bb28a25f52b162069dcc8f03ce49a130e1b30707da430738904621171
+  - id: police_nl
+    category: emergency
+    title: "File:Spoedrit politie.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/7/71/Spoedrit_politie.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "S. Perquin"
+    content: "A Dutch police car with lights and sirens on its way to an emergency call"
+    sha1: 2cc19eeba62db84baa8b447faaf96d1bdbe21ce4
+    sha256: e73a88d40944364afc37aa5bdbd7645968e626800a5b04b0eda9383508a3797e
+    mp4_sha256: 5fdd215dadd0a76458383e3b327f5ebb3e8d02447932ede53ad8df30c6692276
+    iris_sha256: 9114a1dee61a407f6a8be6de8d5e992ad30bd8c99c213ef766284dbd71c33bd4
+  - id: fire_engine_nl
+    category: emergency
+    title: "File:Spoedrit brandweer.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Spoedrit_brandweer.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "S. Perquin"
+    content: "A Dutch fire engine with lights and sirens on its way to an emergency call"
+    sha1: 9229b4d4e1dbf7651ee14bec9a9115a4a26ad9f8
+    sha256: d313db2fb4ee09d9d81880967ad2e029be8e70775c4e0a4d13182e752b895165
+    mp4_sha256: 7bd079d8795e20a1772340882b338f389f938248dd00cfb7ce06ed0635a2ddea
+    iris_sha256: 2c2138aa37f5aa1f90dc31fe4dfb89b42ef0a41a3dfe107be46dcd5ffbf2dfa4
+  - id: fire_berlin
+    category: emergency
+    title: "File:Live Feuerwehr Berlin.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/7/79/Live_Feuerwehr_Berlin.webm"
+    licence: CC BY 3.0
+    licence_url: "https://creativecommons.org/licenses/by/3.0"
+    author: "Lear 21"
+    content: "Einsatz der Feuerwehr Berlin bei brennenden Fahrzeugen"
+    sha1: d356729884c6ba9f0d6f5223ccfc67bfdcb36aa4
+    sha256: 51893a68aa7d23d2e3ba2a9323eb6d6021378594622badca49a109497a0d715e
+    mp4_sha256: 89acc980490ce7df2d2f29148266d806241b3a51fb5ea074eeaee25715e4f14e
+    iris_sha256: 69d649e60dbb6a65f3d37e963274e6190873c9e74dd95ee13a947e97001f2945
+  - id: ambulance_toronto
+    category: emergency
+    title: "File:Toronto EMS on scene.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/f/f7/Toronto_EMS_on_scene.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "Hillelfrei"
+    content: "An ambulance in Toronto displaying flashing red and white lights"
+    sha1: 7a12e912d4c22a1577ba57817d29d17d5decb709
+    sha256: 39706146fc9ca2732303058d50aef10fcf92372f282a074cddfa905012b45520
+    mp4_sha256: 78ad28df7165b077d1ace0b6b64de9cb63e798165407bc69dc15e863d568b1d3
+    iris_sha256: 530e6da692d56613cb75313771cd0963ef7c667e7c3f669f06876e54ac142560
+  - id: disco_rotating
+    category: club
+    title: "File:Rotating disco lights.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/1/13/Rotating_disco_lights.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "JJMr19"
+    content: "Ceiling-mounted disco light apparatus with red, blue, yellow, and green lights, rotating counter-clockwise. The smearing effect from the CCD"
+    sha1: 2780e843911c09613b4366ee7dcc85d028e09c8f
+    sha256: 53cd36ca1e0eecd4ab9d56552047fea5db103cbfe29b000631c81934a26abfe8
+    mp4_sha256: 7fc9be1627070d03139b536717bbdb689457d695a1f17f0cbbf924c849184df7
+    iris_sha256: 8b43e9d5a967923f525a1e889aeb64ed3afa69ab54c05da7a6859085f5fa0604
+  - id: disco_mark_bain
+    category: club
+    title: "File:Mark Bain Disco for None.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/3/3d/Mark_Bain_Disco_for_None.ogv"
+    licence: CC BY-SA 3.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/3.0"
+    author: "Netherlands Media Art Institute, Mark Bain"
+    content: "Probably the world's tiniest disco. A project by Mark Bain, an American-Dutch media artist who works at the intersection of acoustics and ar"
+    sha1: e8298e153f76233264a1f73b00095f54a3e66c6e
+    sha256: ccc0e83d36e7db65a3df3024b4769797a3b4da0963f9d473872791751c3b95f5
+    mp4_sha256: e0b34ab3fa1b25fe06bae5a2ba9d07ca70db2abee7a117e329b65e62939be4b7
+    iris_sha256: ecc4fc21bce369a407fdea2c0bf8d745a1b30f58afd9892e61ed6582abbd8d2d
+  - id: phone_funlights
+    category: device
+    title: "File:Motorola funlights.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/3/33/Motorola_funlights.ogv"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "Devin Magruder"
+    content: "This is my Motorola V3 with funlights enabled. Video contains flashing lights."
+    sha1: e8310dd4b4eba509d661399fbe1ad9a02720ead4
+    sha256: 634524a88c73f290a5bdbae1eb984eaece575fc72bb5f607b068ec11a314a059
+    mp4_sha256: 6a52d2ddf064ebd75e7920fe2cb4cbea94f20e2fa40732eee45dfbbe41b0f0e8
+    iris_sha256: d4983764870f4f856d4f161c7bf72620d1e56ed1eea775125326a7f55a9eb209
+  - id: neon_sign_komeda
+    category: signage
+    title: "File:Krzysztof Komeda neon sign working evening sept 2025.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Krzysztof_Komeda_neon_sign_working_evening_sept_2025.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "Siarhei Besarab"
+    content: "The video shows what the working neon sign in honor of jazz composer Krzysztof Komeda looks like in the evening, located on the wall of the "
+    sha1: 7267ba54aa7ee431fed670ae2b135eec3e9571ae
+    sha256: bd1a8d53957b14e5bf69d0e25beb40e9f75aad7f1e92690ef565508d5e2fd159
+    mp4_sha256: 833b3c402ac97d32fb46c2832048d05ea72b4ca86d322cdd59fdf03516794a58
+    iris_sha256: 2b0af14ea45748c598d353e86c846b0fae1213e0bcdf477b4914bf14d8691141
+  - id: crossing_beacons
+    category: signage
+    title: "File:Roncesvalles Ave crossing at Galley Ave, PXO Type A lights flashing, July 2026.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/0/06/Roncesvalles_Ave_crossing_at_Galley_Ave%2C_PXO_Type_A_lights_flashing%2C_July_2026.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "Qviri"
+    content: "View along Roncesvalles Avenue looking south on a smoky day in July 2026. A pedestrian activates flashing lights at the Galley Avenue PXO an"
+    sha1: 2009bed6af30931051b70eaa981e268397b00cb9
+    sha256: a16ca29b1458f98db39329810cd3d003f37c364061fe48bc69769fa2e515e3d1
+    mp4_sha256: e34a6468f124cdf77a67633a224397b772acd4126d61debc8926795343a22c54
+    iris_sha256: 2ba705cff72d87e84c5199a51039f8880a8ab94fdd4693739b7bb3a2202d391c
+  - id: lightning_germany
+    category: lightning
+    title: "File:Flash-Lightning over Germany.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/5/50/Flash-Lightning_over_Germany.ogv"
+    licence: Public domain
+    licence_url: ""
+    author: "Stefan von Halenbach (SvonHalenbach (talk))"
+    content: "Several lightning strikes in a very short time. The recording was made in realtime with a digital video camera. 50 Hz. For better viewabilit"
+    sha1: 7c2ce9c02ad5a98af10f16983107419824288444
+    sha256: 33e932ada5951a2b30411e618202dc78f8d7daabb8bca982409db5bd1fcd2326
+    mp4_sha256: 5e4eb422b7463a6dd13f8b985fbb1a3bfc5cea3a8cf20368f075964c325175ee
+    iris_sha256: a7964914f25827d5ce862929175dab288c4e5c0ac052215e36e69317ace1e46b
+  - id: lightning_rolla
+    category: lightning
+    title: "File:Lightning Storm in Rolla.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Lightning_Storm_in_Rolla.webm"
+    licence: CC BY 3.0
+    licence_url: "https://creativecommons.org/licenses/by/3.0"
+    author: "https://www.youtube.com/user/sterwing"
+    content: "Some sweet cloud-ground lightning came rolling through, so I pulled out a camera. The audio from the camera was crap so I overdubbed with so"
+    sha1: 5669c473a3a83179775553f8a0bc3ea1607b8d13
+    sha256: 6374da71def3a70d2ec930fcc7deda6affe97c31a06f27ac86ac2b8d27232ece
+    mp4_sha256: f27e4a1f279f8cf8dd6005e43cf9b54e730f3e967dc9f4f13ec7cc705f65cd83
+    iris_sha256: c692b7f85d66dc18fcb673ecd909abe00b16264608c896bac8791f33cc18c168
+  - id: lightning_colorado_timelapse
+    category: lightning
+    title: "File:Lightning storm over Colorado, USA.ogg"
+    url: "https://upload.wikimedia.org/wikipedia/commons/6/66/Lightning_storm_over_Colorado%2C_USA.ogg"
+    licence: CC0
+    licence_url: "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+    author: "NathanScientific"
+    content: "Timelapse of a lightning storm over Colorado Springs, USA, as viewed from the other side of Pikes Peak. Approximately 74 strikes a minute ea"
+    sha1: af92cca229240ef5cd776993e609494345f66a10
+    sha256: 6b67ad1c08df58964f196b8423dc7081d5e6a15c32035f26d02b93e78fc155b5
+    mp4_sha256: 70ed773322db6152ef6f34d1c68edaa2c8dc61e050dd215d9f67fc9a0fb8e7aa
+    iris_sha256: 29aeb9a46c1ed42391591c787b3c0b52be69ee3179e91479fb035808e3203345
+  - id: fireworks_rome
+    category: fireworks
+    title: "File:Fireworks in Rome 46.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/5/52/Fireworks_in_Rome_46.webm"
+    licence: CC BY-SA 4.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/4.0"
+    author: "Nicholas Gemini"
+    content: "Fuochi d'artificio a Roma"
+    sha1: f0b89e5ea8c03359e4d07eabb5efb011a973f035
+    sha256: 3562c9007f3240bb670139746b498d239fdef849e199fcffb31ad1312949288a
+    mp4_sha256: 04d78552eb28ed11cffacdba345396a8ef57b04c5ad898a628acc81bef5f7a1a
+    iris_sha256: 5515afb99f83ac669f912c33323b63e3792cb0b9fe5324b5e3775a9ce698f0d5
+  - id: fireworks_nagaoka
+    category: fireworks
+    title: "File:Nagaoka Festival Fireworks 2012 Extra Large Wide Starmine.webm"
+    url: "https://upload.wikimedia.org/wikipedia/commons/0/0c/Nagaoka_Festival_Fireworks_2012_Extra_Large_Wide_Starmine.webm"
+    licence: CC BY 3.0
+    licence_url: "https://creativecommons.org/licenses/by/3.0"
+    author: "113icecream Japanese Fireworks"
+    content: "Extra Large Wide Starmine at the Nagaoka Festival Fireworks 2012, Japan"
+    sha1: 9236d081b84330aead39106c4f7de92504ca33e5
+    sha256: 300bd6034e06b9d0ad84e82b8be0e3ea9bc07442b5795ffb8d8c8c8a69600ee3
+    mp4_sha256: 93efada6bc4f9d825312ab0402e7f9874e9cf169e0d2f1aa44894c4e7f00d422
+    iris_sha256: da99d333d500fdc58366a2716715d44f05ad409a21ce079f3a363b86b6a08bdc
+  - id: xenon_flash_slowmo
+    category: flash
+    title: "File:Xenon Flash Wiki.ogv"
+    url: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Xenon_Flash_Wiki.ogv"
+    licence: CC BY-SA 3.0
+    licence_url: "https://creativecommons.org/licenses/by-sa/3.0"
+    author: "Nathan Boor of Aimed Research"
+    content: "This is a high-speed, slow-motion video of a xenon flashtube.  The Phantom v12.1 camera was recording at 44,025 frames per second with a 20 "
+    sha1: 54259fef1a4836110d37bd26b5d661cbbc27cd46
+    sha256: 8589b0dc25b24527d5f1b905b22e443e40d93abd3614c7f325ede2231d0c9b46
+    mp4_sha256: ee0be4ea73f912af3b7f0003aba31677eb7a82d6a5d819f50cca34e1adbcd4e0
+    iris_sha256: d7cc0a1c084ccc42b739a90c81ccc5a6a5535103e5c07ea86d67bdde0f862703

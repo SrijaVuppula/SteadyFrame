@@ -6,7 +6,7 @@ SEED ?= 1234
 # extra cdk arguments, e.g. CDK_ARGS="-c bedrock_model_id=us.x.y-v1:0 -c alert_email=me@example.com"
 CDK_ARGS ?=
 
-.PHONY: help venv install test lint demo mcp mcp-demo synth real eval freeze report slides judge bench deploy destroy smoke web local clean
+.PHONY: help venv install test lint demo mcp mcp-demo natural synth real eval freeze report slides judge bench deploy destroy smoke web local clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -43,6 +43,9 @@ synth: ## generate the synthetic hazard suite (deterministic, seeded)
 real: ## download the openly licensed external clips listed in data/SOURCES.md (used by eval.external)
 	$(BIN)/python -m synth.fetch_real --out data/real
 
+natural: ## natural footage for eval.natural: fetch the Commons clips in data/natural.yaml, transcode, label with EA IRIS (Docker)
+	$(BIN)/python -m synth.fetch_natural
+
 eval: ## run every evaluation script; writes eval/results/
 	$(BIN)/python -m eval.detection
 	$(BIN)/python -m eval.robustness
@@ -51,6 +54,7 @@ eval: ## run every evaluation script; writes eval/results/
 	$(BIN)/python -m eval.failures
 	$(BIN)/python -m eval.guardrails
 	$(BIN)/python -m eval.external
+	$(BIN)/python -m eval.natural
 
 freeze: ## copy eval/results into eval/results/frozen (the copy the report is rendered from) and re-render the report
 	mkdir -p eval/results/frozen
