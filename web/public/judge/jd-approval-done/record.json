@@ -1,0 +1,132 @@
+{
+ "kind": "steadyframe.verification_record",
+ "record_version": "1.0",
+ "created_at": "2026-10-19T04:05:01Z",
+ "tool": {
+  "name": "steadyframe",
+  "version": "0.1.0",
+  "opencv": {
+   "version": "5.0.0",
+   "kleidicv": null,
+   "parallel_framework": "GCD"
+  }
+ },
+ "standard": {
+  "profile": "wcag",
+  "name": "WCAG 2.2 success criterion 2.3.1 (general flash and red flash thresholds)",
+  "thresholds": {
+   "luminance_delta": 0.1,
+   "dark_state_max": 0.8,
+   "red_saturation_ratio": 0.8,
+   "red_delta": 20.0,
+   "window_s": 1.0,
+   "max_flashes_per_window": 3,
+   "area_fraction": 0.25,
+   "area_mode": "window",
+   "grid_w": 64,
+   "grid_h": 48,
+   "conservative": false
+  }
+ },
+ "input": {
+  "filename": "r_red_strobe_full.mp4",
+  "sha256": "d2528f546c32ae8dcf9218ec2c52ead2253f27c162a2251c2e354a2d2e6f664d",
+  "bytes": 425672,
+  "width": 320,
+  "height": 240,
+  "fps": 30.0,
+  "frames_analyzed": 150,
+  "duration_s": 5.0
+ },
+ "output": {
+  "filename": "safe.mp4",
+  "sha256": "2bff3b809dd2bc90752e114d0323cd8b889470e2e604c5e039fbeff5efd98071",
+  "bytes": 10390
+ },
+ "result": {
+  "status": "passed",
+  "verdict_before": "fail",
+  "verdict_after": "pass",
+  "segments_flagged": 2,
+  "segments_remaining_after": 0
+ },
+ "segments": [
+  {
+   "id": "g000",
+   "type": "general",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "peak_flash_rate_hz": 5.0,
+   "max_area_fraction": 1.0,
+   "max_delta_L": 0.203,
+   "regions": [
+    {
+     "x": 0.0,
+     "y": 0.0,
+     "w": 1.0,
+     "h": 1.0
+    }
+   ],
+   "outcome": "accepted",
+   "strategy": "S1",
+   "params": {
+    "alpha": 0.1
+   },
+   "attempts": 1,
+   "quality": {
+    "ssim_inside": 0.7856160767318666,
+    "ssim_outside": 1.0,
+    "ssim_overall": 0.7856160767318666
+   },
+   "human_decision": null
+  },
+  {
+   "id": "r001",
+   "type": "red",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "peak_flash_rate_hz": 5.0,
+   "max_area_fraction": 1.0,
+   "max_delta_L": 0.9548,
+   "regions": [
+    {
+     "x": 0.0,
+     "y": 0.0,
+     "w": 1.0,
+     "h": 1.0
+    }
+   ],
+   "outcome": "accepted",
+   "strategy": "S3",
+   "params": {
+    "strength": 0.6,
+    "ratio_floor": 0.7
+   },
+   "attempts": 1,
+   "quality": {
+    "ssim_inside": 0.6936981553255126,
+    "ssim_outside": 1.0,
+    "ssim_overall": 0.6936981553255126
+   },
+   "human_decision": {
+    "approved": true,
+    "candidate_id": "r001-c1",
+    "by": "human",
+    "decided_at": "2026-10-19T04:05:00Z"
+   }
+  }
+ ],
+ "decided_by": {
+  "policy": "fixed",
+  "model_turns": null,
+  "fallback": null
+ },
+ "as11_uk_dpp_pse": {
+  "PSEPass": "Yes",
+  "PSEManufacturer": "SteadyFrame (open source)",
+  "PSEVersion": "steadyframe 0.1.0 / wcag profile"
+ },
+ "statement": "This record states what SteadyFrame measured. A pass means no segment of the output exceeds the published thresholds named above as this analyzer implements them (docs/STANDARDS.md); it is not a certification, not a guarantee that the content is safe for every viewer, and not medical advice.",
+ "recheck": "steadyframe verify <output file> --record record.json",
+ "digest": "e11df423a596c50b47195fbbdd0a97e72acbd3e9fd3dc622f02b98b84a85ccfb"
+}

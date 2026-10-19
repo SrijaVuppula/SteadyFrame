@@ -2,8 +2,14 @@ import { useState } from 'react';
 import { api } from '../api';
 import type { DownloadKind, Job } from '../types';
 
-const KINDS: Array<{ kind: DownloadKind; label: string; file: string }> = [
+const KINDS: Array<{ kind: DownloadKind; label: string; file: string; note?: string }> = [
   { kind: 'video', label: 'Remediated video', file: 'safe.mp4' },
+  { kind: 'record', label: 'Verification record', file: 'record.html',
+    note: 'printable: file hashes, thresholds applied, every segment and fix, any human decision' },
+  { kind: 'record_json', label: 'Verification record (JSON)', file: 'record.json',
+    note: 'check it yourself with steadyframe verify safe.mp4 --record record.json' },
+  { kind: 'warnings', label: 'Viewer warning track', file: 'hazards.vtt',
+    note: 'WebVTT cues before and during each hazard, for players showing the original' },
   { kind: 'report', label: 'Remediation report', file: 'report.json' },
   { kind: 'analysis', label: 'Analysis', file: 'analysis.json' },
   { kind: 'trace', label: 'Agent trace', file: 'trace.jsonl' },
@@ -36,12 +42,13 @@ export function Downloads({ job }: { job: Job }) {
   return (
     <div>
       <ul className="download-list">
-        {available.map(({ kind, label, file }) => (
+        {available.map(({ kind, label, file, note }) => (
           <li key={kind}>
             <button type="button" className="btn" disabled={busy !== null} onClick={() => fetchLink(kind)}>
               {busy === kind ? 'Fetching link…' : `Get ${label}`}
             </button>
             <span className="muted"> {file}</span>
+            {note && <span className="muted small"> · {note}</span>}
             {links[kind] && (
               <>
                 {' '}· <a href={links[kind]} target="_blank" rel="noopener noreferrer" download={file}>

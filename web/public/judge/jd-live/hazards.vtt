@@ -1,0 +1,21 @@
+WEBVTT
+
+NOTE
+Flashing-content warnings from SteadyFrame for the ORIGINAL video. Times and positions
+are the analyzer's measurements; see the verification record for the thresholds.
+
+g000-ahead
+00:00:00.000 --> 00:00:01.000
+[Warning: flashing lights ahead, from 0:01.0]
+
+g000
+00:00:01.000 --> 00:00:03.433
+[Warning: flashing lights, 6 flashes a second, top-left of the screen]
+
+g001-ahead
+00:00:03.433 --> 00:00:06.000
+[Warning: flashing lights ahead, from 0:06.0]
+
+g001
+00:00:06.000 --> 00:00:09.200
+[Warning: flashing lights, 10 flashes a second, bottom-right of the screen]

@@ -1,0 +1,297 @@
+{
+ "schema_version": "1.0",
+ "tool": {
+  "name": "steadyframe",
+  "version": "0.1.0",
+  "opencv": {
+   "version": "5.0.0",
+   "file": "/work/__init__.py",
+   "ffmpeg": "YES",
+   "parallel_framework": "GCD",
+   "baseline": "NEON FP16 NEON_DOTPROD NEON_FP16"
+  }
+ },
+ "input": {
+  "path": "/work/input.mp4",
+  "width": 320,
+  "height": 240,
+  "fps": 30.0,
+  "frames_analyzed": 150,
+  "duration_analyzed_s": 5.0
+ },
+ "output": {
+  "path": "/work/safe.mp4"
+ },
+ "policy": "agent[bedrock]",
+ "status": "passed",
+ "error": null,
+ "before": {
+  "verdict": "fail",
+  "segments": [
+   {
+    "id": "g000",
+    "type": "general",
+    "verdict": "fail",
+    "start_frame": 15,
+    "end_frame": 143,
+    "start_s": 0.5,
+    "end_s": 4.8,
+    "detected_s": 1.1,
+    "peak_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.203,
+    "regions": [
+     {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+     }
+    ],
+    "severity_score": 0.524,
+    "episode_start_s": 0.5,
+    "episode_end_s": 4.9
+   },
+   {
+    "id": "r001",
+    "type": "red",
+    "verdict": "fail",
+    "start_frame": 15,
+    "end_frame": 143,
+    "start_s": 0.5,
+    "end_s": 4.8,
+    "detected_s": 1.1,
+    "peak_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.9548,
+    "regions": [
+     {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+     }
+    ],
+    "severity_score": 0.643,
+    "episode_start_s": 0.5,
+    "episode_end_s": 4.9
+   }
+  ],
+  "per_second": [
+   {
+    "second": 0,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 2.5,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 1,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 2,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 3,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 4,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   }
+  ]
+ },
+ "after": {
+  "verdict": "pass",
+  "segments": [],
+  "per_second": [
+   {
+    "second": 0,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 0.0,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 1,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 0.5,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 2,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 0.5,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 3,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 0.0,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 4,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 0.5,
+    "max_area_fraction": 0.0
+   }
+  ]
+ },
+ "segments": [
+  {
+   "segment_id": "g000",
+   "type": "general",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "outcome": "accepted",
+   "strategy": "S4",
+   "params": {
+    "base": "S1",
+    "alpha": 0.04
+   },
+   "attempts": [
+    {
+     "candidate_id": "g000-c1",
+     "strategy": "S4",
+     "params": {
+      "base": "S1",
+      "alpha": 0.04
+     },
+     "verified": {
+      "passes_for_type": true,
+      "verdict": "pass",
+      "ssim_overall": 0.7733995734259139,
+      "requires_approval": false
+     }
+    }
+   ],
+   "approval": null,
+   "quality": {
+    "ssim_overall": 0.7733995734259139,
+    "ssim_inside": 0.7733995734259139,
+    "ssim_outside": 1.0,
+    "psnr_outside_db": null,
+    "psnr_outside_is_lossless": true,
+    "mean_abs_dL_inside": 0.10132712661469168,
+    "temporal_step_before": 0.06194028055324452,
+    "temporal_step_after": 0.0007604614945648791,
+    "temporal_smoothness_gain": 81.45090973828401,
+    "frames": 129
+   }
+  },
+  {
+   "segment_id": "r001",
+   "type": "red",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "outcome": "accepted",
+   "strategy": "S4",
+   "params": {
+    "base": "S1",
+    "alpha": 0.04
+   },
+   "attempts": [
+    {
+     "candidate_id": "r001-c1",
+     "strategy": "S4",
+     "params": {
+      "base": "S1",
+      "alpha": 0.061
+     },
+     "verified": {
+      "passes_for_type": false,
+      "verdict": "fail",
+      "ssim_overall": 0.7802340198856915,
+      "requires_approval": false
+     }
+    },
+    {
+     "candidate_id": "r001-c2",
+     "strategy": "S4",
+     "params": {
+      "base": "S1",
+      "alpha": 0.04
+     },
+     "verified": {
+      "passes_for_type": true,
+      "verdict": "pass",
+      "ssim_overall": 0.7769511942715608,
+      "requires_approval": false
+     }
+    }
+   ],
+   "approval": null,
+   "quality": {
+    "ssim_overall": 0.7769511942715608,
+    "ssim_inside": 0.7769511942715608,
+    "ssim_outside": 1.0,
+    "psnr_outside_db": null,
+    "psnr_outside_is_lossless": true,
+    "mean_abs_dL_inside": 0.09807952291281648,
+    "temporal_step_before": 0.06194028055324452,
+    "temporal_step_after": 0.004015427371086844,
+    "temporal_smoothness_gain": 15.425576116566473,
+    "frames": 129
+   }
+  }
+ ],
+ "quality": {
+  "ssim_overall": 0.7751753838487374,
+  "ssim_inside": 0.7751753838487374,
+  "ssim_outside": 1.0,
+  "mean_abs_dL_inside": 0.09970332476375407
+ },
+ "trace_path": "/work/trace.jsonl",
+ "iterations": 3,
+ "runtime_s": 36.403,
+ "job_id": "ba9551533eb2",
+ "llm": {
+  "provider": "bedrock",
+  "turns": 12,
+  "input_tokens": 83202,
+  "output_tokens": 1221,
+  "latency_s": 32.995,
+  "errors": []
+ },
+ "pending_approvals": [],
+ "workdir": "/work/job"
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification record safe.mp4</title>
+<style>
+:root{--fg:#1d1d1f;--muted:#555;--line:#d0d0d0;--ok:#1f6f3a;--bad:#a61b1b;--bg:#fff;--panel:#f5f5f5}
+body{font:14px/1.5 system-ui,sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:var(--fg);background:var(--bg)}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:24px 0 6px}
+table{border-collapse:collapse;width:100%;margin:6px 0} th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+th{background:var(--panel);font-weight:600} code{font-size:12px;word-break:break-all}
+.badge{display:inline-block;padding:6px 10px;border-radius:4px;font-weight:700;color:#fff;background:var(--ok)}
+.muted{color:var(--muted)} .note{border:1px solid var(--line);background:var(--panel);padding:8px 12px;margin-top:20px}
+@media print{body{margin:0} .badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<h1>Flash-threshold verification record</h1>
+<p class="muted">WCAG 2.2 success criterion 2.3.1 (general flash and red flash thresholds) · recorded 2026-10-19T04:03:03Z ·
+steadyframe 0.1.0 on OpenCV 5.0.0</p>
+<p><span class="badge">Output meets the thresholds as measured</span></p>
+<p>Before: <b>fail</b>, 2 segment(s) flagged.
+After: <b>pass</b>, 0 segment(s) remaining. Decided by: agent[bedrock], 10 model turns.</p>
+<h2>Files</h2>
+<table><tbody><tr><th>Input</th><td>m_two_segments.mp4 (52158 bytes)</td><td><code>ebb68746953f80b61a519a0e49b13f7b59c9b29da711711e38921ad440187f5a</code></td></tr><tr><th>Output</th><td>safe.mp4 (73417 bytes)</td><td><code>9a538c70b9c889dd43567aa3b77eac625e2ff52c95681b7e59ed3d199e241b5d</code></td></tr></tbody></table>
+<p class="muted">Input: 320x240 at 30.0 fps, 300 frames.</p>
+<h2>Segments flagged in the input</h2>
+<table><thead><tr><th>id</th><th>type</th><th>time</th><th>flashes/s</th><th>area</th><th>max ΔL</th><th>where</th><th>outcome</th><th>fix</th><th>attempts</th><th>SSIM inside</th><th>human decision</th></tr></thead>
+<tbody><tr><td>g000</td><td>general</td><td>1.00–3.43 s</td><td>6.0</td><td>1.00</td><td>0.50</td><td>top-left of the screen</td><td>accepted</td><td>S1 {&quot;alpha&quot;: 0.135}</td><td>1</td><td>0.858</td><td>–</td></tr><tr><td>g001</td><td>general</td><td>6.00–9.20 s</td><td>10.0</td><td>1.00</td><td>0.44</td><td>bottom-right of the screen</td><td>accepted</td><td>S1 {&quot;alpha&quot;: 0.24}</td><td>1</td><td>0.928</td><td>–</td></tr></tbody></table>
+<h2>Thresholds applied</h2>
+<table><tbody><tr><th>luminance_delta</th><td>0.1</td></tr><tr><th>dark_state_max</th><td>0.8</td></tr><tr><th>red_saturation_ratio</th><td>0.8</td></tr><tr><th>red_delta</th><td>20.0</td></tr><tr><th>window_s</th><td>1.0</td></tr><tr><th>max_flashes_per_window</th><td>3</td></tr><tr><th>area_fraction</th><td>0.25</td></tr><tr><th>area_mode</th><td>window</td></tr><tr><th>grid_w</th><td>64</td></tr><tr><th>grid_h</th><td>48</td></tr><tr><th>conservative</th><td>False</td></tr></tbody></table>
+<h2>Delivery metadata</h2>
+<p>In the shape of the AS-11 UK DPP PSE fields (the broadcaster decides which test tools it
+accepts): <b>PSEPass</b> Yes · <b>PSEManufacturer</b> SteadyFrame (open source) · <b>PSEVersion</b> steadyframe 0.1.0 / wcag profile</p>
+<h2>Check this record yourself</h2>
+<p><code>steadyframe verify &lt;output file&gt; --record record.json</code> re-hashes the file and re-runs the analyzer; it
+exits 0 only if the file is the one recorded here and the verdict is unchanged.</p>
+<p class="muted">Record digest (SHA-256 of the record without this field): <code>e9d74e7d175bd118c6cbf6f853baa832c0c07e3b576742a9f8b33529c54a0477</code></p>
+<div class="note">This record states what SteadyFrame measured. A pass means no segment of the output exceeds the published thresholds named above as this analyzer implements them (docs/STANDARDS.md); it is not a certification, not a guarantee that the content is safe for every viewer, and not medical advice.</div>
+</body></html>

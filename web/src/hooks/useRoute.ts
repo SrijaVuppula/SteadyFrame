@@ -1,11 +1,16 @@
-// Tiny history-based router: two routes, no dependency.
+// Tiny history-based router: three routes, no dependency.
 import { useCallback, useEffect, useState } from 'react';
 
-export type Route = { name: 'home' } | { name: 'job'; jobId: string } | { name: 'notfound'; path: string };
+export type Route =
+  | { name: 'home' }
+  | { name: 'judge' }
+  | { name: 'job'; jobId: string }
+  | { name: 'notfound'; path: string };
 
 export function parseRoute(pathname: string): Route {
   const clean = pathname.replace(/\/+$/, '') || '/';
   if (clean === '/') return { name: 'home' };
+  if (clean === '/judge') return { name: 'judge' };
   const m = clean.match(/^\/jobs\/([^/]+)$/);
   if (m) return { name: 'job', jobId: decodeURIComponent(m[1]) };
   return { name: 'notfound', path: clean };

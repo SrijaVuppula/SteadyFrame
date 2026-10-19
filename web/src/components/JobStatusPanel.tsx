@@ -68,7 +68,7 @@ export function JobStatusPanel({ job, pollError }: { job: Job; pollError: string
         </dd></div>
         <div><dt>Profile</dt><dd>{job.profile}{job.conservative ? ' (conservative)' : ''}</dd></div>
         <div><dt>Policy</dt><dd>{job.policy}</dd></div>
-        <div><dt>Engine</dt><dd>steadyframe {job.tool?.version} · OpenCV {job.tool?.opencv}</dd></div>
+        <div><dt>Engine</dt><dd>steadyframe {job.tool?.version} · OpenCV {job.tool?.opencv}{job.tool?.engine === 'cool' ? ' (COOL build on Graviton4)' : ''}</dd></div>
       </dl>
     </section>
   );

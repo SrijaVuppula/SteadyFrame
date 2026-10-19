@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
 import { ACCEPTED_EXTENSIONS, MAX_DURATION_S, MAX_UPLOAD_BYTES, MOCK_MODE, WHAT_IT_DOES } from '../config';
 import { fmtBytes } from '../format';
+import { href } from '../hooks/useRoute';
 import type { Policy, Profile, Sample } from '../types';
 import { rememberUpload } from '../uploadStore';
 
@@ -142,6 +143,13 @@ export function HomePage({ navigate }: Props) {
           logged in a trace you can read on the job page.
         </p>
         <p className="muted">Limits: 100 MB, 120 s, containers {ACCEPTED_EXTENSIONS.join(', ')}. Uploads are deleted after one day.</p>
+        <p className="judge-callout">
+          Judging, or short on time?{' '}
+          <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>
+            Take the 90-second tour
+          </a>{' '}
+          with recorded jobs: no upload, no waiting for a worker.
+        </p>
       </section>
 
       <div className="two-col">

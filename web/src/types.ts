@@ -28,7 +28,9 @@ export const TERMINAL_STATUSES: ReadonlySet<JobStatus> = new Set<JobStatus>([
   'error',
 ]);
 
-export type DownloadKind = 'video' | 'report' | 'analysis' | 'trace' | 'plot' | 'summary';
+export type DownloadKind =
+  | 'video' | 'report' | 'analysis' | 'trace' | 'plot' | 'summary'
+  | 'record' | 'record_json' | 'warnings';
 
 export interface Region {
   x: number;
@@ -182,6 +184,8 @@ export interface JobProgress {
 export interface ToolInfo {
   version: string;
   opencv: string;
+  /** which OpenCV build the worker ran: 'stock' wheel or 'cool' (Graviton4 COOL image) */
+  engine?: string;
 }
 
 export interface Job {
@@ -198,7 +202,7 @@ export interface Job {
   after: AnalysisSummary | null;
   remediation: Remediation | null;
   pending_approvals: PendingApproval[];
-  downloads: Record<DownloadKind, boolean>;
+  downloads: Partial<Record<DownloadKind | 'input', boolean>>;
   error: string | null;
   tool: ToolInfo;
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Accessibility check: build, serve dist/ locally, run @axe-core/cli against the start page and
-// two job pages rendered from fixtures (?fixture=1), write a11y-report.json, exit 1 on any
+// Accessibility check: build, serve dist/ locally, run @axe-core/cli against the start page,
+// two job pages rendered from fixtures (?fixture=1), the judge tour and a recorded job page,
+// write a11y-report.json, exit 1 on any
 // violation of impact serious or critical.
 //
 // Browser: CHROME_PATH, else the Playwright chromium under PLAYWRIGHT_BROWSERS_PATH
@@ -19,7 +20,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
 const args = new Set(process.argv.slice(2));
 const PORT = Number(process.env.A11Y_PORT || 4173);
-const PAGES = ['/?fixture=1', '/jobs/fx-passed?fixture=1', '/jobs/fx-approval?fixture=1'];
+const PAGES = ['/?fixture=1', '/jobs/fx-passed?fixture=1', '/jobs/fx-approval?fixture=1', '/judge', '/jobs/jd-adapt'];
 const FAIL_IMPACTS = new Set(['serious', 'critical']);
 
 const MIME = {

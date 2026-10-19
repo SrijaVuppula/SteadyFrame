@@ -18,7 +18,7 @@ export function RemediationSummary({ job }: { job: Job }) {
           {fmtNum(r.quality?.ssim_overall)} / {fmtNum(r.quality?.ssim_outside)} / {fmtNum(r.quality?.ssim_inside)}
         </dd></div>
         <div><dt>Mean |ΔL| inside regions</dt><dd>{fmtNum(r.quality?.mean_abs_dL_inside)}</dd></div>
-        <div><dt>Engine</dt><dd>steadyframe {job.tool.version} · OpenCV {job.tool.opencv}</dd></div>
+        <div><dt>Engine</dt><dd>steadyframe {job.tool.version} · OpenCV {job.tool.opencv}{job.tool.engine === 'cool' ? ' (COOL build on Graviton4)' : ''}</dd></div>
       </dl>
       <div className="table-wrap" tabIndex={0} role="region" aria-label="Per-segment remediation table, scrollable">
         <table className="data">

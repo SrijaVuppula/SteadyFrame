@@ -24,10 +24,13 @@ export function Layout({ children, navigate }: { children: ReactNode; navigate: 
             <span className="brand-mark" aria-hidden="true">▤</span> SteadyFrame
           </a>
           <p className="tagline">{`Analyzer and remediator that ${WHAT_IT_DOES}.`}</p>
+          <a className="judge-nav" href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>
+            For judges: the 90-second tour
+          </a>
         </div>
       </header>
       <main id="main" className="wrap" tabIndex={-1}>
-        {MOCK_MODE && (
+        {MOCK_MODE && !/^\/(judge|jobs\/jd-)/.test(window.location.pathname) && (
           <p className="notice" role="note">
             Fixture mode: this page is served from bundled sample outputs, not a live API. Jobs
             started here are simulated.

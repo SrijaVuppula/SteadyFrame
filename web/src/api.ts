@@ -1,5 +1,6 @@
 // Typed client for docs/API.md. One interface, two implementations: HTTP and fixtures.
 import { API_BASE, MOCK_MODE } from './config';
+import { isJudgeJob } from './judge';
 import { createMockClient } from './mock';
 import type {
   ApproveRequest,
@@ -119,4 +120,22 @@ export function createHttpClient(base: string): ApiClient {
   };
 }
 
-export const api: ApiClient = MOCK_MODE ? createMockClient() : createHttpClient(API_BASE);
+/** Live client that serves the recorded judge jobs (ids jd-*) from the bundle, so their pages
+ * work on the deployed site without a worker. Every other id goes to the API. */
+export function withRecordings(live: ApiClient, recorded: ApiClient): ApiClient {
+  const pick = (id: string) => (isJudgeJob(id) ? recorded : live);
+  return {
+    ...live,
+    getJob: (id) => pick(id).getJob(id),
+    getSegments: (id) => pick(id).getSegments(id),
+    getTrace: (id, after) => pick(id).getTrace(id, after),
+    approve: (id, body) => pick(id).approve(id, body),
+    downloadUrl: (id, kind) => pick(id).downloadUrl(id, kind),
+    frameUrl: (id, segmentId) => pick(id).frameUrl(id, segmentId),
+    originalUrl: (id) => pick(id).originalUrl(id),
+  };
+}
+
+export const api: ApiClient = MOCK_MODE
+  ? createMockClient()
+  : withRecordings(createHttpClient(API_BASE), createMockClient());

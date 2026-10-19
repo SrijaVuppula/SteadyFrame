@@ -2,12 +2,14 @@ import { useRoute } from './hooks/useRoute';
 import { Layout } from './components/Layout';
 import { HomePage } from './pages/HomePage';
 import { JobPage } from './pages/JobPage';
+import { JudgePage } from './pages/JudgePage';
 
 export default function App() {
   const [route, navigate] = useRoute();
   return (
     <Layout navigate={navigate}>
       {route.name === 'home' && <HomePage navigate={navigate} />}
+      {route.name === 'judge' && <JudgePage navigate={navigate} />}
       {route.name === 'job' && <JobPage jobId={route.jobId} navigate={navigate} />}
       {route.name === 'notfound' && (
         <section className="card">

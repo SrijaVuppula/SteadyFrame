@@ -12,6 +12,7 @@ import { SegmentInspector } from '../components/SegmentInspector';
 import { TraceViewer } from '../components/TraceViewer';
 import { useJob, useSegments, useTrace } from '../hooks/useJob';
 import { href } from '../hooks/useRoute';
+import { isJudgeJob } from '../judge';
 
 interface Props {
   jobId: string;
@@ -66,6 +67,13 @@ export function JobPage({ jobId, navigate }: Props) {
         <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Start</a> › Job {job.job_id}
       </nav>
       <h1>Job {job.job_id}</h1>
+      {isJudgeJob(jobId) && (
+        <p className="notice" role="note">
+          Recorded job: the worker's own code ran this clip (<code>python -m eval.judge_bundle</code>) and its
+          real outputs are bundled with the site, so the page loads without a worker. A decision made here
+          plays back the recorded resume. <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>Back to the judge tour</a>.
+        </p>
+      )}
 
       <JobStatusPanel job={job} pollError={error} />
 

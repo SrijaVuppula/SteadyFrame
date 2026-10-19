@@ -1,0 +1,285 @@
+{
+ "schema_version": "1.0",
+ "tool": {
+  "name": "steadyframe",
+  "version": "0.1.0",
+  "opencv": {
+   "version": "5.0.0",
+   "file": "/work/__init__.py",
+   "ffmpeg": "YES",
+   "parallel_framework": "GCD",
+   "baseline": "NEON FP16 NEON_DOTPROD NEON_FP16"
+  }
+ },
+ "input": {
+  "path": "/work/input.mp4",
+  "width": 320,
+  "height": 240,
+  "fps": 30.0,
+  "frames_analyzed": 150,
+  "duration_analyzed_s": 5.0
+ },
+ "output": {
+  "path": null
+ },
+ "policy": "fixed",
+ "status": "needs_approval",
+ "error": null,
+ "before": {
+  "verdict": "fail",
+  "segments": [
+   {
+    "id": "g000",
+    "type": "general",
+    "verdict": "fail",
+    "start_frame": 15,
+    "end_frame": 143,
+    "start_s": 0.5,
+    "end_s": 4.8,
+    "detected_s": 1.1,
+    "peak_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.203,
+    "regions": [
+     {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+     }
+    ],
+    "severity_score": 0.524,
+    "episode_start_s": 0.5,
+    "episode_end_s": 4.9
+   },
+   {
+    "id": "r001",
+    "type": "red",
+    "verdict": "fail",
+    "start_frame": 15,
+    "end_frame": 143,
+    "start_s": 0.5,
+    "end_s": 4.8,
+    "detected_s": 1.1,
+    "peak_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0,
+    "max_delta_L": 0.9548,
+    "regions": [
+     {
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0
+     }
+    ],
+    "severity_score": 0.643,
+    "episode_start_s": 0.5,
+    "episode_end_s": 4.9
+   }
+  ],
+  "per_second": [
+   {
+    "second": 0,
+    "general": "pass",
+    "red": "pass",
+    "pattern": "pass",
+    "verdict": "pass",
+    "max_flash_rate_hz": 2.5,
+    "max_area_fraction": 0.0
+   },
+   {
+    "second": 1,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 2,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 3,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   },
+   {
+    "second": 4,
+    "general": "fail",
+    "red": "fail",
+    "pattern": "pass",
+    "verdict": "fail",
+    "max_flash_rate_hz": 5.0,
+    "max_area_fraction": 1.0
+   }
+  ]
+ },
+ "after": null,
+ "segments": [
+  {
+   "segment_id": "g000",
+   "type": "general",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "outcome": "accepted",
+   "strategy": "S1",
+   "params": {
+    "alpha": 0.1
+   },
+   "attempts": [
+    {
+     "candidate_id": "g000-c1",
+     "strategy": "S1",
+     "params": {
+      "alpha": 0.1
+     },
+     "verified": {
+      "passes_for_type": true,
+      "verdict": "fail",
+      "ssim_overall": 0.7856160767318666,
+      "requires_approval": false
+     }
+    }
+   ],
+   "approval": null,
+   "quality": {
+    "ssim_overall": 0.7856160767318666,
+    "ssim_inside": 0.7856160767318666,
+    "ssim_outside": 1.0,
+    "psnr_outside_db": null,
+    "psnr_outside_is_lossless": true,
+    "mean_abs_dL_inside": 0.09262914762131927,
+    "temporal_step_before": 0.06194028055324452,
+    "temporal_step_after": 0.010324582930479664,
+    "temporal_smoothness_gain": 5.999300985843006,
+    "frames": 129
+   }
+  },
+  {
+   "segment_id": "r001",
+   "type": "red",
+   "start_s": 0.5,
+   "end_s": 4.8,
+   "outcome": "needs_approval",
+   "strategy": null,
+   "params": null,
+   "attempts": [
+    {
+     "candidate_id": "r001-c1",
+     "strategy": "S3",
+     "params": {
+      "strength": 0.6,
+      "ratio_floor": 0.7
+     },
+     "verified": {
+      "passes_for_type": true,
+      "verdict": "pass",
+      "ssim_overall": 0.6936981553255126,
+      "requires_approval": true
+     }
+    },
+    {
+     "candidate_id": "r001-c2",
+     "strategy": "S4",
+     "params": {
+      "base": "S3",
+      "strength": 0.6,
+      "ratio_floor": 0.7
+     },
+     "verified": {
+      "passes_for_type": true,
+      "verdict": "pass",
+      "ssim_overall": 0.6936981553255126,
+      "requires_approval": true
+     }
+    }
+   ],
+   "approval": {
+    "segment_id": "r001",
+    "reason": "S4: ssim 0.694 below 0.75",
+    "options": [
+     {
+      "candidate_id": "r001-c2",
+      "strategy": "S4",
+      "params": {
+       "base": "S3",
+       "strength": 0.6,
+       "ratio_floor": 0.7
+      },
+      "quality": {
+       "ssim_overall": 0.6936981553255126,
+       "ssim_inside": 0.6936981553255126,
+       "ssim_outside": 1.0,
+       "psnr_outside_db": null,
+       "psnr_outside_is_lossless": true,
+       "mean_abs_dL_inside": 0.09246610416922459,
+       "temporal_step_before": 0.06194028055324452,
+       "temporal_step_after": 0.010378062026575208,
+       "temporal_smoothness_gain": 5.968386043042855,
+       "frames": 129
+      }
+     }
+    ],
+    "last_resort": false,
+    "requested_at": 1792382702.624725,
+    "decision": null
+   },
+   "quality": null
+  }
+ ],
+ "quality": {
+  "ssim_overall": 0.7856160767318666,
+  "ssim_inside": 0.7856160767318666,
+  "ssim_outside": 1.0,
+  "mean_abs_dL_inside": 0.09262914762131927
+ },
+ "trace_path": "/work/trace.jsonl",
+ "iterations": 3,
+ "runtime_s": 1.081,
+ "job_id": "0ac747d65719",
+ "llm": null,
+ "pending_approvals": [
+  {
+   "segment_id": "r001",
+   "reason": "S4: ssim 0.694 below 0.75",
+   "options": [
+    {
+     "candidate_id": "r001-c2",
+     "strategy": "S4",
+     "params": {
+      "base": "S3",
+      "strength": 0.6,
+      "ratio_floor": 0.7
+     },
+     "quality": {
+      "ssim_overall": 0.6936981553255126,
+      "ssim_inside": 0.6936981553255126,
+      "ssim_outside": 1.0,
+      "psnr_outside_db": null,
+      "psnr_outside_is_lossless": true,
+      "mean_abs_dL_inside": 0.09246610416922459,
+      "temporal_step_before": 0.06194028055324452,
+      "temporal_step_after": 0.010378062026575208,
+      "temporal_smoothness_gain": 5.968386043042855,
+      "frames": 129
+     }
+    }
+   ],
+   "last_resort": false,
+   "requested_at": 1792382702.624725,
+   "decision": null
+  }
+ ],
+ "workdir": "/work/job"
+}

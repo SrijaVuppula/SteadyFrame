@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification record r_red_strobe_full.mp4</title>
+<style>
+:root{--fg:#1d1d1f;--muted:#555;--line:#d0d0d0;--ok:#1f6f3a;--bad:#a61b1b;--bg:#fff;--panel:#f5f5f5}
+body{font:14px/1.5 system-ui,sans-serif;max-width:980px;margin:24px auto;padding:0 16px;color:var(--fg);background:var(--bg)}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:24px 0 6px}
+table{border-collapse:collapse;width:100%;margin:6px 0} th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+th{background:var(--panel);font-weight:600} code{font-size:12px;word-break:break-all}
+.badge{display:inline-block;padding:6px 10px;border-radius:4px;font-weight:700;color:#fff;background:var(--bad)}
+.muted{color:var(--muted)} .note{border:1px solid var(--line);background:var(--panel);padding:8px 12px;margin-top:20px}
+@media print{body{margin:0} .badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<h1>Flash-threshold verification record</h1>
+<p class="muted">WCAG 2.2 success criterion 2.3.1 (general flash and red flash thresholds) · recorded 2026-10-19T04:05:02Z ·
+steadyframe 0.1.0 on OpenCV 5.0.0</p>
+<p><span class="badge">No output yet: waiting for a human decision</span></p>
+<p>Before: <b>fail</b>, 2 segment(s) flagged.
+After: <b>None</b>. Decided by: fixed.</p>
+<h2>Files</h2>
+<table><tbody><tr><th>Input</th><td>r_red_strobe_full.mp4 (425672 bytes)</td><td><code>d2528f546c32ae8dcf9218ec2c52ead2253f27c162a2251c2e354a2d2e6f664d</code></td></tr><tr><th>Output</th><td colspan='2'>none</td></tr></tbody></table>
+<p class="muted">Input: 320x240 at 30.0 fps, 150 frames.</p>
+<h2>Segments flagged in the input</h2>
+<table><thead><tr><th>id</th><th>type</th><th>time</th><th>flashes/s</th><th>area</th><th>max ΔL</th><th>where</th><th>outcome</th><th>fix</th><th>attempts</th><th>SSIM inside</th><th>human decision</th></tr></thead>
+<tbody><tr><td>g000</td><td>general</td><td>0.50–4.80 s</td><td>5.0</td><td>1.00</td><td>0.20</td><td>most of the screen</td><td>accepted</td><td>S1 {&quot;alpha&quot;: 0.1}</td><td>1</td><td>0.786</td><td>–</td></tr><tr><td>r001</td><td>red</td><td>0.50–4.80 s</td><td>5.0</td><td>1.00</td><td>0.95</td><td>most of the screen</td><td>needs_approval</td><td>– {}</td><td>2</td><td></td><td>–</td></tr></tbody></table>
+<h2>Thresholds applied</h2>
+<table><tbody><tr><th>luminance_delta</th><td>0.1</td></tr><tr><th>dark_state_max</th><td>0.8</td></tr><tr><th>red_saturation_ratio</th><td>0.8</td></tr><tr><th>red_delta</th><td>20.0</td></tr><tr><th>window_s</th><td>1.0</td></tr><tr><th>max_flashes_per_window</th><td>3</td></tr><tr><th>area_fraction</th><td>0.25</td></tr><tr><th>area_mode</th><td>window</td></tr><tr><th>grid_w</th><td>64</td></tr><tr><th>grid_h</th><td>48</td></tr><tr><th>conservative</th><td>False</td></tr></tbody></table>
+<h2>Delivery metadata</h2>
+<p>In the shape of the AS-11 UK DPP PSE fields (the broadcaster decides which test tools it
+accepts): <b>PSEPass</b> Not tested · <b>PSEManufacturer</b> SteadyFrame (open source) · <b>PSEVersion</b> steadyframe 0.1.0 / wcag profile</p>
+<h2>Check this record yourself</h2>
+<p><code>steadyframe verify &lt;output file&gt; --record record.json</code> re-hashes the file and re-runs the analyzer; it
+exits 0 only if the file is the one recorded here and the verdict is unchanged.</p>
+<p class="muted">Record digest (SHA-256 of the record without this field): <code>e894ec7d35f3d9b8b3214f975247428727a3ae1a1285d8877c71d79ae34ad74c</code></p>
+<div class="note">This record states what SteadyFrame measured. A pass means no segment of the output exceeds the published thresholds named above as this analyzer implements them (docs/STANDARDS.md); it is not a certification, not a guarantee that the content is safe for every viewer, and not medical advice.</div>
+</body></html>

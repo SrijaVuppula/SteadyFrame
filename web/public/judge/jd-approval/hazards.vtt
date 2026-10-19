@@ -1,0 +1,13 @@
+WEBVTT
+
+NOTE
+Flashing-content warnings from SteadyFrame for the ORIGINAL video. Times and positions
+are the analyzer's measurements; see the verification record for the thresholds.
+
+g000
+00:00:00.500 --> 00:00:04.800
+[Warning: flashing lights, 5 flashes a second, most of the screen]
+
+r001
+00:00:00.500 --> 00:00:04.800
+[Warning: red flashing lights, 5 flashes a second, most of the screen]

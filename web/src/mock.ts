@@ -4,6 +4,7 @@
 import type { ApiClient } from './api';
 import { ApiError } from './api';
 import type { Job, JobStatus, Sample, SegmentsResponse, TraceRecord, TraceResponse } from './types';
+import { BUNDLED_FILE, isJudgeJob, judgeFile, loadJudgeJob } from './judge';
 import samplesJson from './fixtures/samples.json';
 import jobPassed from './fixtures/job_passed.json';
 import segmentsPassed from './fixtures/segments_passed.json';
@@ -29,6 +30,7 @@ const FIXTURES: Record<string, Fixture> = {
 };
 
 const SAMPLE_TO_FIXTURE: Record<string, string> = {
+  sample_strobe_region: 'fx-passed',
   sample_two_segments: 'fx-passed',
   sample_two_segments_agent: 'fx-approval',
   sample_red_strobe_region: 'fx-red',
@@ -60,6 +62,25 @@ const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 export function createMockClient(): ApiClient {
   const sims = new Map<string, SimJob>();
   let counter = 0;
+  // recorded judge jobs (public/judge/<id>/): a decision on a paused one switches to the
+  // recording of the same job after that decision, after a short simulated resume
+  const decided = new Map<string, { id: string; at: number }>();
+
+  async function judgeState(id: string) {
+    const d = decided.get(id);
+    if (d) {
+      const resumed = (Date.now() - d.at) / 1000 >= 3;
+      const rec = await loadJudgeJob(resumed ? d.id : id);
+      const job = clone(rec.job);
+      job.job_id = id;
+      if (!resumed) {
+        return { ...rec, job: { ...job, status: 'queued' as JobStatus, pending_approvals: [],
+          progress: { stage: 'queued', detail: 'decision received; resuming from work.tar', fraction: 0.85 } } };
+      }
+      return { ...rec, job };
+    }
+    return loadJudgeJob(id);
+  }
 
   function simState(id: string, sim: SimJob): Job {
     const fx = FIXTURES[sim.target];
@@ -169,13 +190,22 @@ export function createMockClient(): ApiClient {
         profile: req.profile, policy: req.policy, conservative: !!req.conservative });
       return { job_id: id, status: 'queued' };
     },
-    getJob: async (id) => { await sleep(80); return resolveJob(id); },
+    getJob: async (id) => {
+      if (isJudgeJob(id)) return clone((await judgeState(id)).job);
+      await sleep(80);
+      return resolveJob(id);
+    },
     getSegments: async (id) => {
+      if (isJudgeJob(id)) return clone((await judgeState(id)).segments);
       const job = resolveJob(id);
       if (!job.before) return { segments: [] };
       return clone(fixtureFor(id).segments);
     },
     getTrace: async (id, after = 0) => {
+      if (isJudgeJob(id)) {
+        const rec = await judgeState(id);
+        return { records: clone(rec.trace.records.filter((r) => r.seq > after)), complete: true };
+      }
       const job = resolveJob(id);
       const all = fixtureFor(id).trace.records as TraceRecord[];
       const sim = sims.get(id);
@@ -194,6 +224,13 @@ export function createMockClient(): ApiClient {
       return { records: clone(visible.filter((r) => r.seq > after)), complete };
     },
     approve: async (id, body) => {
+      if (isJudgeJob(id)) {
+        if (decided.has(id)) {
+          throw new ApiError(409, 'This recording covers the first decision only. Run a job on the live worker to go further.');
+        }
+        decided.set(id, { id: `${id}-${body.approved ? 'done' : 'rejected'}`, at: Date.now() });
+        return { job_id: id, status: 'queued' };
+      }
       const sim = sims.get(id);
       if (!sim) {
         // a bare fixture id: make it behave like a started simulation so the decision shows
@@ -205,8 +242,18 @@ export function createMockClient(): ApiClient {
       s.decidedAt = Date.now();
       return { job_id: id, status: 'queued' };
     },
-    downloadUrl: async (id, kind) => ({ url: blobUrl(kind, id), kind }),
-    frameUrl: (_id, segmentId) => `/fixtures/${encodeURIComponent(segmentId)}.png`,
+    downloadUrl: async (id, kind) => {
+      if (isJudgeJob(id)) {
+        const d = decided.get(id);
+        const src = d && (Date.now() - d.at) / 1000 >= 3 ? d.id : id;
+        return { url: judgeFile(src, BUNDLED_FILE[kind] ?? `${kind}.json`), kind };
+      }
+      return { url: blobUrl(kind, id), kind };
+    },
+    frameUrl: (id, segmentId) =>
+      isJudgeJob(id)
+        ? judgeFile(id, `stills/${encodeURIComponent(segmentId)}.png`)
+        : `/fixtures/${encodeURIComponent(segmentId)}.png`,
     originalUrl: async () => null,
   };
 }

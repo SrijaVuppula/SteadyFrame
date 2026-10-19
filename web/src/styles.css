@@ -348,3 +348,27 @@ table.data thead th { background: var(--surface-2); }
 .sample-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .sample { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
 .sample p { margin: 2px 0; }
+
+/* judge tour (/judge) */
+.judge-nav { margin-left: auto; font-weight: 600; font-size: 0.95rem; }
+.judge-callout { margin-top: 8px; padding: 8px 12px; border: 1px solid var(--accent); border-radius: 6px; background: var(--surface-2); }
+.judge .lede { font-size: 1.08rem; max-width: 62rem; }
+.judge .claim { font-size: 1.05rem; padding: 8px 12px; border-left: 4px solid var(--accent); background: var(--surface-2); border-radius: 0 6px 6px 0; }
+.judge-links { font-weight: 600; }
+.step { display: inline-flex; align-items: center; justify-content: center; width: 1.6rem; height: 1.6rem; margin-right: 8px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 0.95rem; }
+.judge-stills { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.judge-stills img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; }
+.judge-stills figure { margin: 0; max-width: 320px; }
+.judge-chains h3 { margin-top: 4px; }
+.chain { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
+.chain li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.93rem; }
+.chain-who { font-weight: 700; color: var(--text-2); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.chain-text { overflow-wrap: anywhere; }
+.chain-model { border-left: 4px solid var(--c-pattern); }
+.chain-analyzer { border-left: 4px solid var(--accent); }
+.chain-analyzer.tone-pass, .chain-decision.tone-pass { background: var(--pass-fill); color: var(--text); }
+.chain-analyzer.tone-fail, .chain-tool.tone-fail, .chain-decision.tone-fail { background: var(--fail-fill); color: var(--text); }
+.approval-quote { padding: 8px 12px; background: var(--warn-fill); border-radius: 6px; }
+.keep li { margin: 6px 0; }
+pre.cmd { padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; overflow-x: auto; }
+@media (min-width: 900px) { .judge-chains { grid-template-columns: 1fr 1fr; } }
