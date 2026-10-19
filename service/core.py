@@ -81,6 +81,9 @@ DOWNLOAD_KINDS = {
     "trace": ("trace.jsonl", "application/x-ndjson"),
     "plot": ("plot.png", "image/png"),
     "summary": ("summary.html", "text/html"),
+    "record": ("record.html", "text/html"),
+    "record_json": ("record.json", "application/json"),
+    "warnings": ("hazards.vtt", "text/vtt"),
 }
 INPUT_KIND = "input"  # the original upload (uploads/<id>/input.<ext>) for the click-through preview
 PRESIGN_TTL_S = 15 * 60

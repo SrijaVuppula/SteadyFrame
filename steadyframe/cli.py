@@ -1,7 +1,8 @@
 """Command line interface.
 
-steadyframe analyze input.mp4 [--profile wcag|broadcast] [--json out.json] [--plot out.png]
-steadyframe fix input.mp4 --policy fixed|agent -o safe.mp4 --report report.json
+steadyframe analyze input.mp4 [--profile wcag|broadcast] [--json out.json] [--plot out.png] [--vtt hazards.vtt]
+steadyframe fix input.mp4 --policy fixed|agent -o safe.mp4 --report report.json [--record record.json] [--vtt hazards.vtt]
+steadyframe verify safe.mp4 --record record.json
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ def _add_analyze(sub):
     )
     p.add_argument("--json", dest="json_out", default=None)
     p.add_argument("--plot", default=None, help="write a luminance-over-time PNG")
+    p.add_argument("--vtt", default=None, help="write a WebVTT warning track for this video")
     p.add_argument("--backend", default="auto", choices=["auto", "opencv", "ffmpeg"])
     p.add_argument("--quiet", action="store_true")
     p.set_defaults(func=cmd_analyze)
@@ -54,7 +56,23 @@ def _add_fix(sub):
     )
     p.add_argument("--no-llm", action="store_true", help="alias for --policy fixed")
     p.add_argument("--plot", default=None, help="before/after luminance PNG")
+    p.add_argument(
+        "--record",
+        default=None,
+        help="verification record JSON (an HTML copy is written next to it)",
+    )
+    p.add_argument("--vtt", default=None, help="WebVTT warning track for the original video")
     p.set_defaults(func=cmd_fix)
+
+
+def _add_verify(sub):
+    p = sub.add_parser(
+        "verify", help="re-check a verification record against a file (hash + fresh analysis)"
+    )
+    p.add_argument("input", help="the file the record describes (normally the remediated output)")
+    p.add_argument("--record", required=True)
+    p.add_argument("--backend", default="auto", choices=["auto", "opencv", "ffmpeg"])
+    p.set_defaults(func=cmd_verify)
 
 
 def cmd_analyze(args) -> int:
@@ -78,6 +96,11 @@ def cmd_analyze(args) -> int:
         from .plot import plot_analysis
 
         plot_analysis(result, args.plot)
+    if args.vtt:
+        from .record import hazard_vtt
+
+        Path(args.vtt).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.vtt).write_text(hazard_vtt(result["segments"]))
     if not args.quiet:
         v = result["video"]
         print(f"steadyframe {__version__} / OpenCV {OPENCV_VERSION}")
@@ -112,6 +135,8 @@ def cmd_fix(args) -> int:
         max_iterations=args.max_iterations,
         approve_all=args.approve_all,
         plot_path=args.plot,
+        record_path=args.record,
+        vtt_path=args.vtt,
     )
     print(f"steadyframe {__version__} / OpenCV {OPENCV_VERSION}")
     print(
@@ -124,6 +149,18 @@ def cmd_fix(args) -> int:
     return 0 if report["status"] in ("passed", "no_hazards") else 3
 
 
+def cmd_verify(args) -> int:
+    from .record import verify_file
+
+    record = json.loads(Path(args.record).read_text())
+    res = verify_file(args.input, record, backend=args.backend)
+    print(f"steadyframe {__version__} / OpenCV {OPENCV_VERSION}")
+    for c in res["checks"]:
+        print(f"  {'ok  ' if c['ok'] else 'FAIL'} {c['name']}: {c['detail']}")
+    print("record holds" if res["ok"] else "record does NOT hold for this file")
+    return 0 if res["ok"] else 4
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="steadyframe", description=__doc__)
     ap.add_argument(
@@ -134,6 +171,7 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     _add_analyze(sub)
     _add_fix(sub)
+    _add_verify(sub)
     args = ap.parse_args(argv)
     return args.func(args)
 

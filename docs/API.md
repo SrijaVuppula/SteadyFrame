@@ -29,7 +29,7 @@ created -> uploaded -> queued -> analyzing -> remediating -> rendering -> passed
 | GET | `/jobs/{id}/segments` | | `{"segments": [Segment + {"region_series": {"t": [...], "L": [...]} or null (null until analysis finished), "remediation": {...} or null}]}` |
 | GET | `/jobs/{id}/trace` | `?after=<seq>` | `{"records": [TraceRecord...], "complete": bool}` |
 | POST | `/jobs/{id}/approve` | `{"segment_id": "g000", "approved": true, "candidate_id": "g000-c2"}` | `{"job_id": "...", "status": "queued"}` |
-| GET | `/jobs/{id}/download` | `?kind=input\|video\|report\|analysis\|trace\|plot\|summary` (`input` = the original upload, for the click-through preview) | `{"url": "<presigned GET, 15 min>", "kind": "video"}` (local mode: a direct URL) |
+| GET | `/jobs/{id}/download` | `?kind=input\|video\|report\|analysis\|trace\|plot\|summary\|record\|record_json\|warnings` (`input` = the original upload, for the click-through preview; `record` = verification record HTML, `record_json` = the same as JSON for `steadyframe verify`, `warnings` = WebVTT warning track for the original) | `{"url": "<presigned GET, 15 min>", "kind": "video"}` (local mode: a direct URL) |
 | GET | `/jobs/{id}/frames/{segment_id}.png` | | PNG still frame from the middle of the segment with the regions outlined. Never animated. |
 
 Limits enforced server-side: 100 MB, 120 s, container in {mp4, mov, webm, mkv, gif}. Rejected
@@ -48,7 +48,7 @@ uploads get status `error` with `error` = reason.
   "remediation": {"status": "passed", "iterations": 3, "runtime_s": 41.2, "quality": {"ssim_overall": 0.97, "ssim_outside": 0.999, "ssim_inside": 0.91, "mean_abs_dL_inside": 0.05},
                   "segments": [{"segment_id": "g000", "type": "general", "outcome": "accepted", "strategy": "S1", "params": {"alpha": 0.08}, "attempts": [...], "quality": {...}}]},
   "pending_approvals": [{"segment_id": "g001", "reason": "S6: strategy S6 always needs approval", "options": [{"candidate_id": "g001-c4", "strategy": "S6", "params": {}, "quality": {...}}]}],
-  "downloads": {"video": true, "report": true, "analysis": true, "trace": true, "plot": true, "summary": true},
+  "downloads": {"video": true, "report": true, "analysis": true, "trace": true, "plot": true, "summary": true, "record": true, "record_json": true, "warnings": true},
   "error": null,
   "tool": {"version": "0.1.0", "opencv": "5.0.0"}
 }

@@ -413,6 +413,21 @@ class JobRunner:
         (out / "summary.html").write_text(
             build_summary(job, report, before, after, stills, cv2.__version__)
         )
+        try:
+            from steadyframe.record import build_record, hazard_vtt, write_record
+
+            record = build_record(
+                report,
+                profile,
+                input_path,
+                safe if safe.exists() else None,
+                input_name=(job.get("input") or {}).get("filename"),
+                output_name="safe.mp4",
+            )
+            write_record(record, out / "record.json", out / "record.html")
+            (out / "hazards.vtt").write_text(hazard_vtt((before or {}).get("segments", [])))
+        except Exception as e:  # the record is an extra; never fail the job for it
+            log("warn", "verification record failed", job_id=job_id, error=str(e))
         if status == "needs_approval":
             pack_workdir(job_wd, out / "work.tar")
 
@@ -423,6 +438,9 @@ class JobRunner:
             "trace.jsonl": "application/x-ndjson",
             "plot.png": "image/png",
             "summary.html": "text/html; charset=utf-8",
+            "record.html": "text/html; charset=utf-8",
+            "record.json": "application/json",
+            "hazards.vtt": "text/vtt; charset=utf-8",
             "segments.json": "application/json",
             "work.tar": "application/x-tar",
         }
@@ -470,6 +488,7 @@ class JobRunner:
             tool={
                 "version": report["tool"]["version"],
                 "opencv": report["tool"]["opencv"]["version"],
+                "engine": os.environ.get("STEADYFRAME_OPENCV_ENGINE", "stock"),
             },
             progress={
                 "stage": "needs_approval" if status == "needs_approval" else "done",
@@ -833,11 +852,14 @@ def main(argv=None) -> int:
         return 2
     import steadyframe  # asserts the version too and prints nothing
 
+    maps = Path("/proc/self/maps")
     log(
         "info",
         "package",
         steadyframe=steadyframe.__version__,
         build=steadyframe.opencv_build_summary(),
+        engine=os.environ.get("STEADYFRAME_OPENCV_ENGINE", "stock"),
+        kleidicv_loaded=("kleidi" in maps.read_text().lower()) if maps.exists() else None,
     )
     ctx = Context.from_env()
     stop = threading.Event()

@@ -33,6 +33,8 @@ def fix_file(
     detect_patterns: bool = False,
     trace_sink=None,
     job_id: str | None = None,
+    record_path: str | Path | None = None,
+    vtt_path: str | Path | None = None,
 ) -> dict:
     t0 = time.perf_counter()
     tmp = None
@@ -91,6 +93,16 @@ def fix_file(
     if report_path:
         Path(report_path).parent.mkdir(parents=True, exist_ok=True)
         Path(report_path).write_text(json.dumps(report, indent=2, default=str))
+    if record_path:
+        from ..record import build_record, write_record
+
+        record = build_record(report, job.profile, src, dst)
+        write_record(record, record_path, Path(record_path).with_suffix(".html"))
+    if vtt_path:
+        from ..record import hazard_vtt
+
+        Path(vtt_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(vtt_path).write_text(hazard_vtt(report["before"].get("segments", [])))
     if tmp and not keep_workdir and report["status"] != "needs_approval":
         shutil.rmtree(tmp, ignore_errors=True)
     return report
