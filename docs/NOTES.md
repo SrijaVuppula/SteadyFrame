@@ -317,3 +317,21 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
 - The ECS service is kept as the fallback. With the Lambda in front, scaling out on "visible +
   in flight" would start a Fargate task for every job (the message is in flight while Lambda
   works on it), so the scale-out metric is now visible messages only, two minutes running.
+
+## 2026-10-19  Demo page: a classic film look, far less text
+
+- The page kept the same flow (pick a clip, Run check, watch, approve) but most of its prose
+  went: the banner is one line under a film-strip headline, the "who decides what" card became
+  a billing block (planned by Amazon Bedrock, checked by OpenCV 5, approved by you), clips are
+  drawn thumbnails with a two-word tag, progress is a strip of five frames, the verdicts are
+  two rubber stamps, the chart's limit label moved into the legend, the conversation folds
+  away once a check finishes, and the recorded run where the model changes its plan is a
+  footer link.
+- Fonts are self-hosted from npm (Fraunces with its soft axis for headings, Instrument Sans for
+  text; both OFL), so the page still loads nothing from a third-party host.
+- Motion stays transform-only and stops under reduced motion: the reel by "Now showing" turns
+  while a check runs and the stamps settle once. No colour or brightness changes over time.
+- Checked on the deployed stack: Flashing box with the fixed policy 4.2 s warm (19.4 s for Red
+  strobe on a cold worker); Full-screen red paused for approval at 4.0 s and passed after
+  Approve. axe-core finds no violations on the demo (light, dark, phone width) or on the four
+  other pages the CI audit covers.
