@@ -336,7 +336,11 @@ def _dispatch(job: Job, name: str, args: dict) -> dict:
         open_ = job.open_segments()
         pending = [k for k, o in job.state["segments"].items() if o["status"] == "pending_approval"]
         if open_:
-            raise ToolError(f"segments still open: {', '.join(open_)}")
+            # refused before any rendering; still traced like every other tool call
+            msg = f"segments still open: {', '.join(open_)}"
+            job.trace.tool_call("finalize", {}, iteration=job.state["iterations"], by=by)
+            job.trace.tool_result("finalize", {}, error=msg, iteration=job.state["iterations"])
+            raise ToolError(msg)
         job.trace.decision("finalize_requested", by=by, pending=pending)
         return {
             "ok": True,
