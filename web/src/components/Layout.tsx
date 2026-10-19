@@ -23,10 +23,12 @@ export function Layout({ children, navigate }: { children: ReactNode; navigate: 
           >
             <span className="brand-mark" aria-hidden="true">▤</span> SteadyFrame
           </a>
-          <p className="tagline">{`Analyzer and remediator that ${WHAT_IT_DOES}.`}</p>
-          <a className="judge-nav" href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>
-            For judges: the 90-second tour
-          </a>
+          <p className="tagline">Photosensitivity check and repair for video</p>
+          <nav className="site-nav" aria-label="Site">
+            <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>The 90-second tour</a>
+            <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Check a clip</a>
+            <a href="https://github.com/SrijaVuppula/SteadyFrame">Code</a>
+          </nav>
         </div>
       </header>
       <main id="main" className="wrap" tabIndex={-1}>

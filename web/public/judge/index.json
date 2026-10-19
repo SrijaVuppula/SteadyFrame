@@ -1,6 +1,6 @@
 {
  "generated_at": "2026-10-19T04:05:02Z",
- "git": "40da429",
+ "git": "d072858",
  "opencv": "5.0.0",
  "offline": false,
  "cases": [
@@ -138,6 +138,7 @@
  ],
  "results": [
   {
+   "key": "clips",
    "label": "Synthetic clips with the right verdict",
    "a": 1.0,
    "b": 44,
@@ -145,6 +146,7 @@
    "source": "eval/results/frozen/detection.json"
   },
   {
+   "key": "boundary",
    "label": "Boundary cases right (3 vs 3.5 vs 4 Hz, 0.09 vs 0.11 swing, 24% vs 26% area, ...)",
    "a": 17,
    "b": 17,
@@ -152,12 +154,14 @@
    "source": "eval/results/frozen/detection.json"
   },
   {
+   "key": "f1",
    "label": "Per-second F1 against independent ground truth",
    "a": 1.0,
    "text": "1.000",
    "source": "eval/results/frozen/detection.json"
   },
   {
+   "key": "crf",
    "label": "H.264 re-encodes (CRF 28 and 35) keeping their verdict",
    "a": 16,
    "b": 16,
@@ -165,6 +169,7 @@
    "source": "eval/results/frozen/robustness_summary.json"
   },
   {
+   "key": "external",
    "label": "Third-party clips with the right verdict (EA IRIS, Apple, Intel camera footage)",
    "a": 18,
    "b": 18,
@@ -172,6 +177,7 @@
    "source": "eval/results/frozen/external.json"
   },
   {
+   "key": "iris",
    "label": "EA IRIS test videos where we match IRIS's own expected verdict",
    "a": 8,
    "b": 8,
@@ -179,6 +185,7 @@
    "source": "eval/results/frozen/external.json"
   },
   {
+   "key": "controls",
    "label": "Seconds of calm camera footage wrongly flagged",
    "a": 0,
    "b": 551,
@@ -186,6 +193,7 @@
    "source": "eval/results/frozen/external.json"
   },
   {
+   "key": "fixed",
    "label": "Hazardous clips fixed and passing whole-file re-verification (fixed policy)",
    "a": 25,
    "b": 25,
@@ -193,6 +201,7 @@
    "source": "eval/results/frozen/remediation.json"
   },
   {
+   "key": "agent",
    "label": "Live Bedrock agent: clips fixed",
    "a": 25,
    "b": 25,
@@ -200,6 +209,7 @@
    "source": "eval/results/frozen/agent_vs_fixed_bedrock.json"
   },
   {
+   "key": "attempts",
    "label": "Attempts per hazard: live Bedrock agent vs fixed policy",
    "a": 1.04,
    "b": 1.1,
@@ -207,6 +217,7 @@
    "source": "eval/results/frozen/agent_vs_fixed_bedrock.json"
   },
   {
+   "key": "ssim",
    "label": "Picture kept inside the hazard region, SSIM: agent vs fixed",
    "a": 0.8816677445407572,
    "b": 0.861487728053644,
@@ -214,12 +225,14 @@
    "source": "eval/results/frozen/agent_vs_fixed_bedrock.json"
   },
   {
+   "key": "cost",
    "label": "Model cost for the whole 25-clip suite (USD)",
    "a": 3.041106,
    "text": "3.04",
    "source": "eval/results/frozen/agent_vs_fixed_bedrock.json"
   },
   {
+   "key": "guardrails",
    "label": "Hostile-planner attacks held / false passes",
    "a": 10,
    "b": 10,

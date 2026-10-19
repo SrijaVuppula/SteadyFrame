@@ -85,33 +85,34 @@ FILES = (
 
 # (label, lookup path, format, source file) -- every number on the judge page
 RESULTS = [
-    ("Synthetic clips with the right verdict", "detection.clip_accuracy", "of:detection.n_clips", "detection"),
-    ("Boundary cases right (3 vs 3.5 vs 4 Hz, 0.09 vs 0.11 swing, 24% vs 26% area, ...)",
+    # (key, label, lookup path, format, source file) -- every number on the judge page
+    ("clips", "Synthetic clips with the right verdict", "detection.clip_accuracy", "of:detection.n_clips", "detection"),
+    ("boundary", "Boundary cases right (3 vs 3.5 vs 4 Hz, 0.09 vs 0.11 swing, 24% vs 26% area, ...)",
      "detection.boundary_correct/detection.boundary_total", "ratio", "detection"),
-    ("Per-second F1 against independent ground truth", "detection.per_second.f1", "3f", "detection"),
-    ("H.264 re-encodes (CRF 28 and 35) keeping their verdict",
+    ("f1", "Per-second F1 against independent ground truth", "detection.per_second.f1", "3f", "detection"),
+    ("crf", "H.264 re-encodes (CRF 28 and 35) keeping their verdict",
      "robustness_summary.crf_correct/robustness_summary.crf_total", "ratio", "robustness_summary"),
-    ("Third-party clips with the right verdict (EA IRIS, Apple, Intel camera footage)",
+    ("external", "Third-party clips with the right verdict (EA IRIS, Apple, Intel camera footage)",
      "external.by_profile.wcag.clip_agreement/external.n_clips", "ratio", "external"),
-    ("EA IRIS test videos where we match IRIS's own expected verdict",
+    ("iris", "EA IRIS test videos where we match IRIS's own expected verdict",
      "external.by_profile.broadcast.iris_agreement/external.by_profile.broadcast.iris_clips",
      "ratio", "external"),
-    ("Seconds of calm camera footage wrongly flagged",
+    ("controls", "Seconds of calm camera footage wrongly flagged",
      "external.by_profile.wcag.control_fp_seconds/external.by_profile.wcag.control_seconds",
      "ratio", "external"),
-    ("Hazardous clips fixed and passing whole-file re-verification (fixed policy)",
+    ("fixed", "Hazardous clips fixed and passing whole-file re-verification (fixed policy)",
      "remediation.passed/remediation.n_clips", "ratio", "remediation"),
-    ("Live Bedrock agent: clips fixed", "agent_vs_fixed_bedrock.agent.passed/agent_vs_fixed_bedrock.agent.n_clips",
+    ("agent", "Live Bedrock agent: clips fixed", "agent_vs_fixed_bedrock.agent.passed/agent_vs_fixed_bedrock.agent.n_clips",
      "ratio", "agent_vs_fixed_bedrock"),
-    ("Attempts per hazard: live Bedrock agent vs fixed policy",
+    ("attempts", "Attempts per hazard: live Bedrock agent vs fixed policy",
      "agent_vs_fixed_bedrock.agent.mean_iterations_per_segment|agent_vs_fixed_bedrock.fixed.mean_iterations_per_segment",
      "vs2f", "agent_vs_fixed_bedrock"),
-    ("Picture kept inside the hazard region, SSIM: agent vs fixed",
+    ("ssim", "Picture kept inside the hazard region, SSIM: agent vs fixed",
      "agent_vs_fixed_bedrock.agent.mean_ssim_inside|agent_vs_fixed_bedrock.fixed.mean_ssim_inside",
      "vs3f", "agent_vs_fixed_bedrock"),
-    ("Model cost for the whole 25-clip suite (USD)", "agent_vs_fixed_bedrock.cost_usd", "2f",
+    ("cost", "Model cost for the whole 25-clip suite (USD)", "agent_vs_fixed_bedrock.cost_usd", "2f",
      "agent_vs_fixed_bedrock"),
-    ("Hostile-planner attacks held / false passes", "guardrails.summary.held/guardrails.summary.runs",
+    ("guardrails", "Hostile-planner attacks held / false passes", "guardrails.summary.held/guardrails.summary.runs",
      "ratio", "guardrails"),
 ]  # fmt: skip
 
@@ -161,13 +162,14 @@ def headline_results() -> list[dict]:
         except Exception:
             pass
     rows = []
-    for label, expr, fmt, src in RESULTS:
+    for key, label, expr, fmt, src in RESULTS:
         try:
             v = _value(data, expr, fmt)
         except Exception:
             continue  # not run yet; the page shows only what exists
         rows.append(
             {
+                "key": key,
                 "label": label,
                 **v,
                 "source": f"eval/results/frozen/{src}.json"
