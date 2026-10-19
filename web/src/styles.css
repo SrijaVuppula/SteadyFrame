@@ -547,7 +547,7 @@ a.jx-tile:hover { border-color: var(--accent); }
 .jx-stepper li.done .jx-step-dot { border-color: #45e0a0; background: #45e0a0; color: #062b1c; }
 .jx-live-status { color: #ffffff; margin: 0 0 14px; }
 .jx-elapsed { font-variant-numeric: tabular-nums; font-weight: 800; color: #ffd166; }
-.jx-live-convo { max-height: 520px; overflow-y: auto; padding: 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 14px; }
+.jx-live-convo { max-height: 520px; overflow-y: auto; padding: 14px; border-radius: 14px; background: var(--surface); color: var(--text); border: 1px solid var(--border); margin-bottom: 14px; }
 .jx-live-result { margin-top: 6px; }
 .jx-verdicts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
 .jx-verdict { padding: 6px 12px; border-radius: 10px; font-weight: 800; text-transform: capitalize; background: rgba(255, 255, 255, 0.1); color: #ffffff; }

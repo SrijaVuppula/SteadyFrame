@@ -89,7 +89,7 @@ function LiveRun({ jobId, startedAt, navigate, onReset }: { jobId: string; start
       {error && !job && <p className="alert" role="alert">{error}</p>}
 
       {records.length > 0 && (
-        <div className="jx-live-convo">
+        <div className="jx-live-convo" tabIndex={0} role="region" aria-label="Live log of the planner and the analyzer">
           <Conversation records={records} live={!terminal} />
         </div>
       )}
