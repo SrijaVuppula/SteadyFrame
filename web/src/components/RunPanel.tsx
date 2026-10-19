@@ -1,5 +1,5 @@
-// Sidebar: start a check on a test clip, or upload your own. Nothing here plays the clip; an
-// uploaded file is only inspected for size and duration before it is sent.
+// Start a check on a test clip, or drop in your own. Nothing here plays the clip; an uploaded
+// file is only inspected for size and duration before it is sent.
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import { ACCEPTED_EXTENSIONS, MAX_DURATION_S, MAX_UPLOAD_BYTES } from '../config';
@@ -7,6 +7,8 @@ import { fmtBytes } from '../format';
 import type { Policy, Profile, Sample } from '../types';
 import { CLIP_COPY, FALLBACK, clipName } from '../clips';
 import { rememberUpload } from '../uploadStore';
+import { ClipThumb } from './art';
+import { Icon } from './tour';
 
 function extensionOf(name: string): string {
   const m = name.toLowerCase().match(/\.([a-z0-9]+)$/);
@@ -44,6 +46,7 @@ export function RunPanel({ onStarted }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [file, setFile] = useState<{ f: File; problems: string[] } | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     api.listSamples()
@@ -103,46 +106,59 @@ export function RunPanel({ onStarted }: Props) {
     }
   }
 
+  const pick = (id: string) => () => setClip(id);
   return (
     <section className="sf-card sf-run" aria-labelledby="sf-run-h">
-      <p className="sf-label" id="sf-run-h">Run a check</p>
+      <h2 className="sf-label" id="sf-run-h">Pick a clip</h2>
       <fieldset className="sf-clips">
         <legend className="sr-only">Test clip</legend>
         {samples.map((id) => (
           <label key={id} className={`sf-clip${clip === id ? ' on' : ''}`}>
-            <input type="radio" name="clip" value={id} checked={clip === id} onChange={() => setClip(id)} />
+            <input type="radio" name="clip" value={id} checked={clip === id} onChange={pick(id)} className="sr-only" />
+            <ClipThumb id={id} />
             <span className="sf-clip-name">{CLIP_COPY[id][0]}</span>
-            <span className="sf-clip-hint">{CLIP_COPY[id][1]}</span>
+            <span className="sf-clip-tag">{CLIP_COPY[id][1]}</span>
           </label>
         ))}
       </fieldset>
 
       <fieldset className="sf-seg">
         <legend>Planner</legend>
-        <label className={policy === 'agent' ? 'on' : ''}><input type="radio" name="policy" checked={policy === 'agent'} onChange={() => setPolicy('agent')} /> Bedrock model</label>
-        <label className={policy === 'fixed' ? 'on' : ''}><input type="radio" name="policy" checked={policy === 'fixed'} onChange={() => setPolicy('fixed')} /> Fixed policy</label>
+        <div className="sf-seg-row">
+          <label className={policy === 'agent' ? 'on' : ''}><input type="radio" name="policy" className="sr-only" checked={policy === 'agent'} onChange={() => setPolicy('agent')} />Bedrock model</label>
+          <label className={policy === 'fixed' ? 'on' : ''}><input type="radio" name="policy" className="sr-only" checked={policy === 'fixed'} onChange={() => setPolicy('fixed')} />Fixed policy</label>
+        </div>
       </fieldset>
       <fieldset className="sf-seg">
         <legend>Standard</legend>
-        <label className={profile === 'wcag' ? 'on' : ''}><input type="radio" name="profile" checked={profile === 'wcag'} onChange={() => setProfile('wcag')} /> WCAG 2.3.1</label>
-        <label className={profile === 'broadcast' ? 'on' : ''}><input type="radio" name="profile" checked={profile === 'broadcast'} onChange={() => setProfile('broadcast')} /> Broadcast</label>
+        <div className="sf-seg-row">
+          <label className={profile === 'wcag' ? 'on' : ''}><input type="radio" name="profile" className="sr-only" checked={profile === 'wcag'} onChange={() => setProfile('wcag')} />WCAG 2.3.1</label>
+          <label className={profile === 'broadcast' ? 'on' : ''}><input type="radio" name="profile" className="sr-only" checked={profile === 'broadcast'} onChange={() => setProfile('broadcast')} />Broadcast</label>
+        </div>
       </fieldset>
 
-      <button type="button" className="sf-btn primary sf-wide" disabled={busy} onClick={runSample}>
-        {busy && !file ? 'Starting…' : 'Run check'}
+      <button type="button" className="sf-btn primary sf-go" disabled={busy} onClick={runSample}>
+        <Icon name="clapper" />
+        <span>{busy && !file ? 'Starting…' : 'Run check'}</span>
+        <span className="sf-go-time">{policy === 'agent' ? '~25 s' : '~8 s'}</span>
       </button>
-      <p className="sf-fine">The model plans in about 20–30 s; the fixed policy takes a few seconds.</p>
 
-      <div className="sf-or"><span>or check your own clip</span></div>
-      <label className="sf-file">
-        <span className="sr-only">Video file</span>
-        <input type="file" accept="video/*,.mp4,.mov,.webm,.mkv,.gif" disabled={busy} onChange={(e) => void choose(e.target.files?.[0])} />
+      <label
+        className={`sf-drop${dragging ? ' dragging' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => { e.preventDefault(); setDragging(false); if (!busy) void choose(e.dataTransfer.files?.[0]); }}
+      >
+        <input type="file" className="sr-only" accept="video/*,.mp4,.mov,.webm,.mkv,.gif" disabled={busy}
+          onChange={(e) => void choose(e.target.files?.[0])} />
+        <Icon name="upload" />
+        <span className="sf-drop-main">{file ? file.f.name : 'Or drop your own clip'}</span>
+        <span className="sf-drop-hint">up to 100 MB · 120 s · deleted in a day</span>
       </label>
-      <p className="sf-fine">Up to 100 MB and 120 s. Deleted after one day. Nothing plays on this page.</p>
       {file?.problems.map((p) => <p key={p} className="alert" role="alert">{p}</p>)}
       {file && !file.problems.length && (
         <button type="button" className="sf-btn sf-wide" disabled={busy} onClick={upload}>
-          {progress !== null ? `Uploading ${Math.round(progress * 100)}%` : `Upload and check ${file.f.name}`}
+          {progress !== null ? `Uploading ${Math.round(progress * 100)}%` : 'Upload and check'}
         </button>
       )}
       {error && <p className="alert" role="alert">{error}</p>}

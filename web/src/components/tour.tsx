@@ -4,7 +4,7 @@ import { useMemo, type ReactNode } from 'react';
 import { type Bubble, conversation, flashRate, peak } from '../tourData';
 import type { Segment, Timeline, TraceRecord } from '../types';
 
-export type IconName = 'doc' | 'terminal' | 'captions' | 'play' | 'cross' | 'shield' | 'eye' | 'wrench' | 'stamp' | 'bolt';
+export type IconName = 'doc' | 'terminal' | 'captions' | 'play' | 'cross' | 'shield' | 'eye' | 'wrench' | 'stamp' | 'bolt' | 'upload' | 'arrow' | 'clapper' | 'braces';
 
 export function Icon({ name }: { name: IconName }) {
   const p: Record<IconName, ReactNode> = {
@@ -18,6 +18,10 @@ export function Icon({ name }: { name: IconName }) {
     wrench: <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z" />,
     stamp: <><path d="M9 3h6v6l2 3H7l2-3z" /><path d="M5 15h14v3H5zM7 21h10" /></>,
     bolt: <path d="M13 3L5 13h6l-1 8 8-10h-6z" />,
+    upload: <><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5" /><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" /></>,
+    arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+    clapper: <><path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" /><path d="M4 10l-.6-3.2a1 1 0 0 1 .8-1.2l13.6-2.4a1 1 0 0 1 1.2.8L19.6 7 4 10zM8.5 5.2l2.6 3.4M13.6 4.3l2.6 3.4" /></>,
+    braces: <path d="M8 4c-2 0-2 1.5-2 3v2c0 1.5-1 3-2 3 1 0 2 1.5 2 3v2c0 1.5 0 3 2 3M16 4c2 0 2 1.5 2 3v2c0 1.5 1 3 2 3-1 0-2 1.5-2 3v2c0 1.5 0 3-2 3" />,
   };
   return (
     <svg className="jx-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -29,7 +33,7 @@ export function Icon({ name }: { name: IconName }) {
 // ---------------------------------------------------------------- before/after chart
 
 export function RateChart({ before, after, segments, duration }: { before: Timeline; after: Timeline | null; segments: Segment[]; duration: number }) {
-  const W = 960, H = 280, ML = 40, MR = 16, MT = 16, MB = 34;
+  const W = 960, H = 250, ML = 40, MR = 16, MT = 16, MB = 34;
   const rb = flashRate(before);
   const ra = after ? flashRate(after) : null;
   const ymax = Math.max(4, Math.ceil(peak(rb) + 1));
@@ -42,29 +46,23 @@ export function RateChart({ before, after, segments, duration }: { before: Timel
     return d;
   };
   const ticks = Array.from({ length: Math.floor(duration) + 1 }, (_, i) => i).filter((t) => duration <= 12 || t % 2 === 0);
-  // the label goes in the middle of the widest stretch without a hazard, clear of the lines
-  const edges = [0, ...[...segments].sort((a, b) => a.start_s - b.start_s).flatMap((s) => [s.start_s, s.end_s]), duration];
-  let quietMid = duration / 2, widest = -1;
-  for (let i = 0; i + 1 < edges.length; i += 2) {
-    if (edges[i + 1] - edges[i] > widest) { widest = edges[i + 1] - edges[i]; quietMid = (edges[i] + edges[i + 1]) / 2; }
-  }
+  const levels = [...new Set([0, 3, ymax])];
   return (
     <svg className="jx-chart" viewBox={`0 0 ${W} ${H}`} role="img"
       aria-label={`Flashes per second over ${duration.toFixed(0)} seconds: before the fix the peak is ${peak(rb).toFixed(0)}; after it, ${peak(ra ?? []).toFixed(1)}; the limit is 3.`}>
       {segments.map((s) => (
         <rect key={s.id} className="jx-chart-seg" x={x(s.start_s)} y={MT} width={Math.max(2, x(s.end_s) - x(s.start_s))} height={H - MT - MB} rx="6" />
       ))}
-      {[0, Math.round(ymax / 2), ymax].map((v) => (
+      {levels.map((v) => (
         <g key={v}>
           <line className="jx-chart-grid" x1={ML} x2={W - MR} y1={y(v)} y2={y(v)} />
           <text className="jx-chart-label" x={ML - 8} y={y(v) + 4} textAnchor="end">{v}</text>
         </g>
       ))}
       {ticks.map((t) => (
-        <text key={t} className="jx-chart-label" x={x(t)} y={H - 10} textAnchor="middle">{t}s</text>
+        <text key={t} className={`jx-chart-label${t === 0 ? ' jx-chart-t0' : ''}`} x={x(t)} y={H - 10} textAnchor="middle">{t}s</text>
       ))}
       <line className="jx-chart-limit" x1={ML} x2={W - MR} y1={y(3)} y2={y(3)} />
-      <text className="jx-chart-limit-label" x={Math.min(W - MR - 130, Math.max(ML + 130, x(quietMid)))} y={y(3) - 8} textAnchor="middle">limit: 3 flashes a second</text>
       <path className="jx-chart-before" d={path(before, rb)} />
       {after && <path className="jx-chart-after" d={path(after, ra)} />}
     </svg>

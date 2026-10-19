@@ -1,10 +1,9 @@
-// The live demo: one page, like the product itself. Run a check on a test clip or your own
-// upload and watch it on the deployed AWS worker; the main card shows the current (or, before
-// the first run, a recorded example) check, the sidebar starts new ones and lists recent ones.
+// The live demo: one page, like the product itself. Pick a test clip (or drop in your own) and
+// watch the deployed AWS worker check it; the main card shows the current check, or before the
+// first run a recorded one. Checks started here are listed under the picker.
 import { useCallback, useEffect, useState } from 'react';
 import { CheckView } from '../components/CheckView';
 import { RunPanel } from '../components/RunPanel';
-import { href } from '../hooks/useRoute';
 import { loadRecent, saveRecent, type RecentCheck } from '../recent';
 import type { Policy } from '../types';
 
@@ -50,14 +49,42 @@ export function DemoPage({ navigate }: { navigate: (p: string) => void }) {
 
   return (
     <div className="sf-demo">
-      <h1 className="sr-only">SteadyFrame live demo</h1>
-      <p className="sf-banner" role="note">
-        <strong>This is a live demo on AWS.</strong> Pick a test clip and press <strong>Run check</strong> to
-        watch SteadyFrame find the flashing that can trigger seizures, repair only that part, and re-check
-        its own repair. Nothing on this page plays: hazards are shown as still frames and plots.
-      </p>
+      <section className="sf-hero" aria-labelledby="sf-hero-h">
+        <div className="sf-hero-text">
+          <h1 id="sf-hero-h">Find the flash. <em>Steady the frame.</em></h1>
+          <p>A live flash-safety check on AWS. Pick a clip and press Run check. No video plays here.</p>
+        </div>
+        <dl className="sf-credits">
+          <div><dt>planned by</dt><dd>Amazon Bedrock</dd></div>
+          <div><dt>checked by</dt><dd>OpenCV 5</dd></div>
+          <div><dt>approved by</dt><dd>you</dd></div>
+        </dl>
+      </section>
 
       <div className="sf-layout">
+        <aside className="sf-side" aria-label="Run a check">
+          <RunPanel onStarted={started} />
+
+          {recent.length > 0 && (
+            <section className="sf-card sf-recent-card" aria-labelledby="sf-recent-h">
+              <h2 className="sf-label" id="sf-recent-h">Your checks</h2>
+              <ul className="sf-recent">
+                {recent.map((r) => (
+                  <li key={r.jobId}>
+                    <button type="button" className={`sf-recent-item${shown.jobId === r.jobId ? ' on' : ''}`}
+                      aria-current={shown.jobId === r.jobId ? 'true' : undefined}
+                      onClick={() => setCurrent({ jobId: r.jobId, label: r.label })}>
+                      <span className={`sf-dot s-${r.status ?? 'running'}`} aria-hidden="true" />
+                      <span className="sf-recent-name">{r.label}</span>
+                      <span className="sf-recent-meta">{STATUS_LABEL[r.status ?? ''] ?? 'running'}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </aside>
+
         <div className="sf-main">
           <CheckView
             key={shown.jobId}
@@ -69,42 +96,6 @@ export function DemoPage({ navigate }: { navigate: (p: string) => void }) {
             onStatus={onStatus}
           />
         </div>
-
-        <aside className="sf-side" aria-label="Run and history">
-          <RunPanel onStarted={started} />
-
-          <section className="sf-card" aria-labelledby="sf-recent-h">
-            <p className="sf-label" id="sf-recent-h">Recent checks</p>
-            {recent.length === 0 ? (
-              <p className="sf-fine">Checks you run appear here (kept in this browser only).</p>
-            ) : (
-              <ul className="sf-recent">
-                {recent.map((r) => (
-                  <li key={r.jobId}>
-                    <button type="button" className={`sf-recent-item${shown.jobId === r.jobId ? ' on' : ''}`}
-                      onClick={() => setCurrent({ jobId: r.jobId, label: r.label })}>
-                      <span className={`sf-dot s-${r.status ?? 'running'}`} aria-hidden="true" />
-                      <span className="sf-recent-name">{r.label}</span>
-                      <span className="sf-recent-meta">{STATUS_LABEL[r.status ?? ''] ?? 'running'} · {r.policy === 'agent' ? 'model' : 'fixed'}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section className="sf-card" aria-labelledby="sf-how-h">
-            <p className="sf-label" id="sf-how-h">Who decides what</p>
-            <ul className="sf-how">
-              <li><span className="sf-how-k">Model</span><span>picks the repair and its strength from the measurements; never sees pixels</span></li>
-              <li><span className="sf-how-k">Analyzer</span><span>OpenCV 5 re-checks every candidate and the whole file; only it can pass a job</span></li>
-              <li><span className="sf-how-k">You</span><span>approve or reject any repair that changes the picture a lot</span></li>
-            </ul>
-            <p className="sf-fine">
-              <a href={href('/jobs/jd-adapt')} onClick={(e) => { e.preventDefault(); navigate('/jobs/jd-adapt'); }}>Recorded run where the model changes its plan</a>
-            </p>
-          </section>
-        </aside>
       </div>
     </div>
   );
