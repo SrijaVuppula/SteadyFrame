@@ -76,6 +76,12 @@ function RateChart({ before, after, segments, duration }: { before: Timeline; af
   };
   const ticks = Array.from({ length: Math.floor(duration) + 1 }, (_, i) => i).filter((t) => duration <= 12 || t % 2 === 0);
   const pb = peak(before.general_rate_hz), pa = peak(after?.general_rate_hz);
+  // the label goes in the middle of the widest stretch without a hazard, clear of the lines
+  const edges = [0, ...[...segments].sort((a, b) => a.start_s - b.start_s).flatMap((s) => [s.start_s, s.end_s]), duration];
+  let quietMid = duration / 2, widest = -1;
+  for (let i = 0; i + 1 < edges.length; i += 2) {
+    if (edges[i + 1] - edges[i] > widest) { widest = edges[i + 1] - edges[i]; quietMid = (edges[i] + edges[i + 1]) / 2; }
+  }
   return (
     <svg className="jx-chart" viewBox={`0 0 ${W} ${H}`} role="img"
       aria-label={`Flashes per second over ${duration.toFixed(0)} seconds: before the fix the peak is ${pb.toFixed(0)}; after it, ${pa.toFixed(1)}; the limit is 3.`}>
@@ -92,7 +98,7 @@ function RateChart({ before, after, segments, duration }: { before: Timeline; af
         <text key={t} className="jx-chart-label" x={x(t)} y={H - 10} textAnchor="middle">{t}s</text>
       ))}
       <line className="jx-chart-limit" x1={ML} x2={W - MR} y1={y(3)} y2={y(3)} />
-      <text className="jx-chart-limit-label" x={ML + 8} y={y(3) - 8}>limit: 3 flashes a second</text>
+      <text className="jx-chart-limit-label" x={x(quietMid)} y={y(3) - 8} textAnchor="middle">limit: 3 flashes a second</text>
       <path className="jx-chart-before" d={path(before)} />
       {after && <path className="jx-chart-after" d={path(after)} />}
     </svg>
