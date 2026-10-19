@@ -1,11 +1,12 @@
-PY ?= python
+# python3.11 if it is on PATH (the version CI and the images use), else python3
+PY ?= $(shell command -v python3.11 2>/dev/null || command -v python3 2>/dev/null || echo python)
 VENV ?= .venv
 BIN := $(VENV)/bin
 SEED ?= 1234
 # extra cdk arguments, e.g. CDK_ARGS="-c bedrock_model_id=us.x.y-v1:0 -c alert_email=me@example.com"
 CDK_ARGS ?=
 
-.PHONY: help venv install test lint synth real eval freeze report slides bench deploy destroy smoke web local clean
+.PHONY: help venv install test lint demo synth real eval freeze report slides judge bench deploy destroy smoke web local clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
@@ -20,6 +21,9 @@ install: venv ## install the package with dev extras (pinned)
 
 test: ## run the test suite
 	$(BIN)/python -m pytest
+
+demo: ## the whole loop on this machine, no credentials: sample clips -> analyze -> fix -> verify -> demo/
+	$(BIN)/python -m service.demo --out demo
 
 lint: ## ruff check + format check
 	$(BIN)/ruff check .
@@ -37,6 +41,7 @@ eval: ## run every evaluation script; writes eval/results/
 	$(BIN)/python -m eval.remediation
 	$(BIN)/python -m eval.agent_vs_fixed
 	$(BIN)/python -m eval.failures
+	$(BIN)/python -m eval.guardrails
 	$(BIN)/python -m eval.external
 
 freeze: ## copy eval/results into eval/results/frozen (the copy the report is rendered from) and re-render the report
@@ -44,9 +49,13 @@ freeze: ## copy eval/results into eval/results/frozen (the copy the report is re
 	cp eval/results/*.json eval/results/*.md eval/results/*.png eval/results/frozen/
 	rm -rf eval/results/frozen/failures && cp -r eval/results/failures eval/results/frozen/failures
 	$(BIN)/python -m eval.report
+	$(BIN)/python -m eval.judge_bundle --index-only
 
 report: ## render docs/report/REPORT.md from the frozen results
 	$(BIN)/python -m eval.report
+
+judge: ## recorded jobs + headline numbers for the /judge page (live agent: needs Bedrock; JUDGE_ARGS=--offline otherwise)
+	$(BIN)/python -m eval.judge_bundle $(JUDGE_ARGS)
 
 slides: ## results slides for the video from the frozen results -> docs/video/slides/
 	$(BIN)/python -m eval.slides

@@ -36,6 +36,7 @@ infra/cdk.out/
 infra/.cdk.staging/
 
 # misc
+/demo/
 .DS_Store
 .env
 *.log
