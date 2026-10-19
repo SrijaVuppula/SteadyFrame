@@ -64,7 +64,7 @@ export function RateChart({ before, after, segments, duration }: { before: Timel
         <text key={t} className="jx-chart-label" x={x(t)} y={H - 10} textAnchor="middle">{t}s</text>
       ))}
       <line className="jx-chart-limit" x1={ML} x2={W - MR} y1={y(3)} y2={y(3)} />
-      <text className="jx-chart-limit-label" x={x(quietMid)} y={y(3) - 8} textAnchor="middle">limit: 3 flashes a second</text>
+      <text className="jx-chart-limit-label" x={Math.min(W - MR - 130, Math.max(ML + 130, x(quietMid)))} y={y(3) - 8} textAnchor="middle">limit: 3 flashes a second</text>
       <path className="jx-chart-before" d={path(before, rb)} />
       {after && <path className="jx-chart-after" d={path(after, ra)} />}
     </svg>

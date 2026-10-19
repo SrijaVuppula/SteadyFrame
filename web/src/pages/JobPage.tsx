@@ -64,14 +64,14 @@ export function JobPage({ jobId, navigate }: Props) {
   return (
     <>
       <nav aria-label="Breadcrumb" className="crumbs">
-        <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Start</a> › Job {job.job_id}
+        <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Live demo</a> › Job {job.job_id}
       </nav>
       <h1>Job {job.job_id}</h1>
       {isJudgeJob(jobId) && (
         <p className="notice" role="note">
           Recorded job: the worker's own code ran this clip (<code>python -m eval.judge_bundle</code>) and its
           real outputs are bundled with the site, so the page loads without a worker. A decision made here
-          plays back the recorded resume. <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>Back to the judge tour</a>.
+          plays back the recorded resume. <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Back to the live demo</a>.
         </p>
       )}
 

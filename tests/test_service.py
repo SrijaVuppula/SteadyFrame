@@ -224,7 +224,12 @@ def test_validation_rejects_bad_uploads(client, ctx, tmp_path):
 def test_samples_and_from_sample(client, ctx):
     samples = client.get("/api/samples").json()
     ids = {s["id"] for s in samples}
-    assert {"sample_strobe_region", "sample_red_strobe", "sample_clean"} <= ids
+    assert {
+        "sample_strobe_region",
+        "sample_red_strobe",
+        "sample_red_fullscreen",
+        "sample_clean",
+    } <= ids
     assert all(
         {"name", "description", "hazard_types", "duration_s", "warning"} <= set(s) for s in samples
     )

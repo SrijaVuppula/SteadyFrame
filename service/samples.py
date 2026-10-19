@@ -78,6 +78,35 @@ SAMPLES: list[dict] = [
         },
     },
     {
+        "id": "sample_red_fullscreen",
+        "name": "Full-screen red strobe (5 Hz)",
+        "description": "The whole frame strobes between dark red and saturated red from 0.5 s "
+        "to 4.5 s. There is no regional fix: the repair has to change the whole picture, and "
+        "when the passing candidate changes it too much the job waits for a person.",
+        "hazard_types": ["red", "general"],
+        "duration_s": 5,
+        "warning": True,
+        "config": {
+            "name": "sample_red_fullscreen",
+            "width": 320,
+            "height": 240,
+            "fps": 30,
+            "duration_s": 5.0,
+            "codec": "lossless",
+            "events": [
+                {
+                    "kind": "flash",
+                    "freq_hz": 5.0,
+                    "waveform": "square",
+                    "low": "darkred",
+                    "high": "red",
+                    "start_s": 0.5,
+                    "end_s": 4.5,
+                }
+            ],
+        },
+    },
+    {
         "id": "sample_clean",
         "name": "Clean clip (slow fade)",
         "description": "A three second fade from black to white and a static texture. No "

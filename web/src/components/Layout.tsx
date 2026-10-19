@@ -2,13 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { api } from '../api';
 import { MOCK_MODE, WHAT_IT_DOES } from '../config';
 import { href } from '../hooks/useRoute';
+import { REPO_URL } from '../judge';
 import type { Health } from '../types';
 
 export function Layout({ children, navigate }: { children: ReactNode; navigate: (p: string) => void }) {
-  const [health, setHealth] = useState<Health | null>(null);
+  const [health, setHealth] = useState<Health | null | undefined>(undefined);
   useEffect(() => {
     api.health().then(setHealth).catch(() => setHealth(null));
   }, []);
+  const live = !!health && health.ok;
 
   return (
     <>
@@ -19,43 +21,33 @@ export function Layout({ children, navigate }: { children: ReactNode; navigate: 
             className="brand"
             href={href('/')}
             onClick={(e) => { e.preventDefault(); navigate('/'); }}
-            aria-label="SteadyFrame, start page"
+            aria-label="SteadyFrame, live demo"
           >
             <span className="brand-mark" aria-hidden="true">▤</span> SteadyFrame
           </a>
-          <p className="tagline">Photosensitivity check and repair for video</p>
-          <nav className="site-nav" aria-label="Site">
-            <a href={href('/judge')} onClick={(e) => { e.preventDefault(); navigate('/judge'); }}>Live demo</a>
-            <a href={href('/')} onClick={(e) => { e.preventDefault(); navigate('/'); }}>Check a clip</a>
-            <a href="https://github.com/SrijaVuppula/SteadyFrame">Code</a>
-          </nav>
+          <p className="tagline">Flash-safety check and repair for video</p>
+          <div className="site-actions">
+            <span className={`sf-live${live ? '' : ' off'}`} title={health ? `OpenCV ${health.opencv} · ${health.mode}` : undefined}>
+              <span aria-hidden="true" className="sf-live-dot" /> {health === undefined ? 'Connecting' : live ? 'Live' : 'Offline'}
+            </span>
+            <a className="site-link" href={REPO_URL}>Code</a>
+            <a className="site-link" href={`${REPO_URL}/blob/main/docs/report/REPORT.md`}>Report</a>
+          </div>
         </div>
       </header>
       <main id="main" className="wrap" tabIndex={-1}>
-        {MOCK_MODE && !/^\/(judge|jobs\/jd-)/.test(window.location.pathname) && (
+        {MOCK_MODE && (
           <p className="notice" role="note">
-            Fixture mode: this page is served from bundled sample outputs, not a live API. Jobs
-            started here are simulated.
+            Fixture mode: this page is served from bundled sample outputs, not a live API.
           </p>
         )}
         {children}
       </main>
       <footer className="site-footer">
         <div className="wrap">
-          <p>
-            <strong>Responsible use.</strong> SteadyFrame {WHAT_IT_DOES}. It is an engineering aid
-            for content review, not a medical device, and a passing result is a threshold check,
-            not a guarantee about any individual viewer. Uploaded files are deleted after one day.
-          </p>
-          <p className="muted">
-            No tutorial media on this site. Video previews are shown on request only, never
-            autoplayed; the original is dimmed, reduced and slowed. Captions and audio tracks of
-            the input are carried into the remediated file unchanged.
-          </p>
-          <p className="muted">
-            {health
-              ? `API ${health.mode} mode · steadyframe ${health.version} · OpenCV ${health.opencv}`
-              : 'API status unavailable'}
+          <p className="muted small">
+            SteadyFrame {WHAT_IT_DOES}. Not a medical device: a pass means the thresholds were met,
+            not that a clip is safe for every viewer. Uploads are deleted after one day.
           </p>
         </div>
       </footer>

@@ -62,8 +62,13 @@ def pinned_versions() -> tuple[str, str]:
 def samples_dir(skip: bool) -> Path:
     """Render the sample clips for the bucket deployment (gitignored: they flash)."""
     d = HERE / ".samples"
-    expected = [d / "sample_strobe_region.mp4", d / "sample_red_strobe.mp4", d / "sample_clean.mp4"]
-    if all(p.exists() for p in expected):
+    try:
+        from service.samples import SAMPLES  # metadata only; needs no cv2
+
+        expected = [d / f"{s['id']}.mp4" for s in SAMPLES]
+    except Exception:
+        expected = []
+    if expected and all(p.exists() for p in expected):
         return d
     try:
         from service.samples import generate
