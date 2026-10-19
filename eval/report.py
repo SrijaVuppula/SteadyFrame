@@ -18,6 +18,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "docs" / "report" / "REPORT.template.md"
 OUT = ROOT / "docs" / "report" / "REPORT.md"
+# other documents rendered from the same results the same way
+EXTRA = [(ROOT / "docs" / "JUDGES.template.md", ROOT / "docs" / "JUDGES.md")]
 FIG = ROOT / "docs" / "report" / "figures"
 
 PH = re.compile(r"\{\{([\w.\-\[\]\"]+)(?::([^}]+))?\}\}")
@@ -73,6 +75,9 @@ def main(argv=None) -> int:
     for svg in (ROOT / "docs" / "diagrams").glob("*.svg"):
         shutil.copyfile(svg, FIG / svg.name)
     OUT.write_text(text)
+    for tpl, out in EXTRA:
+        if tpl.exists():
+            out.write_text(PH.sub(sub, tpl.read_text()))
     print(
         f"wrote {OUT.relative_to(ROOT)}; {len(missing)} placeholder(s) without data"
         + (": " + ", ".join(sorted(set(missing))) if missing else "")

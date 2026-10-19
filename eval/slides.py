@@ -1,6 +1,6 @@
 """Results slides for the video, rendered from the frozen results (1920x1080 PNG).
 
-    python -m eval.slides  -> docs/video/slides/01_detection.png ... 05_limits.png
+    python -m eval.slides  -> docs/video/slides/01_detection.png ... 06_limits.png
 
 Every number is read from eval/results/frozen/*.json and bench/results/*.json, so the slides
 match the report. Re-run after `make freeze` (for example once the EC2 benchmark rows exist).
@@ -213,6 +213,33 @@ def remediation() -> None:
     save(fig, "03_remediation.png")
 
 
+def guardrails() -> None:
+    g = load("guardrails")
+    sm = g["summary"]
+    fig = slide(
+        "Trying to break it",
+        "A hostile planner speaks the same tool protocol as the model and tries one shortcut per run",
+    )
+    tiles(
+        fig,
+        [
+            (f"{sm['held']}/{sm['runs']}", "attacks held", "no shortcut got through"),
+            (f"{sm['false_pass']}", "false passes", "status passed, fresh analysis fails"),
+            (f"{sm['refused_calls']}", "hostile calls refused", "by the tools, not by the model"),
+        ],
+        y=0.55,
+    )
+    rows = [r for r in g["rows"]][:10]
+    for i, r in enumerate(rows):
+        y = 0.47 - i * 0.04
+        fig.text(0.05, y, r["what"], fontsize=17, color=INK)
+        fig.text(0.62, y, r["status"].replace("_", " "), fontsize=17, color=INK_2)
+        fig.text(
+            0.8, y, "held" if r["held"] else "NOT HELD", fontsize=17, color=INK, weight="semibold"
+        )
+    save(fig, "04_guardrails.png")
+
+
 def benchmark() -> None:
     runs = []
     for p in sorted(BENCH.glob("*.json")):
@@ -257,7 +284,7 @@ def benchmark() -> None:
             fontsize=20,
             color=INK_2,
         )
-    save(fig, "04_benchmark.png")
+    save(fig, "05_benchmark.png")
 
 
 def limits() -> None:
@@ -268,23 +295,24 @@ def limits() -> None:
     )
     items = [
         "The area rule is quantised to grid cells: the 24% vs 26% clip flips at some grid sizes.",
-        "Full-frame, full-swing strobes have no gentle fix; they go to a human for approval.",
+        "Full-frame strobes have no regional fix; a repair that changes too much goes to a person.",
         "Flashing that sits exactly at the limit is treated as one episode, which can cost quality.",
         f"External set is small: {e['n_clips']} clips, no concert or emergency-vehicle footage yet.",
-        "No display model: relative luminance from sRGB stands in for cd/m².",
+        "Luminance is relative to peak white; a display brighter than the reference is not modelled.",
         "The pattern detector is experimental and only warns.",
         "Not a medical device. A pass means the published thresholds were met.",
     ]
     for i, t in enumerate(items):
         fig.text(0.07, 0.72 - i * 0.085, "•", fontsize=30, color=ACCENT)
         fig.text(0.095, 0.72 - i * 0.085, t, fontsize=28, color=INK)
-    save(fig, "05_limits.png")
+    save(fig, "06_limits.png")
 
 
 def main() -> int:
     detection()
     external()
     remediation()
+    guardrails()
     benchmark()
     limits()
     return 0

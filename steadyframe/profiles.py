@@ -53,7 +53,8 @@ BROADCAST = Profile(
     area_mode="screen",
     notes=(
         "Ofcom Annex 1 / ITU-R BT.1702; area is 25% of the whole frame",
-        "absolute cd/m2 thresholds approximated with the 0.10 relative-luminance rule",
+        "20 and 160 cd/m2 are 0.10 and 0.80 of peak white on the note's reference display "
+        "(gamma 2.2, 200 cd/m2), so the relative-luminance thresholds are kept",
     ),
 )
 

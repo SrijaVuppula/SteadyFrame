@@ -33,6 +33,23 @@ photosensitivity thresholds". Wording we never use: "prevents seizures", "medica
   warning, dimmed, small and slowed. Thumbnails are stills. Docs and the demo video show
   luminance plots and stills, not flashing clips.
 - The remediated video is shown only after the analyzer verified the whole file.
+- The recorded jobs bundled with the web app for the `/judge` tour (`web/public/judge/`)
+  contain stills, plots, traces, records and the verified remediated output, never the
+  hazardous input.
+
+## The verification record and the warning track
+
+- `record.json` / `record.html` say what was measured, with which thresholds and which build,
+  and are re-checkable (`steadyframe verify`). The record says in its own text that it is not a
+  certification. The AS-11 UK DPP PSE fields in it (`PSEPass`, `PSEManufacturer`,
+  `PSEVersion`) are filled in that shape for convenience; which test tools a broadcaster
+  accepts for those fields is the broadcaster's decision, and SteadyFrame is not on any such
+  list.
+- Threshold tests can miss: a UK TV advertisement that passed a Harding test was withdrawn in
+  2024 after viewers reported seizures. That is one more reason the record states measurements
+  rather than safety.
+- `hazards.vtt` is a warning track for the original video. It helps a player warn viewers; it
+  does not make the original safe to show.
 
 ## Data handling
 
@@ -40,7 +57,8 @@ photosensitivity thresholds". Wording we never use: "prevents seizures", "medica
   and deleted by lifecycle rule after 24 hours. Job metadata and traces in DynamoDB expire
   after 7 days. No public buckets. Nothing is used for training.
 - The agent sends analyzer measurements (numbers and segment ids) to the model, never
-  frames or file names beyond the job id.
+  frames, file names or container metadata. `eval/guardrails.py` plants instructions in a
+  clip's file name and metadata tags and checks that none of that text reaches the model.
 - Local mode (`docker compose up`) keeps everything on the machine.
 
 ## Misuse considerations

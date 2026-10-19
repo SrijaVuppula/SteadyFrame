@@ -202,3 +202,80 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   URLs for the source archive and the results; the instance self-terminates and the script
   terminates it anyway. Not run yet: needs the deploy credentials and, for COOL, the
   Marketplace subscription and AMI id.
+
+## 2026-10-19  Ofcom note read in full
+
+- ofcom.org.uk now answers the guidance PDF with a bot check. The Internet Archive's capture of
+  2023-10-01 has it (4 pages, SHA-256 `e5b85896...7774ffa`, text extracted with PDFKit). The
+  sentence quoted on 2026-10-08 matches word for word except that the search-index extract had
+  dropped "(see notes 1 and 2)"; STANDARDS.md now quotes the PDF and paraphrases the rest by
+  paragraph.
+- Two things the secondary summaries had wrong or missing. Stationary patterns are limited at
+  40% of the screen, not 25% (25% is for patterns that move, flash or reverse); our
+  experimental pattern detector uses 25% for both, so it over-flags stationary patterns
+  between the two. And notes 1 and 2 fix a reference display: gamma 2.2, peak white
+  200 cd/m2. On that display 20 cd/m2 is 0.10 and 160 cd/m2 is 0.80 of peak white, the WCAG
+  numbers, so the `broadcast` profile's thresholds are the note's own on its reference display.
+  The remaining gap is the sRGB curve versus a pure 2.2 power law near black, and real displays
+  brighter than the reference.
+- The note's "leading edges 9 frames or more apart are acceptable" rule is not an exemption here.
+  At 25 fps it cannot change a verdict; at 30 fps four flashes 0.30 s apart fall in one second,
+  which we fail and the note accepts. Recorded as stricter.
+
+## 2026-10-19  Verification record, warning track, `steadyframe verify`
+
+- `steadyframe/record.py`. `fix --record record.json` (and every service job) writes a record:
+  SHA-256 of input and output, profile and thresholds, analyzer and OpenCV build, verdicts,
+  each segment with its fix and any human decision, a digest of the record. `record.html` is
+  the printable form. The three PSE fields of AS-11 UK DPP delivery metadata (`PSEPass`
+  mandatory, `PSEManufacturer`, `PSEVersion` when tested; AMWA spec) are included in that
+  shape, with the note that broadcasters choose which tools they accept.
+- `steadyframe verify <file> --record record.json` re-hashes the file and re-runs the
+  analyzer with the record's profile; exit 4 if anything differs. The record is a claim anyone
+  can re-check, not a certificate, and says so.
+- `hazards.vtt`: WebVTT cues for the original, one advance cue (only when there is at least a
+  second of room) and one during each segment, with rate and a plain-words screen position.
+- New download kinds `record`, `record_json`, `warnings` in the API and the UI.
+
+## 2026-10-19  Adversarial planner
+
+- `eval/guardrails.py`: a hostile planner on the real tool protocol, one shortcut per run, plus
+  a clip whose file name and title/comment/description tags carry instructions (the tags are
+  read back with ffmpeg to prove the plant). 10/10 held, 0 false passes, 16 refused calls.
+- Found while writing it: a `finalize` refused because segments were still open was not in the
+  trace (the loop raised before any tool record). It is traced now like every other call.
+- `budget_burn` ends in `needs_approval`, not `passed`: with the segment's four attempts used,
+  the fixed policy can only ask a person. That is the intended behaviour.
+
+## 2026-10-19  Judge tour, zero-credential demo
+
+- `/judge` in the web app, from `web/public/judge/` written by `python -m eval.judge_bundle`,
+  which runs `service.core.Api` + `service.worker.JobRunner` on the local store, i.e. the
+  worker's code. Live Bedrock (the inference profile id passed on the command line only) for `jd-live` (m_two_segments: both segments first try with the hinted alpha, 10 turns,
+  76k input tokens) and `jd-adapt` (r_red_strobe_full: S4/S1 at the hinted alpha 0.061 fails
+  re-analysis at 5.5 Hz, the model lowers alpha to 0.04, passes; 12 turns). The live agent did
+  not need a person on that clip. The approval case is the fixed policy on the same clip (S3,
+  SSIM 0.694 < 0.75); the paused job's store is copied and resumed twice, approved (passes)
+  and rejected (tries S4/S3, same SSIM, asks again). Outputs are copied with host paths
+  scrubbed; hazardous inputs are never copied. The bundled records verify.
+- The HTTP client serves `jd-*` ids from the bundle, so those job pages work on the deployed
+  site without a worker; the fixture-mode banner is replaced by a "recorded job" note there.
+- `make demo` (`service/demo.py`): the three sample clips, analyze, fix with the heuristic
+  planner, write and verify the record. About 5 s here. `PY` in the Makefile now prefers
+  `python3.11` when there is no `python` on PATH.
+- Cost of today's Bedrock calls: two recorded jobs, about 160k input and 2k output tokens.
+
+## 2026-10-19  COOL worker engine, budget
+
+- The COOL container listing (Graviton4, OpenCV 5, Python 3.10-3.12 variants, $0.03 per
+  container hour after a 7-day trial) is built for Neoverse-V2 and says Fargate (Graviton2) is
+  not a supported target. `-c worker_engine=cool -c cool_image=<uri>` builds the worker FROM
+  that image (`Dockerfile.cool`, which never imports cv2 at build time because the entitlement
+  check runs when libopencv_core loads) and runs it on an ECS capacity provider of c8g.large
+  instances in bridge mode in the public subnets, with `aws-marketplace:RegisterUsage` on the
+  task role. Default deploy unchanged (template byte-identical). Not deployed yet: needs the
+  Marketplace subscription.
+- `bench/ec2.py` on the COOL AMI now uses the vendor venv `/opt/cool/venvs/python_3.11` as the
+  listing's usage instructions say and refuses to run unless `cv2` loads from `/opt/cool`.
+- Observability stack: a 50 USD monthly cost budget e-mailing the alert address (80% actual,
+  100% forecast). The report had claimed one; now the IaC has it.

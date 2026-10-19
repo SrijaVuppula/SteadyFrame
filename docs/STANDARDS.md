@@ -85,43 +85,70 @@ frame rather than a fixed angle, which is only exact for a full-screen 4:3 viewp
 ## 2. ITU-R BT.1702 / Ofcom guidance (profile `broadcast`)
 
 Sources: ITU-R BT.1702-2 "Guidance for the reduction of photosensitive epileptic seizures
-caused by television" and Ofcom Broadcasting Code Annex 1 "Guidance notes on flashing images
-and regular patterns in television". The PDFs could not be fetched from my machine
-(see NOTES.md); the values below are as summarised by Epilepsy Action, the ASA and the
-ACM TACCESS 2024 gap analysis (10.1145/3694790).
-
-One sentence read verbatim on 2026-10-08 from the text of the legacy guidance note PDF
-(https://www.ofcom.org.uk/__data/assets/pdf_file/0021/16248/gn_flash.pdf, "ITC Guidance Note
-for Licensees", revised July 2001 with a 2002 editorial amendment) through a search index's
-extract, because the PDF itself still would not open from here:
+caused by television" (BT.1702-3, 11/2023, is the version in force) and the Ofcom guidance
+note on flashing images and regular patterns, which Ofcom still publishes as the legacy "ITC
+Guidance Note for Licensees on Flashing Images and Regular Patterns in Television" (revised
+and re-issued July 2001, editorial amendment June 2002). The ofcom.org.uk copy sits behind a
+bot check, so the note was read on 2026-10-19 from the Internet Archive's capture of
+2023-10-01 (https://web.archive.org/web/20231001095538/https://www.ofcom.org.uk/__data/assets/pdf_file/0021/16248/gn_flash.pdf,
+4 pages, SHA-256 `e5b858967a2c0476a49fcf6e06e766ce1f0fe49c4f3bd1aee947a2fad7774ffa`).
+The definition, checked word for word against that copy:
 
 > A potentially harmful flash occurs when there is a pair of opposing changes in luminance
 > (i.e., an increase in luminance followed by a decrease, or a decrease followed by an
-> increase) of 20 candelas per square metre (cd.m-2) or more. This applies only when the
-> screen luminance of the darker image is below 160 cd.m-2.
+> increase) of 20 candelas per square metre (cd.m-2) or more (see notes 1 and 2). This
+> applies only when the screen luminance of the darker image is below 160 cd.m-2.
+
+The rest of the note, by paragraph (paraphrased; short phrases quoted):
+
+- **§3** continues: irrespective of luminance, a transition to or from a saturated red is also
+  potentially harmful.
+- **§3.1** Isolated single, double or triple flashes are acceptable. A sequence is not permitted
+  when *both* (i) the combined area of concurrent flashes occupies more than one quarter of the
+  displayed screen area and (ii) there are "more than three flashes within any one-second
+  period". Successive flashes whose leading edges are 9 frames or more apart are acceptable
+  whatever their brightness or area.
+- **§4** Fast cuts are provocative when they make areas of the screen flash; the same limits
+  apply.
+- **§5, §5.1** A potentially harmful regular pattern has more than five light-dark pairs of
+  stripes in any orientation (parallel, radial, curved, or rows of elements such as dots).
+  Stationary patterns are not permitted above 40% of the displayed screen; patterns that change
+  direction, oscillate, flash or reverse in contrast are not permitted above 25%; in both cases
+  only when the darker bars are below 160 cd/m2 and differ from the lighter bars by 20 cd/m2 or
+  more. Patterns that flow smoothly across, into or out of the screen in one direction are
+  exempt.
+- **Notes 1 and 2** Compliance measurements assume a display gamma of 2.2 and the ITU-R BT.500
+  home viewing environment, where peak white is 200 cd/m2. Note 3: overscan of about 3.5% of
+  picture width or height may be assumed.
+- The introduction adds that flashing lasting more than 5 seconds "might constitute a risk"
+  even when it complies, because the cumulative risk is unknown.
 
 Ofcom's technical analysis in the 2012 ASA ruling on a Citroën advertisement (A11-164759)
-names the three conditions it checks for a breach: a change in brightness above the defined
-level, more than three pairs of opposing changes in any one second, and more than 25% of the
-screen area changing in brightness. That is the rule set the `broadcast` profile implements.
-The rest of Annex 1 is summarised below rather than quoted.
+names the same three conditions for a breach: a change in brightness above the defined level,
+more than three pairs of opposing changes in any one second, and more than 25% of the screen
+area changing in brightness.
 
-Reported rules:
+Implementation and where it differs from the note:
 
-- A potentially harmful flash is a change in luminance of 20 cd/m2 or more where the darker
-  image is below 160 cd/m2 (screen luminance).
-- Isolated single, double or triple flashes are acceptable; a sequence of flashes is not
-  permitted when the flashing exceeds three flashes in any one second.
-- The area rule is the flashing area exceeding one quarter (25%) of the displayed screen area.
-- Regular patterns: more than five light-dark pairs of stripes in any orientation, high
-  contrast, occupying more than 25% of the screen; stationary patterns are permitted only if
-  they last no more than half a second, patterns that flash or change direction are not.
-
-Implementation: same transition machine as `wcag`, but the area test is the fraction of the
-*whole frame* that is flashing (> 0.25). Absolute cd/m2 cannot be recovered from an sRGB
-video without a display model, so the transition threshold stays at 0.10 relative luminance;
-the report says so. The pattern detector (`pattern.py`, experimental) implements the
-"more than five light-dark pairs, > 25% of the screen, > 0.5 s" rule on the luminance map.
+- Area: same transition machine as `wcag`, but the area test is the fraction of the *whole
+  frame* that is flashing (> 0.25). Overscan is not cropped, so a flash at the very edge counts
+  slightly more than on a 2001 television.
+- Luminance: on the note's own reference display (gamma 2.2, peak white 200 cd/m2), 20 cd/m2 is
+  0.10 and 160 cd/m2 is 0.80 of peak white, exactly the WCAG relative-luminance thresholds. The
+  `broadcast` profile therefore keeps 0.10 and 0.80. The analyzer linearises with the sRGB
+  curve rather than a pure 2.2 power law (the two differ most near black), and a display
+  brighter than the reference is not modelled.
+- Red: the PEAT/IRIS saturated-red rule from section 1 is applied in both profiles.
+- 9-frame rule: not implemented as an exemption. At 25 fps flashes 9 frames apart are at most
+  2.8 a second, so they pass the rate rule anyway; at 30 or 60 fps four flashes 0.30 s apart can
+  fall in one second, which this tool fails and the note would accept. Stricter, not looser.
+- Patterns (`pattern.py`, experimental, off by default): "more than five light-dark pairs,
+  > 25% of the screen, > 0.5 s" on the luminance map. The 0.5 s duration comes from the
+  secondary summaries cited in NOTES.md, not from the 2001 note, and the detector does not
+  separate stationary patterns (40% limit) from moving ones (25%), so stationary patterns
+  between 25% and 40% of the screen are over-flagged.
+- The 5-second advisory is not a rule here; the viewer warning track (`hazards.vtt`) marks
+  every flagged segment regardless.
 
 ## 3. What the tool does not claim
 
