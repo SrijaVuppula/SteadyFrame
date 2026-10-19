@@ -217,6 +217,10 @@ def main(argv=None) -> int:
     ec2 = boto3.client("ec2", region_name=a.region)
     ssm = boto3.client("ssm", region_name=a.region)
 
+    problem = plan_problem(boto3.Session(region_name=a.region), cfg["instance_type"])
+    if problem:
+        print(problem, file=sys.stderr)
+        return 2
     ami = a.ami or ssm.get_parameter(Name=SSM_UBUNTU.format(arch=cfg["arch"]))["Parameter"]["Value"]
     s3.put_object(Bucket=a.bucket, Key=keys["src_url"], Body=archive())
 
@@ -229,24 +233,11 @@ def main(argv=None) -> int:
         "src_url": presign("get_object", keys["src_url"]),
         **{k: presign("put_object", v) for k, v in keys.items() if k != "src_url"},
     }
-    resp = ec2.run_instances(
-        ImageId=ami,
-        InstanceType=cfg["instance_type"],
-        MinCount=1,
-        MaxCount=1,
-        UserData=user_data(label, cfg["cool"], a.reps, a.price, urls),
-        InstanceInitiatedShutdownBehavior="terminate",
-        MetadataOptions={"HttpTokens": "required", "HttpEndpoint": "enabled"},
-        TagSpecifications=[
-            {
-                "ResourceType": "instance",
-                "Tags": [
-                    {"Key": "Name", "Value": f"steadyframe-bench-{label}"},
-                    {"Key": "project", "Value": "steadyframe"},
-                ],
-            }
-        ],
-    )
+    try:
+        resp = launch(ec2, ami, cfg, label, a, urls)
+    except ClientError as e:
+        print(launch_error(e, cfg["cool"]), file=sys.stderr)
+        return 2
     iid = resp["Instances"][0]["InstanceId"]
     print(f"launched {iid} ({cfg['instance_type']}, {ami}); waiting for results under {prefix}/")
     t0 = time.time()
@@ -291,6 +282,68 @@ def main(argv=None) -> int:
         print(f"saved {dst.relative_to(ROOT)}")
     print("next: python -m bench.compare bench/results/*.json --out bench/results/comparison.md")
     return 0
+
+
+def plan_problem(session, instance_type: str) -> str | None:
+    """The AWS Free Plan only launches Free Tier instance types and has no Marketplace access.
+    Say so before uploading anything, instead of failing inside RunInstances."""
+    try:
+        st = session.client("freetier").get_account_plan_state()
+    except Exception:
+        return None  # older SDK, no permission, or not applicable: let EC2 decide
+    if st.get("accountPlanType") != "FREE":
+        return None
+    try:
+        eligible = session.client("ec2").describe_instance_types(
+            InstanceTypes=[instance_type],
+            Filters=[{"Name": "free-tier-eligible", "Values": ["true"]}],
+        )["InstanceTypes"]
+    except Exception:
+        eligible = []
+    if eligible:
+        return None
+    return (
+        f"This account is on the AWS Free Plan, which launches only Free Tier instance types "
+        f"(no {instance_type}) and has no AWS Marketplace access (no COOL). Upgrade it to the "
+        "paid plan first: Billing and Cost Management -> Free Tier / account plan -> Upgrade plan. "
+        "Remaining credits keep applying to the bills."
+    )
+
+
+def launch_error(e, cool: bool) -> str:
+    code = e.response.get("Error", {}).get("Code", "")
+    msg = e.response.get("Error", {}).get("Message", str(e))
+    if code == "OptInRequired" and cool:
+        return (
+            "RunInstances: OptInRequired. The account has not subscribed to the COOL AMI listing; "
+            "see bench/README.md, 'COOL: subscription and AMI id'."
+        )
+    if "Free Tier" in msg:
+        return (
+            f"RunInstances refused: {msg} (the account is on the AWS Free Plan; upgrade it first)."
+        )
+    return f"RunInstances failed: {code}: {msg}"
+
+
+def launch(ec2, ami: str, cfg: dict, label: str, a, urls: dict) -> dict:
+    return ec2.run_instances(
+        ImageId=ami,
+        InstanceType=cfg["instance_type"],
+        MinCount=1,
+        MaxCount=1,
+        UserData=user_data(label, cfg["cool"], a.reps, a.price, urls),
+        InstanceInitiatedShutdownBehavior="terminate",
+        MetadataOptions={"HttpTokens": "required", "HttpEndpoint": "enabled"},
+        TagSpecifications=[
+            {
+                "ResourceType": "instance",
+                "Tags": [
+                    {"Key": "Name", "Value": f"steadyframe-bench-{label}"},
+                    {"Key": "project", "Value": "steadyframe"},
+                ],
+            }
+        ],
+    )
 
 
 if __name__ == "__main__":

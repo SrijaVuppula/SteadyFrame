@@ -8,7 +8,16 @@ from pathlib import Path
 
 import pytest
 
-from bench.ec2 import CONFIGS, COOL_CHECK, COOL_VENV, ROOT, main, user_data
+from bench.ec2 import (
+    CONFIGS,
+    COOL_CHECK,
+    COOL_VENV,
+    ROOT,
+    launch_error,
+    main,
+    plan_problem,
+    user_data,
+)
 
 URLS = {
     k: f"https://example.invalid/{k}?X-Amz-Signature=a&b=c"
@@ -115,3 +124,48 @@ def test_remote_sh_runs_the_same_cool_setup():
     assert COOL_CHECK in sh  # same /opt/cool + 5.x check, verbatim
     assert f"COOL_VENV={COOL_VENV}\n" in sh and '. "$COOL_VENV/bin/activate"' in sh
     assert '"numpy==$VENV_NUMPY"' in sh and "--system-site-packages" not in sh
+
+
+class _Client:
+    def __init__(self, plan=None, eligible=(), fail=False):
+        self.plan, self.eligible, self.fail = plan, eligible, fail
+
+    def get_account_plan_state(self):
+        if self.fail:
+            raise RuntimeError("no freetier API")
+        return {"accountPlanType": self.plan}
+
+    def describe_instance_types(self, InstanceTypes, Filters):
+        return {"InstanceTypes": [{"InstanceType": t} for t in InstanceTypes if t in self.eligible]}
+
+
+class _Session:
+    def __init__(self, client):
+        self._c = client
+
+    def client(self, _name):
+        return self._c
+
+
+def test_free_plan_stops_before_launch_unless_the_type_is_eligible():
+    msg = plan_problem(_Session(_Client(plan="FREE")), "c8g.xlarge")
+    assert "Free Plan" in msg and "c8g.xlarge" in msg and "Upgrade" in msg
+    assert (
+        plan_problem(_Session(_Client(plan="FREE", eligible=("t4g.small",))), "t4g.small") is None
+    )
+    assert plan_problem(_Session(_Client(plan="PAID")), "c8g.xlarge") is None
+    assert plan_problem(_Session(_Client(fail=True)), "c8g.xlarge") is None  # let EC2 decide
+
+
+def test_launch_errors_say_what_to_do():
+    from botocore.exceptions import ClientError
+
+    def err(code, msg):
+        return ClientError({"Error": {"Code": code, "Message": msg}}, "RunInstances")
+
+    assert "bench/README.md" in launch_error(err("OptInRequired", "subscribe"), cool=True)
+    free = err(
+        "InvalidParameterCombination", "The specified instance type is not eligible for Free Tier."
+    )
+    assert "Free Plan" in launch_error(free, cool=False)
+    assert "Boom" in launch_error(err("Boom", "x"), cool=False)

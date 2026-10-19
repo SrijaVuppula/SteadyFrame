@@ -279,3 +279,20 @@ Dated log of what I checked, where, and what I decided. Newest at the bottom.
   listing's usage instructions say and refuses to run unless `cv2` loads from `/opt/cool`.
 - Observability stack: a 50 USD monthly cost budget e-mailing the alert address (80% actual,
   100% forecast). The report had claimed one; now the IaC has it.
+
+## 2026-10-19  EC2 benchmark blocked by the account plan
+
+- `freetier get-account-plan-state` on the deploy account: `FREE`, active, credits remaining.
+  The Free Plan launches only Free Tier instance types (t3/t4g/t8i micro and small,
+  c7i-flex.large, m7i-flex.large) and has no AWS Marketplace access. `RunInstances` for
+  c8g.xlarge and c7i.xlarge returned "not eligible for Free Tier" (a `--dry-run` call had
+  passed, because dry runs check permissions, not the plan); the COOL AMI returned
+  `OptInRequired`. No instance started.
+- The only Arm types allowed are burstable Graviton2 (t4g), which would say nothing about COOL
+  (built for Graviton4) and give noisy numbers, so no partial benchmark was run. The three
+  configurations wait for the account to move to the paid plan; credits carry over.
+- `bench/ec2.py` now checks the plan before uploading and explains the refusal instead of a
+  traceback. COOL AMIs found for the Graviton4 listing: `ami-033e481a24f94c8cb` (2026-07-15)
+  and `ami-01db31139bc5615d8` (2026-04-22, "v2").
+- On-demand Linux prices in us-east-1 today (Pricing API): c7i.xlarge 0.1785 USD/h,
+  c8g.xlarge 0.15952 USD/h. COOL AMI software on c8g.xlarge: 0.01 USD/h after a 7-day trial.

@@ -42,6 +42,13 @@ three cost well under a dollar.
 
 ### COOL: subscription and AMI id
 
+**Account plan first.** An account on the AWS Free Plan can launch only Free Tier instance
+types (t3/t4g small sizes, c7i-flex.large, m7i-flex.large; no c7i.xlarge, no Graviton4) and has
+no AWS Marketplace access, so none of the three configurations runs there. `bench/ec2.py`
+checks the plan (`freetier:GetAccountPlanState`) and stops before uploading anything. Upgrade
+in the Billing console ("Upgrade plan"); remaining credits keep applying to the bills.
+
+
 Once per account, signed in to the AWS console as the account that runs the benchmark:
 
 1. Open the AMI listing "Cloud Optimized OpenCV For AWS Graviton4":
@@ -50,6 +57,10 @@ Once per account, signed in to the AWS console as the account that runs the benc
    active.
 3. "Continue to Configuration": software version "Cloud Optimized OpenCV 3.1" (OpenCV 5.0 on
    Ubuntu 24.04 LTS), region us-east-1. Copy the AMI id shown there; it is the `--ami` value.
+   (Seen with `aws ec2 describe-images --owners aws-marketplace` on 2026-10-19: the listing's
+   product code `aajkmdd4qo3r7yhqg61a7aah9` has two arm64 images in us-east-1,
+   `ami-033e481a24f94c8cb` from 2026-07-15 and `ami-01db31139bc5615d8` from 2026-04-22, "v2".
+   The configuration page is the authority on which one is 3.1.)
 
 The listing has a 7-day free trial; after it the software is billed per hour of use, 0.01
 USD/hour on c8g.xlarge, on top of the instance's EC2 price. Pass `--price` as the instance's
